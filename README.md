@@ -1,59 +1,96 @@
-# ECommerceClient
+# Angular E-Commerce Client
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 20.3.16.
+## Overview
 
-## Development server
+This is a modern, enterprise-grade e-commerce application built with Angular 20. The project focuses on high performance, maintainability, and a premium user experience. It utilizes a zoneless change detection strategy powered by Angular Signals and a robust UI foundation combining Tailwind CSS v4 and PrimeNG v20.
 
-To start a local development server, run:
+## Key Features
 
-```bash
-ng serve
-```
+### Buyer Experience
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- Product Discovery: Browsable and searchable product catalog with advanced filtering by category and price range.
+- Shopping Cart: Dynamic cart management with quantity adjustments and persistent storage.
+- Wishlist: Personal collection of favorite products for future purchase.
+- Checkout Flow: Secure multi-step checkout process with shipping address management and Stripe payment integration.
+- Order Tracking: Comprehensive order history and real-time status tracking via a status timeline.
+- Reviews: Interactive review system with star ratings and feedback for products.
 
-## Code scaffolding
+### Seller Dashboard
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+- Product Management: Tools for sellers to add, edit, and manage their product inventory.
+- Sales Overview: Performance metrics showing total revenue and products sold.
+- Stock Alerts: Visual indicators for low stock and out-of-stock items.
+- Store Profile: Management of store identity, including name, description, and branding.
 
-```bash
-ng generate component component-name
-```
+### Administration Panel
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+- System Dashboard: Global performance overview with revenue charts and key statistics.
+- User Management: Administrative control over user accounts, including role management and restriction capabilities.
+- Order Management: Platform-wide order oversight with status update capabilities and CSV export functionality.
+- Content Management: Control over homepage banners and hero carousel content.
 
-```bash
-ng generate --help
-```
+## Technology Stack
 
-## Building
+- Framework: Angular 20 (Zoneless with Signals)
+- Styling: Tailwind CSS v4, PrimeNG v20, PrimeFlex v4
+- Icons: PrimeIcons v7
+- State Management: Angular Signals
+- Testing: Jasmine and Karma
+- Linting and Formatting: ESLint and Prettier
+- Git Hooks: Husky and lint-staged
 
-To build the project run:
+## Project Architecture
 
-```bash
-ng build
-```
+The project follows a modular and scalable structure:
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+- core/: Single-instance services, global guards, interceptors, and application-wide models.
+- shared/: Reusable components, directives, and pipes used across multiple features.
+- features/: Feature-specific modules (Products, Cart, Orders, Auth, Admin, Seller).
+- layouts/: Standard page shells (Main, Admin, Seller).
 
-## Running unit tests
+## Design Previews
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+[IMAGE_PLACEHOLDER: Home Page Desktop View]
 
-```bash
-ng test
-```
+[IMAGE_PLACEHOLDER: Product List Filtering]
 
-## Running end-to-end tests
+[IMAGE_PLACEHOLDER: Admin Dashboard Statistics]
 
-For end-to-end (e2e) testing, run:
+[IMAGE_PLACEHOLDER: Mobile Responsive Sidebar]
 
-```bash
-ng e2e
-```
+## Getting Started
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### Prerequisites
 
-## Additional Resources
+- Node.js (version specified in .nvmrc)
+- Angular CLI 20
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### Installation
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+### Development
+
+1. Start the development server:
+   ```bash
+   npm start
+   ```
+2. Navigate to `http://localhost:4200`
+
+### Quality Control
+
+- Run linting: `npm run lint`
+- Run formatting: `npm run format`
+- Run unit tests: `npm run test`
+- Run tests with coverage: `npm run test:coverage`
+
+## Documentation
+
+Additional project documentation is available in the `docs/` directory:
+
+- collaboration-guide.md: Guidelines for team collaboration and code standards.
+- memory.md: Current project state and technical decisions.
+- tasks.md: Detailed task breakdown and definition of done.
