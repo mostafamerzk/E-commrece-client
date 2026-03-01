@@ -9,7 +9,13 @@ import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
 
 import { routes } from './app.routes';
-
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { errorInterceptor } from './core/interceptors/error.interceptor';
+import { loadingInterceptor } from './core/interceptors/loading.interceptor';
+import { AUTH_FACADE, TOAST_FACADE } from './core/tokens/app.tokens';
+import { AuthService } from './core/services/auth.service';
+import { ToastService } from './core/services/toast.service';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
@@ -21,5 +27,8 @@ export const appConfig: ApplicationConfig = {
         preset: Aura,
       },
     }),
+    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor, loadingInterceptor])),
+    { provide: AUTH_FACADE, useExisting: AuthService },
+    { provide: TOAST_FACADE, useExisting: ToastService },
   ],
 };
