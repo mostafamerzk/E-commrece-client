@@ -66,7 +66,7 @@ No feature files exist yet.
 | TASK-F02 | HTTP Interceptors (auth, error, loading) | Fathi | [x] Done | — |
 | TASK-M01 | StorageService + AuthService | Mostafa | [x] Done | fix-m01-m02 |
 | TASK-M02 | LoadingService + ToastService | Mostafa | [x] Done | fix-m01-m02 |
-| TASK-I01 | Route Guards | Issac | [ ] Not started | — |
+| TASK-I01 | Route Guards | Issac | [x] Done | — |
 | TASK-I02 | TypeScript Model Files | Issac | [x] Done | — |
 | TASK-K01 | App Routing Configuration | Mokhtar | [ ] Not started | — |
 
@@ -76,6 +76,7 @@ No feature files exist yet.
 
 | Task ID | Description | Owner | Date |
 |---------|-------------|-------|------|
+| TASK-I01 | Route Guards | Issac | 2026-03-02 |
 | TASK-I02 | TypeScript Model Files | Issac | 2026-03-01 |
 | TASK-F01 | Base HTTP Infrastructure + ApiService | Fathi | 2026-03-02 |
 | TASK-F02 | HTTP Interceptors (auth, error, loading) | Fathi | 2026-03-02 |
@@ -105,9 +106,9 @@ _None yet._
 ## Last Session Summary
 
 - **Date:** 2026-03-02
-- **Who:** Mostafa
-- **What was done:** Completed implementation of `StorageService`, `AuthService`, `LoadingService`, and `ToastService`. Migrated 100% of unit tests to Zoneless Angular support. Resolved Node v24 and Chromium environment issues. ACHIEVED 40/40 PASSING UNIT TESTS. Pushed rebased branch `fix-m01-m02`.
-- **What is next:** Proceed with Phase 0 tasks for Issac (Route Guards).
+- **Who:** Issac
+- **What was done:** Completed TASK-I01 Route Guards. Implemented `authGuard`, `guestGuard`, `adminGuard`, and `sellerGuard` using Angular signals and `AuthService`. Verified with comprehensive unit tests (49/49 passing).
+- **What is next:** Mokhtar to proceed with TASK-K01 App Routing Configuration.
 
 ---
 
@@ -119,3 +120,4 @@ _None yet._
 | 2026-03-01 | Maintenance | Documentation refactored; AI-specific terminology removed; collaboration guide renamed |
 | 2026-03-01 | Task I02 | TypeScript Model Files completed by Issac |
 | 2026-03-02 | Task M01/M02 | Storage, Auth, Loading, and Toast services completed + Zoneless tests fixed |
+| 2026-03-02 | Task I01 | Route Guards completed by Issac |
