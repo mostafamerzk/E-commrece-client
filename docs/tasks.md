@@ -290,7 +290,7 @@
 ---
 
 ### [TASK-I02] TypeScript Model Files
-**Status:** [ ]
+**Status:** [x]
 **Phase:** 0 — Setup
 **Files to create:**
 - src/app/core/models/auth.model.ts

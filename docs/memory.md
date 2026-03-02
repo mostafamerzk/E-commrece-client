@@ -13,7 +13,7 @@
 - **Styling:** Tailwind CSS + PrimeNG + PrimeFlex
 - **Language:** TypeScript (strict mode)
 - **Testing:** Jasmine + Karma (Angular default)
-- **Backend base URL (dev):** http://localhost:3000/api
+- **Backend base URL (dev):** http://localhost:3000
 - **Repository:** [ADD GITHUB REPO URL WHEN CREATED]
 
 ## Team Members & Ownership
@@ -67,14 +67,16 @@ No feature files exist yet.
 | TASK-M01 | StorageService + AuthService | Mostafa | [x] Done | — |
 | TASK-M02 | LoadingService + ToastService | Mostafa | [x] Done | — |
 | TASK-I01 | Route Guards | Issac | [ ] Not started | — |
-| TASK-I02 | TypeScript Model Files | Issac | [ ] Not started | — |
+| TASK-I02 | TypeScript Model Files | Issac | [x] Done | — |
 | TASK-K01 | App Routing Configuration | Mokhtar | [ ] Not started | — |
 
 ---
 
 ## Recently Completed Tasks
 
-_Nothing completed yet. Project was just scaffolded._
+| Task ID | Description | Owner | Date |
+|---------|-------------|-------|------|
+| TASK-I02 | TypeScript Model Files | Issac | 2026-03-01 |
 
 ---
 
@@ -111,3 +113,4 @@ _None yet._
 |------|---------|--------|
 | 2026-02-28 | Scaffold | Initial project structure and configuration generated |
 | 2026-03-01 | Maintenance | Documentation refactored; AI-specific terminology removed; collaboration guide renamed |
+| 2026-03-01 | Task I02 | TypeScript Model Files completed by Issac |
