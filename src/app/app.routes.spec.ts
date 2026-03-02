@@ -1,7 +1,7 @@
-import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { provideRouter, Router, Routes } from '@angular/router';
+import { TestBed } from '@angular/core/testing';
+import { provideRouter, Router, Routes, RouterOutlet } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { AUTH_FACADE } from './core/tokens/app.tokens';
+import { AuthService } from './core/services/auth.service';
 import { signal, Component, provideZonelessChangeDetection, WritableSignal } from '@angular/core';
 import { authGuard } from './core/guards/auth.guard';
 import { adminGuard } from './core/guards/admin.guard';
@@ -16,7 +16,7 @@ class MockHomeComponent {}
 @Component({
   selector: 'app-auth-layout',
   standalone: true,
-  imports: [],
+  imports: [RouterOutlet],
   template: '<router-outlet></router-outlet>',
 })
 class MockAuthLayoutComponent {}
@@ -33,7 +33,7 @@ class MockCartComponent {}
 @Component({
   selector: 'app-admin-layout',
   standalone: true,
-  imports: [],
+  imports: [RouterOutlet],
   template: '<router-outlet></router-outlet>',
 })
 class MockAdminLayoutComponent {}
@@ -72,6 +72,8 @@ interface AuthFacadeMock {
   isAdmin: WritableSignal<boolean>;
   isSeller: WritableSignal<boolean>;
   currentUser: WritableSignal<unknown>;
+  login: () => void;
+  logout: () => void;
 }
 
 describe('App Routing', () => {
@@ -84,6 +86,8 @@ describe('App Routing', () => {
       isAdmin: signal(false),
       isSeller: signal(false),
       currentUser: signal(null),
+      login: () => {},
+      logout: () => {},
     };
 
     await TestBed.configureTestingModule({
@@ -92,58 +96,51 @@ describe('App Routing', () => {
         provideRouter(testRoutes),
         provideHttpClient(),
         provideHttpClientTesting(),
-        { provide: AUTH_FACADE, useValue: authFacadeMock },
+        { provide: AuthService, useValue: authFacadeMock },
       ],
     }).compileComponents();
 
     harness = await RouterTestingHarness.create();
   });
 
-  it('should navigate to "" (Home)', fakeAsync(() => {
-    harness.navigateByUrl('/');
-    tick();
+  it('should navigate to "" (Home)', async () => {
+    await harness.navigateByUrl('/');
     expect(TestBed.inject(Router).url).toBe('/');
-  }));
+  });
 
-  it('should navigate to "/products"', fakeAsync(() => {
-    harness.navigateByUrl('/products');
-    tick();
+  it('should navigate to "/products"', async () => {
+    await harness.navigateByUrl('/products');
     expect(TestBed.inject(Router).url).toBe('/products');
-  }));
+  });
 
-  it('should redirect /cart to /auth/login when NOT logged in', fakeAsync(() => {
+  it('should redirect /cart to /auth/login when NOT logged in', async () => {
     authFacadeMock.isLoggedIn.set(false);
-    harness.navigateByUrl('/cart');
-    tick();
+    await harness.navigateByUrl('/cart');
     expect(TestBed.inject(Router).url).toBe('/auth/login');
-  }));
+  });
 
-  it('should allow /cart when logged in', fakeAsync(() => {
+  it('should allow /cart when logged in', async () => {
     authFacadeMock.isLoggedIn.set(true);
-    harness.navigateByUrl('/cart');
-    tick();
+    await harness.navigateByUrl('/cart');
     expect(TestBed.inject(Router).url).toBe('/cart');
-  }));
+  });
 
-  it('should redirect /admin to / when NOT an admin', fakeAsync(() => {
+  it('should redirect /admin to / when NOT an admin', async () => {
     authFacadeMock.isLoggedIn.set(true);
     authFacadeMock.isAdmin.set(false);
-    harness.navigateByUrl('/admin');
-    tick();
+    await harness.navigateByUrl('/admin');
     expect(TestBed.inject(Router).url).toBe('/');
-  }));
+  });
 
-  it('should allow /admin when user is admin', fakeAsync(() => {
+  it('should allow /admin when user is admin', async () => {
     authFacadeMock.isLoggedIn.set(true);
     authFacadeMock.isAdmin.set(true);
-    harness.navigateByUrl('/admin');
-    tick();
+    await harness.navigateByUrl('/admin');
     expect(TestBed.inject(Router).url).toBe('/admin');
-  }));
+  });
 
-  it('should navigate to any unknown route and stay there (NotFoundComponent)', fakeAsync(() => {
-    harness.navigateByUrl('/unknown-route-123');
-    tick();
+  it('should navigate to any unknown route and stay there (NotFoundComponent)', async () => {
+    await harness.navigateByUrl('/unknown-route-123');
     expect(TestBed.inject(Router).url).toBe('/unknown-route-123');
-  }));
+  });
 });
