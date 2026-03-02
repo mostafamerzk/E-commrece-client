@@ -29,7 +29,7 @@
 
 ## Current Project Phase
 
-**Phase 0 — Project Scaffolded. No features implemented yet.**
+**Phase 1 — Core Services. Category management and shared components in progress.**
 
 ---
 
@@ -48,10 +48,10 @@
 ## File Structure State
 
 ```
-[SCAFFOLD COMPLETE]
-All folders created with .gitkeep.
-Configuration files generated and committed.
-No feature files exist yet.
+[PHASE 1 INITIATED]
+- Category feature files implemented (service, component, tests).
+- Shared components (empty-state, spinner) and pipes (truncate, discount) in progress.
+- All core configuration files are stable.
 ```
 
 ---
@@ -68,7 +68,8 @@ No feature files exist yet.
 | TASK-M02 | LoadingService + ToastService | Mostafa | [x] Done | fix-m01-m02 |
 | TASK-I01 | Route Guards | Issac | [x] Done | — |
 | TASK-I02 | TypeScript Model Files | Issac | [x] Done | — |
-| TASK-K01 | App Routing Configuration | Mokhtar | [ ] Not started | — |
+| TASK-K01 | App Routing Configuration | Mokhtar | [x] Done | task/k01 |
+| TASK-M03 | Category Service & Management (Admin) | Mostafa | [x] Done | feature/category-managment |
 
 ---
 
@@ -82,12 +83,14 @@ No feature files exist yet.
 | TASK-F02 | HTTP Interceptors (auth, error, loading) | Fathi | 2026-03-02 |
 | TASK-M01 | StorageService + AuthService | Mostafa | 2026-03-02 |
 | TASK-M02 | LoadingService + ToastService | Mostafa | 2026-03-02 |
+| TASK-M03 | Category Service & Management | Mostafa | 2026-03-03 |
+| TASK-K01 | App Routing Configuration | Mokhtar | 2026-03-02 |
 
 ---
 
 ## Currently In Progress
 
-_Nothing in progress. Awaiting team to begin Phase 0 tasks._
+_Awaiting next assignment in Phase 1 (Core Services & Feature Pages)._
 
 ---
 
@@ -105,10 +108,10 @@ _None yet._
 
 ## Last Session Summary
 
-- **Date:** 2026-03-02
-- **Who:** Issac
-- **What was done:** Completed TASK-I01 Route Guards. Implemented `authGuard`, `guestGuard`, `adminGuard`, and `sellerGuard` using Angular signals and `AuthService`. Verified with comprehensive unit tests (49/49 passing).
-- **What is next:** Mokhtar to proceed with TASK-K01 App Routing Configuration.
+- **Date:** 2026-03-03
+- **Who:** Mostafa
+- **What was done:** Completed TASK-M03 Category Service & Management. Implemented `CategoryService`, `CategoriesComponent` (Admin), and shared `EmptyStateComponent`. Resolved 14+ linting errors and pushed to branch `a`.
+- **What is next:** Proceed with next Phase 1/2 tasks (Product Service or Shared Components).
 
 ---
 
@@ -121,3 +124,4 @@ _None yet._
 | 2026-03-01 | Task I02 | TypeScript Model Files completed by Issac |
 | 2026-03-02 | Task M01/M02 | Storage, Auth, Loading, and Toast services completed + Zoneless tests fixed |
 | 2026-03-02 | Task I01 | Route Guards completed by Issac |
+| 2026-03-03 | Task M03 | Category Management and Empty State completed by Mostafa on branch `a` |
