@@ -13,3 +13,8 @@ description:
 3. **Context Retrieval:** Read `docs/memory.md` to identify the current active Task ID.
 4. **Consistency Check:** Briefly check if the local branch matches the "Current Focus" in the memory file.
 5. **Output:** "Environment synced. Reviewing memory.md... I am ready to work on [Task ID]. What's our first move?"
+
+## UI/UX
+
+- Follow the existing design system in `docs/design` Folder.
+- Ensure all interactive elements have proper ARIA labels for e-commerce accessibility.

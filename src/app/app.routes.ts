@@ -104,6 +104,13 @@ export const routes: Routes = [
             (m) => m.DashboardComponent
           ),
       },
+      {
+        path: 'categories',
+        loadComponent: () =>
+          import('./features/admin/pages/categories/categories.component').then(
+            (m) => m.CategoriesComponent
+          ),
+      },
     ],
   },
   {
