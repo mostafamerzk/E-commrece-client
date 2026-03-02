@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
@@ -15,6 +16,7 @@ describe('ErrorInterceptor', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       providers: [
+        provideZonelessChangeDetection(),
         { provide: AUTH_FACADE, useValue: authServiceSpy },
         { provide: TOAST_FACADE, useValue: toastSpy },
         provideHttpClient(withInterceptors([errorInterceptor])),

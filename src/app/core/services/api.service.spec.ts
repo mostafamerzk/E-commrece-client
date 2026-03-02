@@ -1,4 +1,5 @@
 import { TestBed } from '@angular/core/testing';
+import { provideZonelessChangeDetection } from '@angular/core';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
 import { ApiService } from './api.service';
@@ -10,7 +11,12 @@ describe('ApiService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [ApiService, provideHttpClient(), provideHttpClientTesting()],
+      providers: [
+        provideZonelessChangeDetection(),
+        ApiService,
+        provideHttpClient(),
+        provideHttpClientTesting(),
+      ],
     });
 
     service = TestBed.inject(ApiService);
@@ -48,8 +54,8 @@ describe('ApiService', () => {
     service.get('/products').subscribe({
       next: () => fail('should not succeed'),
       error: (err) => {
-        expect(err).toBeInstanceOf(Error);
-        expect(err.message).toBe('Test error');
+        expect(err.status).toBe(500);
+        expect(err.error.message).toBe('Test error');
       },
     });
 
