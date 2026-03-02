@@ -77,6 +77,8 @@ No feature files exist yet.
 | Task ID | Description | Owner | Date |
 |---------|-------------|-------|------|
 | TASK-I02 | TypeScript Model Files | Issac | 2026-03-01 |
+| TASK-F01 | Base HTTP Infrastructure + ApiService | Fathi | 2026-03-02 |
+| TASK-F02 | HTTP Interceptors (auth, error, loading) | Fathi | 2026-03-02 |
 | TASK-M01 | StorageService + AuthService | Mostafa | 2026-03-02 |
 | TASK-M02 | LoadingService + ToastService | Mostafa | 2026-03-02 |
 
