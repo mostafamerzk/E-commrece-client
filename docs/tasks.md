@@ -175,7 +175,7 @@
 ---
 
 ### [TASK-M03] Category Service & Management (Admin)
-**Status:** [ ]
+**Status:** [x]
 **Phase:** 1 — Core Services
 **Files to create:**
 - src/app/core/services/category.service.ts
