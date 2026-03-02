@@ -62,10 +62,10 @@ No feature files exist yet.
 
 | Task ID | Description | Owner | Status | PR |
 |---------|-------------|-------|--------|----|
-| TASK-F01 | Base HTTP Infrastructure + ApiService | Fathi | [ ] Not started | — |
-| TASK-F02 | HTTP Interceptors (auth, error, loading) | Fathi | [ ] Not started | — |
-| TASK-M01 | StorageService + AuthService | Mostafa | [ ] Not started | — |
-| TASK-M02 | LoadingService + ToastService | Mostafa | [ ] Not started | — |
+| TASK-F01 | Base HTTP Infrastructure + ApiService | Fathi | [x] Done | — |
+| TASK-F02 | HTTP Interceptors (auth, error, loading) | Fathi | [x] Done | — |
+| TASK-M01 | StorageService + AuthService | Mostafa | [x] Done | — |
+| TASK-M02 | LoadingService + ToastService | Mostafa | [x] Done | — |
 | TASK-I01 | Route Guards | Issac | [ ] Not started | — |
 | TASK-I02 | TypeScript Model Files | Issac | [x] Done | — |
 | TASK-K01 | App Routing Configuration | Mokhtar | [ ] Not started | — |
@@ -100,10 +100,10 @@ _None yet._
 
 ## Last Session Summary
 
-- **Date:** 2026-03-01
-- **Who:** Issac + Mostafa
-- **What was done:** Completed TASK-I02 (TypeScript Model Files). Models for Auth, Product, Order, Cart, Review, Category, Banner, Admin, Payment, Seller, and Shared entities were implemented according to API contracts. Documentation updated to reflect completion.
-- **What is next:** Fathi should begin TASK-F01 (Base HTTP Infrastructure) or Mostafa should start TASK-M01.
+- **Date:** 2026-03-02
+- **Who:** Fathi
+- **What was done:** Fixed import errors in `app.config.ts` by implementing `StorageService`, `AuthService`, and `ToastService` stubs. Improved `error.interceptor.ts` and `loading.interceptor.ts`. Added full unit tests for base HTTP infrastructure.
+- **What is next:** Proceed with Phase 0 tasks for Issac (Route Guards and TypeScript Model Files).
 
 ---
 
