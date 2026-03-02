@@ -13,7 +13,7 @@
 - **Styling:** Tailwind CSS + PrimeNG + PrimeFlex
 - **Language:** TypeScript (strict mode)
 - **Testing:** Jasmine + Karma (Angular default)
-- **Backend base URL (dev):** http://localhost:3000/api
+- **Backend base URL (dev):** http://localhost:3000
 - **Repository:** [ADD GITHUB REPO URL WHEN CREATED]
 
 ## Team Members & Ownership
@@ -67,14 +67,16 @@ No feature files exist yet.
 | TASK-M01 | StorageService + AuthService | Mostafa | [ ] Not started | — |
 | TASK-M02 | LoadingService + ToastService | Mostafa | [ ] Not started | — |
 | TASK-I01 | Route Guards | Issac | [ ] Not started | — |
-| TASK-I02 | TypeScript Model Files | Issac | [ ] Not started | — |
+| TASK-I02 | TypeScript Model Files | Issac | [x] Done | — |
 | TASK-K01 | App Routing Configuration | Mokhtar | [ ] Not started | — |
 
 ---
 
 ## Recently Completed Tasks
 
-_Nothing completed yet. Project was just scaffolded._
+| Task ID | Description | Owner | Date |
+|---------|-------------|-------|------|
+| TASK-I02 | TypeScript Model Files | Issac | 2026-03-01 |
 
 ---
 
@@ -99,9 +101,9 @@ _None yet._
 ## Last Session Summary
 
 - **Date:** 2026-03-01
-- **Who:** System Maintenance
-- **What was done:** Updated project documentation to remove specific collaborator labels and renamed the collaboration guide. Verified the base scaffold including Tailwind, PrimeNG, and Husky setup. Excluded design specifications from the core project context logs.
-- **What is next:** Team should begin Phase 0 tasks as outlined in the Task Status section.
+- **Who:** Issac + Mostafa
+- **What was done:** Completed TASK-I02 (TypeScript Model Files). Models for Auth, Product, Order, Cart, Review, Category, Banner, Admin, Payment, Seller, and Shared entities were implemented according to API contracts. Documentation updated to reflect completion.
+- **What is next:** Fathi should begin TASK-F01 (Base HTTP Infrastructure) or Mostafa should start TASK-M01.
 
 ---
 
@@ -111,3 +113,4 @@ _None yet._
 |------|---------|--------|
 | 2026-02-28 | Scaffold | Initial project structure and configuration generated |
 | 2026-03-01 | Maintenance | Documentation refactored; AI-specific terminology removed; collaboration guide renamed |
+| 2026-03-01 | Task I02 | TypeScript Model Files completed by Issac |

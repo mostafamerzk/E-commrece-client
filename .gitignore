@@ -2,7 +2,7 @@
 /dist
 /.angular
 /node_modules
-
+/.agent
 # Environment secrets — NEVER commit real secrets
 .env
 .env.local
