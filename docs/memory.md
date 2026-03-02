@@ -64,8 +64,8 @@ No feature files exist yet.
 |---------|-------------|-------|--------|----|
 | TASK-F01 | Base HTTP Infrastructure + ApiService | Fathi | [x] Done | — |
 | TASK-F02 | HTTP Interceptors (auth, error, loading) | Fathi | [x] Done | — |
-| TASK-M01 | StorageService + AuthService | Mostafa | [x] Done | — |
-| TASK-M02 | LoadingService + ToastService | Mostafa | [x] Done | — |
+| TASK-M01 | StorageService + AuthService | Mostafa | [x] Done | fix-m01-m02 |
+| TASK-M02 | LoadingService + ToastService | Mostafa | [x] Done | fix-m01-m02 |
 | TASK-I01 | Route Guards | Issac | [ ] Not started | — |
 | TASK-I02 | TypeScript Model Files | Issac | [x] Done | — |
 | TASK-K01 | App Routing Configuration | Mokhtar | [ ] Not started | — |
@@ -77,6 +77,8 @@ No feature files exist yet.
 | Task ID | Description | Owner | Date |
 |---------|-------------|-------|------|
 | TASK-I02 | TypeScript Model Files | Issac | 2026-03-01 |
+| TASK-M01 | StorageService + AuthService | Mostafa | 2026-03-02 |
+| TASK-M02 | LoadingService + ToastService | Mostafa | 2026-03-02 |
 
 ---
 
@@ -101,9 +103,9 @@ _None yet._
 ## Last Session Summary
 
 - **Date:** 2026-03-02
-- **Who:** Fathi
-- **What was done:** Fixed import errors in `app.config.ts` by implementing `StorageService`, `AuthService`, and `ToastService` stubs. Improved `error.interceptor.ts` and `loading.interceptor.ts`. Added full unit tests for base HTTP infrastructure.
-- **What is next:** Proceed with Phase 0 tasks for Issac (Route Guards and TypeScript Model Files).
+- **Who:** Mostafa
+- **What was done:** Completed implementation of `StorageService`, `AuthService`, `LoadingService`, and `ToastService`. Migrated 100% of unit tests to Zoneless Angular support. Resolved Node v24 and Chromium environment issues. ACHIEVED 40/40 PASSING UNIT TESTS. Pushed rebased branch `fix-m01-m02`.
+- **What is next:** Proceed with Phase 0 tasks for Issac (Route Guards).
 
 ---
 
@@ -114,3 +116,4 @@ _None yet._
 | 2026-02-28 | Scaffold | Initial project structure and configuration generated |
 | 2026-03-01 | Maintenance | Documentation refactored; AI-specific terminology removed; collaboration guide renamed |
 | 2026-03-01 | Task I02 | TypeScript Model Files completed by Issac |
+| 2026-03-02 | Task M01/M02 | Storage, Auth, Loading, and Toast services completed + Zoneless tests fixed |
