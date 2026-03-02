@@ -1,13 +1,30 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { ToastFacade } from '../tokens/app.tokens';
+import { MessageService } from 'primeng/api';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ToastService implements ToastFacade {
-  // Simple implementation to satisfy the facade
+  private messageService = inject(MessageService);
+
   show(message: string): void {
-    console.log('[Toast]:', message);
-    // Real implementation with PrimeNG or other UI will follow later in Phase 0
+    this.info(message);
+  }
+
+  success(message: string, title: string = 'Success'): void {
+    this.messageService.add({ severity: 'success', summary: title, detail: message });
+  }
+
+  error(message: string, title: string = 'Error'): void {
+    this.messageService.add({ severity: 'error', summary: title, detail: message });
+  }
+
+  info(message: string, title: string = 'Info'): void {
+    this.messageService.add({ severity: 'info', summary: title, detail: message });
+  }
+
+  warn(message: string, title: string = 'Warning'): void {
+    this.messageService.add({ severity: 'warn', summary: title, detail: message });
   }
 }
