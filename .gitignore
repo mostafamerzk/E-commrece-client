@@ -22,7 +22,7 @@ Thumbs.db
 
 # Testing
 /coverage
-
+/test_results.txt
 # Logs
 npm-debug.log*
 yarn-debug.log*
