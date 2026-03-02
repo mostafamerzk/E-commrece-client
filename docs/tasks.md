@@ -401,7 +401,7 @@
 ## MOKHTAR — Wishlist & Seller Dashboard
 
 ### [TASK-K01] App Routing Configuration
-**Status:** [ ]
+**Status:** [x]
 **Phase:** 0 — Setup
 **Files to create:**
 - src/app/app.routes.ts
