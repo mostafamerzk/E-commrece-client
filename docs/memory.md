@@ -13,7 +13,7 @@
 - **Styling:** Tailwind CSS + PrimeNG + PrimeFlex
 - **Language:** TypeScript (strict mode)
 - **Testing:** Jasmine + Karma (Angular default)
-- **Backend base URL (dev):** http://localhost:3000/api
+- **Backend base URL (dev):** http://localhost:3000
 - **Repository:** [ADD GITHUB REPO URL WHEN CREATED]
 
 ## Team Members & Ownership
@@ -62,19 +62,25 @@ No feature files exist yet.
 
 | Task ID | Description | Owner | Status | PR |
 |---------|-------------|-------|--------|----|
-| TASK-F01 | Base HTTP Infrastructure + ApiService | Fathi | [ ] Not started | — |
-| TASK-F02 | HTTP Interceptors (auth, error, loading) | Fathi | [ ] Not started | — |
-| TASK-M01 | StorageService + AuthService | Mostafa | [ ] Not started | — |
-| TASK-M02 | LoadingService + ToastService | Mostafa | [ ] Not started | — |
+| TASK-F01 | Base HTTP Infrastructure + ApiService | Fathi | [x] Done | — |
+| TASK-F02 | HTTP Interceptors (auth, error, loading) | Fathi | [x] Done | — |
+| TASK-M01 | StorageService + AuthService | Mostafa | [x] Done | fix-m01-m02 |
+| TASK-M02 | LoadingService + ToastService | Mostafa | [x] Done | fix-m01-m02 |
 | TASK-I01 | Route Guards | Issac | [ ] Not started | — |
-| TASK-I02 | TypeScript Model Files | Issac | [ ] Not started | — |
+| TASK-I02 | TypeScript Model Files | Issac | [x] Done | — |
 | TASK-K01 | App Routing Configuration | Mokhtar | [ ] Not started | — |
 
 ---
 
 ## Recently Completed Tasks
 
-_Nothing completed yet. Project was just scaffolded._
+| Task ID | Description | Owner | Date |
+|---------|-------------|-------|------|
+| TASK-I02 | TypeScript Model Files | Issac | 2026-03-01 |
+| TASK-F01 | Base HTTP Infrastructure + ApiService | Fathi | 2026-03-02 |
+| TASK-F02 | HTTP Interceptors (auth, error, loading) | Fathi | 2026-03-02 |
+| TASK-M01 | StorageService + AuthService | Mostafa | 2026-03-02 |
+| TASK-M02 | LoadingService + ToastService | Mostafa | 2026-03-02 |
 
 ---
 
@@ -98,10 +104,10 @@ _None yet._
 
 ## Last Session Summary
 
-- **Date:** 2026-03-01
-- **Who:** System Maintenance
-- **What was done:** Updated project documentation to remove specific collaborator labels and renamed the collaboration guide. Verified the base scaffold including Tailwind, PrimeNG, and Husky setup. Excluded design specifications from the core project context logs.
-- **What is next:** Team should begin Phase 0 tasks as outlined in the Task Status section.
+- **Date:** 2026-03-02
+- **Who:** Mostafa
+- **What was done:** Completed implementation of `StorageService`, `AuthService`, `LoadingService`, and `ToastService`. Migrated 100% of unit tests to Zoneless Angular support. Resolved Node v24 and Chromium environment issues. ACHIEVED 40/40 PASSING UNIT TESTS. Pushed rebased branch `fix-m01-m02`.
+- **What is next:** Proceed with Phase 0 tasks for Issac (Route Guards).
 
 ---
 
@@ -111,3 +117,5 @@ _None yet._
 |------|---------|--------|
 | 2026-02-28 | Scaffold | Initial project structure and configuration generated |
 | 2026-03-01 | Maintenance | Documentation refactored; AI-specific terminology removed; collaboration guide renamed |
+| 2026-03-01 | Task I02 | TypeScript Model Files completed by Issac |
+| 2026-03-02 | Task M01/M02 | Storage, Auth, Loading, and Toast services completed + Zoneless tests fixed |

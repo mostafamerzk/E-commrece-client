@@ -9,7 +9,7 @@
 ## FATHI — Cart & Products
 
 ### [TASK-F01] Base HTTP Infrastructure
-**Status:** [ ]
+**Status:** [x]
 **Phase:** 0 — Setup
 **Files to create:**
 - src/app/core/services/api.service.ts
@@ -23,7 +23,7 @@
 ---
 
 ### [TASK-F02] All Three HTTP Interceptors
-**Status:** [ ]
+**Status:** [x]
 **Phase:** 0 — Setup
 **Files to create:**
 - src/app/core/interceptors/auth.interceptor.ts
@@ -290,7 +290,7 @@
 ---
 
 ### [TASK-I02] TypeScript Model Files
-**Status:** [ ]
+**Status:** [x]
 **Phase:** 0 — Setup
 **Files to create:**
 - src/app/core/models/auth.model.ts
