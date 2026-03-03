@@ -130,7 +130,12 @@ export class CategoriesComponent implements OnInit {
       this.categoryService
         .update(
           this.categoryForm.id,
-          { name: this.categoryForm.name, description: this.categoryForm.description },
+          {
+            name: this.categoryForm.name,
+            ...(this.categoryForm.description
+              ? { description: this.categoryForm.description }
+              : {}),
+          },
           this.selectedFile || undefined
         )
         .subscribe({
@@ -156,7 +161,12 @@ export class CategoriesComponent implements OnInit {
     } else if (this.selectedFile) {
       this.categoryService
         .create(
-          { name: this.categoryForm.name, description: this.categoryForm.description },
+          {
+            name: this.categoryForm.name,
+            ...(this.categoryForm.description
+              ? { description: this.categoryForm.description }
+              : {}),
+          },
           this.selectedFile
         )
         .subscribe({
