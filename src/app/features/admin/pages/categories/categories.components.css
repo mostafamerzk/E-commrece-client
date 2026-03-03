@@ -1,6 +1,395 @@
-:host {
+/* ─── Page Layout ─── */
+.cat-page {
+  padding: 2rem;
+  background: #f4f6f9;
+  min-height: 100vh;
+}
+
+/* ─── Page Header ─── */
+.cat-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+}
+
+.cat-header h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #1e293b;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.25rem 0;
+}
+
+.cat-header p {
+  font-size: 0.84rem;
+  color: #64748b;
+  margin: 0;
+}
+
+/* ─── Search Toolbar ─── */
+.cat-toolbar {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  padding: 0.9rem 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.search-wrapper {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-wrapper .search-icon {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  font-size: 0.85rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.55rem 0.9rem 0.55rem 2.5rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  background: #f8fafc;
+  color: #1e293b;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    background 0.2s;
+  font-family: inherit;
+}
+
+.search-input:focus {
+  border-color: #2563eb; /* primary-600 */
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  background: #fff;
+}
+
+.clear-btn {
+  font-size: 0.8rem;
+  color: #2563eb; /* primary-600 */
+  cursor: pointer;
+  font-weight: 600;
+  background: none;
+  border: none;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.clear-btn:hover {
+  color: #1d4ed8; /* primary-700 */
+  text-decoration: underline;
+}
+
+/* ─── Table Card ─── */
+.cat-table-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ─── PrimeNG Table Overrides ─── */
+.cat-table .p-datatable-thead > tr > th {
+  background: #f8fafc !important;
+  color: #475569 !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.07em !important;
+  padding: 0.85rem 1rem !important;
+  border-bottom: 1.5px solid #e2e8f0 !important;
+  border-color: transparent !important;
+}
+
+.cat-table .p-datatable-tbody > tr {
+  background: #ffffff !important;
+  transition: background 0.12s !important;
+  border: none !important;
+}
+
+.cat-table .p-datatable-tbody > tr:nth-child(even) {
+  background: #fafbfc !important;
+}
+
+.cat-table .p-datatable-tbody > tr:hover {
+  background: #eff6ff !important; /* primary-50 */
+}
+
+.cat-table .p-datatable-tbody > tr > td {
+  padding: 0.8rem 1rem !important;
+  border-bottom: 1px solid #f1f5f9 !important;
+  border-color: #f1f5f9 !important;
+  color: #334155 !important;
+  font-size: 0.875rem !important;
+}
+
+.cat-table .p-paginator {
+  background: #f8fafc !important;
+  border-top: 1.5px solid #e2e8f0 !important;
+  padding: 0.6rem 1rem !important;
+}
+
+.cat-table .p-paginator .p-paginator-page.p-highlight {
+  background: #2563eb !important; /* primary-600 */
+  color: #fff !important;
+  border-color: #2563eb !important;
+}
+
+/* ─── Image Cell ─── */
+.img-cell {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1.5px solid #e2e8f0;
+  background: #f1f5f9;
+}
+
+.img-cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   display: block;
 }
-::ng-deep .p-datatable-sm .p-datatable-tbody > tr > td {
-  padding: 0.5rem 1rem;
+
+/* ─── ID Badge ─── */
+.id-badge {
+  font-family: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.7rem;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  display: inline-block;
+  border: 1px solid #e2e8f0;
+}
+
+/* ─── Slug Tag ─── */
+.slug-tag {
+  font-size: 0.75rem;
+  color: #2563eb; /* primary-600 */
+  background: #eff6ff; /* primary-50  */
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  display: inline-block;
+  font-weight: 500;
+  border: 1px solid #bfdbfe; /* primary-200 */
+}
+
+/* ─── Description ─── */
+.desc-cell {
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #64748b;
+  font-size: 0.82rem;
+  display: block;
+}
+
+/* ─── Empty State ─── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 4rem 2rem;
+  color: #94a3b8;
+  text-align: center;
+}
+
+.empty-state .empty-icon {
+  font-size: 3rem;
+  color: #cbd5e1;
+}
+.empty-state .empty-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #64748b;
+  margin: 0;
+}
+.empty-state .empty-sub {
+  font-size: 0.84rem;
+  margin: 0;
+}
+
+/* ─── Dialog Overrides ─── */
+.p-dialog {
+  border-radius: 18px !important;
+  overflow: hidden !important;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.14) !important;
+  border: 1px solid #e2e8f0 !important;
+}
+
+.p-dialog .p-dialog-header {
+  background: #ffffff !important;
+  border-bottom: 1.5px solid #f1f5f9 !important;
+  padding: 1.2rem 1.5rem !important;
+}
+
+.p-dialog .p-dialog-title {
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+  color: #1e293b !important;
+}
+
+.p-dialog .p-dialog-content {
+  padding: 1.5rem !important;
+  background: #ffffff !important;
+  color: #334155 !important;
+}
+
+.p-dialog .p-dialog-footer {
+  padding: 1rem 1.5rem !important;
+  background: #f8fafc !important;
+  border-top: 1.5px solid #f1f5f9 !important;
+  display: flex !important;
+  gap: 0.5rem !important;
+  justify-content: flex-end !important;
+}
+
+/* ─── Form Fields ─── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.req {
+  color: #ef4444;
+  margin-left: 2px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.62rem 0.9rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  font-size: 0.875rem;
+  color: #1e293b;
+  background: #f8fafc;
+  outline: none;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  border-color: #2563eb; /* primary-600 */
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  background: #fff;
+}
+
+.form-control:disabled {
+  color: #94a3b8;
+  background: #f1f5f9;
+  cursor: not-allowed;
+}
+
+.form-hint {
+  font-size: 0.76rem;
+  color: #94a3b8;
+}
+
+.existing-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.existing-preview img {
+  width: 52px;
+  height: 52px;
+  border-radius: 8px;
+  object-fit: cover;
+  border: 1px solid #e2e8f0;
+  flex-shrink: 0;
+}
+
+.existing-preview p {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.file-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: #059669;
+  background: #ecfdf5;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  font-weight: 500;
+  border: 1px solid #a7f3d0;
+}
+
+/* ─── Toast ─── */
+.p-toast .p-toast-message {
+  border-radius: 12px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+}
+
+.p-toast .p-toast-message-success {
+  background: #f0fdf4 !important;
+  border-left: 4px solid #22c55e !important;
+  color: #15803d !important;
+}
+
+.p-toast .p-toast-message-error {
+  background: #fef2f2 !important;
+  border-left: 4px solid #ef4444 !important;
+  color: #b91c1c !important;
+}
+
+.p-toast .p-toast-message-success .p-toast-message-icon,
+.p-toast .p-toast-message-success .p-toast-summary {
+  color: #16a34a !important;
+}
+
+.p-toast .p-toast-message-error .p-toast-message-icon,
+.p-toast .p-toast-message-error .p-toast-summary {
+  color: #dc2626 !important;
+}
+
+/* ─── Confirm Dialog ─── */
+.p-confirmdialog .p-dialog-header {
+  background: #ffffff !important;
+}
+.p-confirmdialog .p-dialog-content {
+  background: #ffffff !important;
+  color: #374151 !important;
+}
+.p-confirmdialog .p-dialog-footer {
+  background: #f8fafc !important;
 }

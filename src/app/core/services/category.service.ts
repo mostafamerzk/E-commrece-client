@@ -25,15 +25,14 @@ export class CategoryService {
     return this.api.get<CategoryResponse>(`${this.endpoint}/${id}`);
   }
 
-  /**
-   * Creates a new category.
-   * Since it involves an image upload, we use FormData.
-   */
   create(payload: CreateCategoryPayload, image: File): Observable<CategoryResponse> {
     const formData = new FormData();
     formData.append('name', payload.name);
     if (payload.parentCategoryId) {
       formData.append('parentCategoryId', payload.parentCategoryId);
+    }
+    if (payload.description) {
+      formData.append('description', payload.description);
     }
     formData.append('image', image);
 
@@ -41,14 +40,13 @@ export class CategoryService {
     return this.api.post<CategoryResponse, FormData>(this.endpoint, formData);
   }
 
-  /**
-   * Updates an existing category.
-   * Uses PATCH and FormData for optional image/name updates.
-   */
   update(id: string, payload: UpdateCategoryPayload, image?: File): Observable<CategoryResponse> {
     const formData = new FormData();
     if (payload.name) {
       formData.append('name', payload.name);
+    }
+    if (payload.description) {
+      formData.append('description', payload.description);
     }
     if (image) {
       formData.append('image', image);

@@ -1,97 +1,108 @@
-<div class="p-6 bg-gray-50 min-h-screen">
-  <!-- 1. Page Header -->
-  <div class="flex items-center justify-between mb-6">
+<div class="cat-page">
+  <!-- ── Header ── -->
+  <div class="cat-header">
     <div>
-      <h1 class="text-2xl font-bold text-gray-900">Category Management</h1>
-      <p class="text-sm text-gray-500">{{ categories().length }} total categories</p>
+      <h1>Category Management</h1>
+      <p>{{ filteredCategories().length }} of {{ categories().length }} categories shown</p>
     </div>
     <p-button
-      label="Add Category"
+      label="New Category"
       icon="pi pi-plus"
       (onClick)="showDialog()"
       styleClass="p-button-sm"
-    ></p-button>
+    />
   </div>
 
-  <!-- 2. Filter Toolbar -->
-  <div class="bg-white rounded-xl border border-gray-200 p-4 mb-5 flex items-center shadow-sm">
-    <div class="relative w-full md:w-80">
-      <i class="pi pi-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i>
+  <!-- ── Search Toolbar ── -->
+  <div class="cat-toolbar">
+    <div class="search-wrapper">
+      <i class="pi pi-search search-icon"></i>
       <input
-        pInputText
+        class="search-input"
         type="text"
         [value]="searchQuery()"
         (input)="onSearchInput($event)"
-        placeholder="Search categories..."
-        class="w-full text-sm pl-10"
+        placeholder="Search by name or slug…"
       />
     </div>
+    @if (searchQuery()) {
+      <button class="clear-btn" (click)="searchQuery.set('')">Clear</button>
+    }
   </div>
 
-  <!-- 3. Data Table -->
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+  <!-- ── Table ── -->
+  <div class="cat-table-card">
     <p-table
       [value]="filteredCategories()"
       [rows]="10"
       [paginator]="true"
-      [responsiveLayout]="'scroll'"
       [loading]="isLoading()"
-      styleClass="p-datatable-sm p-datatable-striped"
+      styleClass="cat-table"
     >
       <ng-template pTemplate="header">
         <tr>
-          <th class="w-24">Image</th>
+          <th style="width: 90px">ID</th>
+          <th style="width: 80px">Image</th>
           <th>Name</th>
           <th>Slug</th>
-          <th>Created At</th>
-          <th class="w-32">Actions</th>
+          <th>Description</th>
+          <th style="width: 120px; text-align: center">Actions</th>
         </tr>
       </ng-template>
-      <ng-template pTemplate="body" let-category>
-        <tr class="hover:bg-gray-50 transition-colors">
+
+      <ng-template pTemplate="body" let-cat>
+        <tr>
           <td>
-            <div class="w-12 h-12 rounded-lg overflow-hidden border border-gray-100 bg-gray-50">
-              <img
-                [src]="category.image.secure_url"
-                [alt]="category.name"
-                class="w-full h-full object-cover"
-              />
+            <span class="id-badge">{{ cat._id | slice: -8 }}</span>
+          </td>
+          <td>
+            <div class="img-cell">
+              <img [src]="cat.image?.secure_url" [alt]="cat.name" />
             </div>
           </td>
-          <td class="font-medium text-gray-800">{{ category.name }}</td>
-          <td class="text-gray-500 text-sm">{{ category.slug }}</td>
-          <td class="text-gray-400 text-xs">{{ category.createdAt | date: 'mediumDate' }}</td>
+          <td style="font-weight: 600; color: #1e293b">{{ cat.name }}</td>
           <td>
-            <div class="flex gap-2">
+            <span class="slug-tag">{{ cat.slug }}</span>
+          </td>
+          <td>
+            <span class="desc-cell" [title]="cat.description || ''">
+              {{ cat.description || '—' }}
+            </span>
+          </td>
+          <td style="text-align: center">
+            <div style="display: inline-flex; gap: 4px">
               <p-button
                 icon="pi pi-pencil"
                 [text]="true"
                 severity="success"
-                (onClick)="editCategory(category)"
-                aria-label="Edit"
-              ></p-button>
+                (onClick)="editCategory(cat)"
+                [title]="'Edit ' + cat.name"
+                styleClass="p-button-sm"
+              />
               <p-button
                 icon="pi pi-trash"
                 [text]="true"
                 severity="danger"
-                (onClick)="deleteCategory(category)"
-                aria-label="Delete"
-              ></p-button>
+                (onClick)="deleteCategory(cat)"
+                [title]="'Delete ' + cat.name"
+                styleClass="p-button-sm"
+              />
             </div>
           </td>
         </tr>
       </ng-template>
+
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="5" class="text-center py-12">
-            <div class="flex flex-col items-center gap-3 text-gray-400">
-              <i class="pi pi-tags text-5xl"></i>
-              <p class="text-lg font-semibold text-gray-600">No categories found</p>
-              <p class="text-sm">
+          <td colspan="6">
+            <div class="empty-state">
+              <i class="pi pi-folder-open empty-icon"></i>
+              <p class="empty-title">No categories found</p>
+              <p class="empty-sub">
                 {{
                   searchQuery()
-                    ? 'Try adjusting your search query.'
-                    : 'Get started by creating your first category.'
+                    ? 'Try a different search term.'
+                    : 'Click "New Category" to get started.'
                 }}
               </p>
             </div>
@@ -101,66 +112,107 @@
     </p-table>
   </div>
 
-  <!-- 4. Dialog -->
+  <!-- ── Dialog ── -->
   <p-dialog
     [(visible)]="displayDialog"
-    [header]="isEditing ? 'Edit Category' : 'Add Category'"
+    [header]="isEditing ? 'Edit Category' : 'Create Category'"
     [modal]="true"
-    [style]="{ width: '520px' }"
+    [style]="{ width: '480px' }"
     [draggable]="false"
+    [resizable]="false"
     appendTo="body"
   >
-    <div class="flex flex-col gap-5 pt-2">
-      <div class="flex flex-col gap-2">
-        <label for="name" class="text-sm font-medium text-gray-700">Category Name *</label>
+    <div style="display: flex; flex-direction: column; gap: 1.1rem">
+      <!-- Name -->
+      <div class="form-group">
+        <label class="form-label">Name <span class="req">*</span></label>
         <input
-          pInputText
-          id="name"
+          class="form-control"
           [(ngModel)]="categoryForm.name"
           placeholder="e.g. Home Appliances"
-          class="w-full"
-          required
         />
       </div>
 
-      <div class="flex flex-col gap-2">
-        <span class="text-sm font-medium text-gray-700">Category Image *</span>
+      <!-- Slug (read-only when editing) -->
+      @if (isEditing) {
+        <div class="form-group">
+          <label class="form-label">Slug</label>
+          <input class="form-control" [value]="categoryForm.slug || ''" disabled />
+          <span class="form-hint">Auto-generated by the server</span>
+        </div>
+      }
+
+      <!-- Description -->
+      <div class="form-group">
+        <label class="form-label">Description</label>
+        <textarea
+          class="form-control"
+          [(ngModel)]="categoryForm.description"
+          placeholder="Brief description for this category…"
+          rows="3"
+          style="resize: vertical"
+        ></textarea>
+      </div>
+
+      <!-- Existing image preview -->
+      @if (isEditing && categoryForm.existingImageUrl) {
+        <div class="form-group">
+          <label class="form-label">Current Image</label>
+          <div class="existing-preview">
+            <img [src]="categoryForm.existingImageUrl" alt="Current" />
+            <p>Upload a new file below to replace this image.</p>
+          </div>
+        </div>
+      }
+
+      <!-- Upload -->
+      <div class="form-group">
+        <label class="form-label">
+          {{ isEditing ? 'Replace Image' : 'Category Image' }}
+          @if (!isEditing) {
+            <span class="req">*</span>
+          }
+        </label>
         <p-fileUpload
           mode="basic"
           [auto]="false"
-          chooseLabel="Choose Image"
+          chooseLabel="Choose File"
           chooseIcon="pi pi-upload"
           (onSelect)="onFileSelect($event)"
           accept="image/*"
-          styleClass="w-full"
-        ></p-fileUpload>
-        <div
-          *ngIf="selectedFile"
-          class="text-xs text-blue-600 font-medium mt-1 flex items-center gap-1"
-        >
-          <i class="pi pi-file text-[10px]"></i> {{ selectedFile.name }}
-        </div>
-        <p class="text-xs text-gray-400 mt-1">Recommended: Square image, max 2MB.</p>
+          styleClass="p-button-outlined p-button-sm"
+        />
+        @if (selectedFile) {
+          <span class="file-badge">
+            <i class="pi pi-check-circle"></i>{{ selectedFile.name }}
+          </span>
+        }
+        @if (!isEditing) {
+          <span class="form-hint">PNG, JPG, WEBP — max 2 MB. Square images work best.</span>
+        }
       </div>
     </div>
+
     <ng-template pTemplate="footer">
-      <div class="flex gap-2 justify-end">
-        <p-button
-          label="Cancel"
-          [text]="true"
-          severity="secondary"
-          (onClick)="hideDialog()"
-        ></p-button>
-        <p-button
-          label="Save Changes"
-          icon="pi pi-check"
-          [disabled]="!categoryForm.name || (!isEditing && !selectedFile)"
-          (onClick)="saveCategory()"
-        ></p-button>
-      </div>
+      <p-button
+        label="Cancel"
+        icon="pi pi-times"
+        [text]="true"
+        severity="secondary"
+        (onClick)="hideDialog()"
+        styleClass="p-button-sm"
+      />
+      <p-button
+        [label]="isEditing ? 'Update' : 'Create'"
+        icon="pi pi-check"
+        [loading]="isSaving()"
+        [disabled]="!categoryForm.name || (!isEditing && !selectedFile)"
+        (onClick)="saveCategory()"
+        styleClass="p-button-sm"
+      />
     </ng-template>
   </p-dialog>
 
-  <p-toast></p-toast>
-  <p-confirmDialog></p-confirmDialog>
+  <p-toast />
+  <p-confirmDialog />
 </div>

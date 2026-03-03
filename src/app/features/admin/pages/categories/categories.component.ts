@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, OnInit, inject, signal, computed, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TableModule } from 'primeng/table';
@@ -29,6 +29,7 @@ import { Category } from '../../../../core/models/category.model';
   providers: [MessageService, ConfirmationService],
   templateUrl: './categories.component.html',
   styleUrl: './categories.components.css',
+  encapsulation: ViewEncapsulation.None,
 })
 export class CategoriesComponent implements OnInit {
   private categoryService = inject(CategoryService);
@@ -37,7 +38,10 @@ export class CategoriesComponent implements OnInit {
 
   categories = signal<Category[]>([]);
   isLoading = signal(false);
+  isSaving = signal(false); // Added missing signal
   searchQuery = signal('');
+
+  parentCategories = computed(() => this.categories().filter((c) => !c.parentCategoryId)); // Added computed for parent categories
 
   filteredCategories = computed(() => {
     const query = this.searchQuery().toLowerCase().trim();
@@ -49,7 +53,19 @@ export class CategoriesComponent implements OnInit {
 
   displayDialog = false;
   isEditing = false;
-  categoryForm: { name: string; id?: string } = { name: '' };
+  categoryForm: {
+    name: string;
+    slug?: string;
+    description?: string;
+    parentCategoryId?: string;
+    id?: string;
+    existingImageUrl?: string;
+  } = {
+    name: '',
+    slug: '',
+    description: '',
+    parentCategoryId: undefined,
+  };
   selectedFile: File | null = null;
 
   ngOnInit() {
@@ -81,7 +97,7 @@ export class CategoriesComponent implements OnInit {
 
   showDialog() {
     this.isEditing = false;
-    this.categoryForm = { name: '' };
+    this.categoryForm = { name: '', slug: '', description: '' };
     this.selectedFile = null;
     this.displayDialog = true;
   }
@@ -96,18 +112,25 @@ export class CategoriesComponent implements OnInit {
 
   editCategory(category: Category) {
     this.isEditing = true;
-    this.categoryForm = { name: category.name, id: category._id };
+    this.categoryForm = {
+      name: category.name,
+      slug: category.slug,
+      description: category.description,
+      parentCategoryId: category.parentCategoryId,
+      existingImageUrl: category.image?.secure_url,
+      id: category._id,
+    };
     this.selectedFile = null;
     this.displayDialog = true;
   }
 
   saveCategory() {
-    this.isLoading.set(true);
+    this.isSaving.set(true); // Using isSaving instead of isLoading for the button state
     if (this.isEditing && this.categoryForm.id) {
       this.categoryService
         .update(
           this.categoryForm.id,
-          { name: this.categoryForm.name },
+          { name: this.categoryForm.name, description: this.categoryForm.description },
           this.selectedFile || undefined
         )
         .subscribe({
@@ -119,6 +142,7 @@ export class CategoriesComponent implements OnInit {
             });
             this.loadCategories();
             this.hideDialog();
+            this.isSaving.set(false);
           },
           error: () => {
             this.messageService.add({
@@ -126,29 +150,35 @@ export class CategoriesComponent implements OnInit {
               summary: 'Error',
               detail: 'Could not update category',
             });
-            this.isLoading.set(false);
+            this.isSaving.set(false);
           },
         });
     } else if (this.selectedFile) {
-      this.categoryService.create({ name: this.categoryForm.name }, this.selectedFile).subscribe({
-        next: () => {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Category created',
-          });
-          this.loadCategories();
-          this.hideDialog();
-        },
-        error: () => {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Could not create category',
-          });
-          this.isLoading.set(false);
-        },
-      });
+      this.categoryService
+        .create(
+          { name: this.categoryForm.name, description: this.categoryForm.description },
+          this.selectedFile
+        )
+        .subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'Category created',
+            });
+            this.loadCategories();
+            this.hideDialog();
+            this.isSaving.set(false); // Added this line
+          },
+          error: () => {
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Could not create category',
+            });
+            this.isSaving.set(false); // Changed from isLoading to isSaving
+          },
+        });
     }
   }
 

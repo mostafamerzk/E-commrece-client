@@ -28,6 +28,8 @@ export interface Category {
   // "Home Electronics" → "home-electronics"
   slug: string;
 
+  description?: string;
+
   image: CloudinaryImage;
 
   // Optional: only present for subcategories.
@@ -50,6 +52,7 @@ export interface Category {
  */
 export interface CreateCategoryPayload {
   name: string;
+  description?: string;
   // Optional: include to make this a subcategory of an existing category
   parentCategoryId?: string;
 }
@@ -60,6 +63,7 @@ export interface CreateCategoryPayload {
  */
 export interface UpdateCategoryPayload {
   name?: string;
+  description?: string;
   // The image file is handled via FormData — not included here
 }
 
