@@ -428,7 +428,7 @@
 ---
 
 ### [TASK-K02] Main Layout Component (Header + Footer)
-**Status:** [ ]
+**Status:** [x]
 **Phase:** 1 — Layouts
 **Files to create:**
 - src/app/layouts/main-layout/main-layout.component.ts
