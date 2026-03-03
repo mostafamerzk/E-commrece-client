@@ -1,0 +1,6 @@
+:host {
+  display: block;
+}
+::ng-deep .p-datatable-sm .p-datatable-tbody > tr > td {
+  padding: 0.5rem 1rem;
+}
