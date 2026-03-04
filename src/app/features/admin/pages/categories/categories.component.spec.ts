@@ -26,6 +26,7 @@ describe('CategoriesComponent', () => {
       _id: '1',
       name: 'Cat 1',
       slug: 'cat-1',
+      description: 'Description 1',
       image: { secure_url: 'url1', public_id: 'id1' },
       createdAt: new Date().toISOString(),
       createdBy: 'user1',
@@ -34,6 +35,7 @@ describe('CategoriesComponent', () => {
       _id: '2',
       name: 'Dog 1',
       slug: 'dog-1',
+      description: 'Description 2',
       image: { secure_url: 'url2', public_id: 'id2' },
       createdAt: new Date().toISOString(),
       createdBy: 'user2',
@@ -184,6 +186,7 @@ describe('CategoriesComponent', () => {
     expect(component.displayDialog).toBeTrue();
     expect(component.isEditing).toBeTrue();
     expect(component.categoryForm.name).toBe('Cat 1');
+    expect(component.categoryForm.description).toBe('Description 1');
     expect(component.categoryForm.id).toBe('1');
     expect(component.selectedFile).toBeNull();
   });
@@ -214,9 +217,9 @@ describe('CategoriesComponent', () => {
     expect(messageServiceMock.add).toHaveBeenCalledWith(
       jasmine.objectContaining({ severity: 'success' })
     );
-    // loadCategories() is called after success → getAll called on init + after save = 2
     expect(categoryServiceMock.getAll).toHaveBeenCalledTimes(2);
     expect(component.displayDialog).toBeFalse();
+    expect(component.isSaving()).toBeFalse();
   });
 
   it('should not call create() when no file is selected', () => {
@@ -266,6 +269,7 @@ describe('CategoriesComponent', () => {
     );
     expect(categoryServiceMock.getAll).toHaveBeenCalledTimes(2);
     expect(component.displayDialog).toBeFalse();
+    expect(component.isSaving()).toBeFalse();
   });
 
   it('should pass the new file to update() when a replacement file is selected', () => {

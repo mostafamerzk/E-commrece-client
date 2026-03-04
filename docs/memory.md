@@ -83,8 +83,9 @@
 | TASK-F02 | HTTP Interceptors (auth, error, loading) | Fathi | 2026-03-02 |
 | TASK-M01 | StorageService + AuthService | Mostafa | 2026-03-02 |
 | TASK-M02 | LoadingService + ToastService | Mostafa | 2026-03-02 |
+| TASK-K02 | Main Layout Component | Mokhtar | 2026-03-03 |
+| TASK-K01 | App Routing Configuration | Mokhtar | 2026-03-03 |
 | TASK-M03 | Category Service & Management | Mostafa | 2026-03-03 |
-| TASK-K01 | App Routing Configuration | Mokhtar | 2026-03-02 |
 
 ---
 
@@ -110,8 +111,8 @@ _None yet._
 
 - **Date:** 2026-03-03
 - **Who:** Antigravity (Agent)
-- **What was done:** Fixed Category Management UI blowout and compilation errors. Synchronized `CategoriesComponent` (Admin) and `CategoryService` with the new design spec (added `description`, `slug`, `parentCategoryId`). Resolved PrimeNG 18 compatibility issues and restored missing Angular imports.
-- **What is next:** Proceed with Phase 1/2 tasks (Product Service or Shared Components).
+- **What was done:** Refined `MainLayoutComponent` with "ITI Shop" branding, responsive mobile drawer, and signal-based state management (Cart count, Wishlist count, Auth status). Verified `App Routing Configuration` (TASK-K01) and ensured zero compilation errors across core layouts.
+- **What is next:** Proceed with Phase 1/2 feature work (Product Service, Cart Service, or Shared Components like Product Cards).
 
 ---
 
@@ -127,4 +128,4 @@ _None yet._
 | 2026-03-03 | Task M03 | Category Management and Empty State completed by Mostafa on branch `a` |
 | 2026-03-03 | Docs | Missing Admin Category design spec added |
 | 2026-03-03 | Task M03 | Category Management UI updated to match design spec (added description/slug) |
-| 2026-03-03 | Build Fix | Resolved compilation errors and UI blowout in Categories component |
+| 2026-03-03 | Task K01/K02 | Routing and Main Layout refined with "ITI Shop" branding; Memory updated |

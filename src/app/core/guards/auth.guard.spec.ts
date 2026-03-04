@@ -25,9 +25,7 @@ describe('authGuard', () => {
   });
 
   it('should allow access if user is logged in', () => {
-    (
-      Object.getOwnPropertyDescriptor(authServiceSpy, 'isLoggedIn')?.get as jasmine.Spy
-    ).and.returnValue(signal(true));
+    (authServiceSpy.isLoggedIn as any).set(true);
 
     const result = TestBed.runInInjectionContext(() => authGuard({} as any, {} as any));
     expect(result).toBeTrue();

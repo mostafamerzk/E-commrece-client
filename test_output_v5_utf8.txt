@@ -1,0 +1,187 @@
+﻿node.exe : npm warn 
+invalid config include=
+"src/app/layouts/main-l
+ayout/main-layout.compo
+nent.spec.ts" set in 
+command line options
+At C:\Program Files\nod
+ejs\npm.ps1:29 char:3
++   & $NODE_EXE 
+$NPM_CLI_JS $args
++   ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~
+    + CategoryInfo     
+         : 
+NotSpecified: (npm     
+warn invali...nd line  
+   options:String) [], 
+R    emoteException
+    + 
+FullyQualifiedErrorI   
+ d : NativeCommandError
+ 
+npm warn invalid 
+config Must be one or 
+more of: prod, dev, 
+optional, peer
+
+> e-commerce-client@0.0.0 test:ci
+> ng test --watch=false --browsers=ChromeHeadless
+
+[33mΓ¥»[39m Building...
+[32mΓ£ö[39m Building...
+[1mInitial chunk files[22m               [2m | [22m[1mNames[22m                          [2m | [22m [1mRaw size[22m
+[32mchunk-EZUTNM2I.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m  [36m2.27 MB[39m[2m | [22m
+[32mchunk-KRZV7HFI.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m  [36m2.00 MB[39m[2m | [22m
+[32mpolyfills.js[39m                      [2m | [22m[2mpolyfills[22m                      [2m | [22m[36m945.64 kB[39m[2m | [22m
+[32mstyles.css[39m                        [2m | [22m[2mstyles[22m                         [2m | [22m[36m487.77 kB[39m[2m | [22m
+[32mchunk-6H2HKE2R.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m[36m232.04 kB[39m[2m | [22m
+[32mchunk-76MHJYG7.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m[36m197.94 kB[39m[2m | [22m
+[32mspec-categories.component.spec.js[39m [2m | [22m[2mspec-categories.component.spec[22m [2m | [22m[36m178.92 kB[39m[2m | [22m
+[32mchunk-WXK4DBKB.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m [36m96.56 kB[39m[2m | [22m
+[32mchunk-TRMKEENR.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m [36m44.26 kB[39m[2m | [22m
+[32mchunk-2NUW7M2I.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m [36m43.44 kB[39m[2m | [22m
+[32mspec-main-layout.component.spec.js[39m[2m | [22m[2mspec-main-layout.component.spec[22m[2m | [22m [36m37.81 kB[39m[2m | [22m
+[32mchunk-EIOHZ6FL.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m [36m23.83 kB[39m[2m | [22m
+[32mchunk-7DCVMVON.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m [36m20.42 kB[39m[2m | [22m
+[32mspec-app.routes.spec.js[39m           [2m | [22m[2mspec-app.routes.spec[22m           [2m | [22m [36m14.85 kB[39m[2m | [22m
+[32mchunk-D5GWPRGX.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m [36m12.20 kB[39m[2m | [22m
+[32mspec-auth.service.spec.js[39m         [2m | [22m[2mspec-auth.service.spec[22m         [2m | [22m  [36m5.07 kB[39m[2m | [22m
+[32mspec-order.service.spec.js[39m        [2m | [22m[2mspec-order.service.spec[22m        [2m | [22m  [36m4.63 kB[39m[2m | [22m
+[32mtest_main.js[39m                      [2m | [22m[2mtest_main[22m                      [2m | [22m  [36m4.39 kB[39m[2m | [22m
+[32mspec-category.service.spec.js[39m     [2m | [22m[2mspec-category.service.spec[22m     [2m | [22m  [36m3.75 kB[39m[2m | [22m
+[32mspec-error.interceptor.spec.js[39m    [2m | [22m[2mspec-error.interceptor.spec[22m    [2m | [22m  [36m3.65 kB[39m[2m | [22m
+[32mspec-api.service.spec.js[39m          [2m | [22m[2mspec-api.service.spec[22m          [2m | [22m  [36m3.02 kB[39m[2m | [22m
+[32mspec-toast.service.spec.js[39m        [2m | [22m[2mspec-toast.service.spec[22m        [2m | [22m  [36m2.86 kB[39m[2m | [22m
+[32mspec-storage.service.spec.js[39m      [2m | [22m[2mspec-storage.service.spec[22m      [2m | [22m  [36m2.54 kB[39m[2m | [22m
+[32mspec-seller.guard.spec.js[39m         [2m | [22m[2mspec-seller.guard.spec[22m         [2m | [22m  [36m2.38 kB[39m[2m | [22m
+[32mspec-app.spec.js[39m                  [2m | [22m[2mspec-app.spec[22m                  [2m | [22m  [36m2.37 kB[39m[2m | [22m
+[32mchunk-AGWXSFXK.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m  [36m2.26 kB[39m[2m | [22m
+[32mspec-loading.interceptor.spec.js[39m  [2m | [22m[2mspec-loading.interceptor.spec[22m  [2m | [22m  [36m2.10 kB[39m[2m | [22m
+[32mchunk-S7UMA2UT.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m  [36m1.99 kB[39m[2m | [22m
+[32mspec-auth.interceptor.spec.js[39m     [2m | [22m[2mspec-auth.interceptor.spec[22m     [2m | [22m  [36m1.93 kB[39m[2m | [22m
+[32mchunk-E6VBBZUW.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m  [36m1.90 kB[39m[2m | [22m
+[32mspec-guest.guard.spec.js[39m          [2m | [22m[2mspec-guest.guard.spec[22m          [2m | [22m  [36m1.81 kB[39m[2m | [22m
+[32mspec-auth.guard.spec.js[39m           [2m | [22m[2mspec-auth.guard.spec[22m           [2m | [22m  [36m1.81 kB[39m[2m | [22m
+[32mspec-admin.guard.spec.js[39m          [2m | [22m[2mspec-admin.guard.spec[22m          [2m | [22m  [36m1.79 kB[39m[2m | [22m
+[32mspec-loading.service.spec.js[39m      [2m | [22m[2mspec-loading.service.spec[22m      [2m | [22m  [36m1.48 kB[39m[2m | [22m
+[32mchunk-KRAL5AVI.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m  [36m1.02 kB[39m[2m | [22m
+[32mchunk-7OQ6F6UD.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m[36m936 bytes[39m[2m | [22m
+[32mchunk-OUWUEVGJ.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m[36m733 bytes[39m[2m | [22m
+[32mchunk-2KD3EZIO.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m[36m731 bytes[39m[2m | [22m
+[32mchunk-DORTBF56.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m[36m727 bytes[39m[2m | [22m
+[32mchunk-S5VXSZVO.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m[36m669 bytes[39m[2m | [22m
+[32mchunk-36GOY32I.js[39m                 [2m | [22m[2m-[22m                              [2m | [22m[36m625 bytes[39m[2m | [22m
+[32mjasmine-cleanup-0.js[39m              [2m | [22m[2mjasmine-cleanup-0[22m              [2m | [22m[36m519 bytes[39m[2m | [22m
+
+[1m [22m                                 [2m | [22m[1mInitial total[22m                  [2m | [22m  [1m6.67 MB[22m
+
+Application bundle generation complete. [7.505 seconds] - 2026-03-03T19:02:40.180Z
+
+[32m03 03 2026 21:02:42.646:INFO [karma-server]: [39mKarma v6.4.4 server started at http://localhost:9876/
+[32m03 03 2026 21:02:42.649:INFO [launcher]: [39mLaunching browsers ChromeHeadless with concurrency unlimited
+[32m03 03 2026 21:02:42.845:INFO [launcher]: [39mStarting browser ChromeHeadless
+[32m03 03 2026 21:02:46.748:INFO [Chrome Headless 124.0.6367.119 (Windows 10)]: [39mConnected on socket 0N0VtQZ_SVQq8Ry2AAAB with id 7909063
+Chrome Headless 124.0.6367.119 (Windows 10): Executed 0 of 91[32m SUCCESS[39m (0 secs / 0 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 1 of 91[32m SUCCESS[39m (0 secs / 0.026 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 2 of 91[32m SUCCESS[39m (0 secs / 0.033 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 3 of 91[32m SUCCESS[39m (0 secs / 0.083 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 4 of 91[32m SUCCESS[39m (0 secs / 0.128 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 5 of 91[32m SUCCESS[39m (0 secs / 0.166 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 6 of 91[32m SUCCESS[39m (0 secs / 0.2 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 7 of 91[32m SUCCESS[39m (0 secs / 0.242 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 8 of 91[32m SUCCESS[39m (0 secs / 0.287 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 9 of 91[32m SUCCESS[39m (0 secs / 0.395 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 10 of 91[32m SUCCESS[39m (0 secs / 0.418 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 11 of 91[32m SUCCESS[39m (0 secs / 0.443 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 12 of 91[32m SUCCESS[39m (0 secs / 0.471 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 13 of 91[32m SUCCESS[39m (0 secs / 0.497 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 14 of 91[32m SUCCESS[39m (0 secs / 0.526 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 15 of 91[32m SUCCESS[39m (0 secs / 0.549 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 16 of 91[32m SUCCESS[39m (0 secs / 0.575 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 17 of 91[32m SUCCESS[39m (0 secs / 0.6 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 18 of 91[32m SUCCESS[39m (0 secs / 0.623 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 19 of 91[32m SUCCESS[39m (0 secs / 0.652 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 20 of 91[32m SUCCESS[39m (0 secs / 0.678 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 21 of 91[32m SUCCESS[39m (0 secs / 0.704 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 22 of 91[32m SUCCESS[39m (0 secs / 0.737 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 23 of 91[32m SUCCESS[39m (0 secs / 0.766 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 24 of 91[32m SUCCESS[39m (0 secs / 0.768 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 25 of 91[32m SUCCESS[39m (0 secs / 0.771 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 26 of 91[32m SUCCESS[39m (0 secs / 0.776 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 27 of 91[32m SUCCESS[39m (0 secs / 0.778 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 28 of 91[32m SUCCESS[39m (0 secs / 0.78 secs)
+[1A[2KERROR: [36m'API Error:', HttpErrorResponse{headers: _HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: 'https://e-commerce-node-iti.vercel.app/products', ok: false, type: undefined, redirected: undefined, name: 'HttpErrorResponse', message: 'Http failure response for https://e-commerce-node-iti.vercel.app/products: 500 Server Error', error: Object{message: 'Test error'}}[39m
+Chrome Headless 124.0.6367.119 (Windows 10): Executed 28 of 91[32m SUCCESS[39m (0 secs / 0.78 secs)
+ERROR: 'API Error:', HttpErrorResponse{headers: _HttpHeaders{headers: Map{}, normalizedNames: Map{}, lazyInit: undefined, lazyUpdate: null}, status: 500, statusText: 'Server Error', url: 'https://e-commerce-node-iti.vercel.app/products', ok: false, type: undefined, redirected: undefined, name: 'HttpErrorResponse', message: 'Http failure response for https://e-commerce-node-iti.vercel.app/products: 500 Server Error', error: Object{message: 'Test error'}}
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 29 of 91[32m SUCCESS[39m (0 secs / 0.783 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 30 of 91[32m SUCCESS[39m (0 secs / 0.786 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 31 of 91[32m SUCCESS[39m (0 secs / 0.788 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 32 of 91[32m SUCCESS[39m (0 secs / 0.817 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 33 of 91[32m SUCCESS[39m (0 secs / 0.834 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 34 of 91[32m SUCCESS[39m (0 secs / 0.856 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 35 of 91[32m SUCCESS[39m (0 secs / 0.87 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 36 of 91[32m SUCCESS[39m (0 secs / 0.88 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 37 of 91[32m SUCCESS[39m (0 secs / 0.887 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 38 of 91[32m SUCCESS[39m (0 secs / 0.894 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 39 of 91[32m SUCCESS[39m (0 secs / 0.897 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 40 of 91[32m SUCCESS[39m (0 secs / 0.899 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 41 of 91[32m SUCCESS[39m (0 secs / 0.902 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 42 of 91[32m SUCCESS[39m (0 secs / 0.904 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 43 of 91[32m SUCCESS[39m (0 secs / 0.907 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 44 of 91[32m SUCCESS[39m (0 secs / 0.909 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 45 of 91[32m SUCCESS[39m (0 secs / 0.911 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 46 of 91[32m SUCCESS[39m (0 secs / 0.914 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 47 of 91[32m SUCCESS[39m (0 secs / 0.916 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 48 of 91[32m SUCCESS[39m (0 secs / 0.918 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 49 of 91[32m SUCCESS[39m (0 secs / 0.919 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 50 of 91[32m SUCCESS[39m (0 secs / 0.92 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 51 of 91[32m SUCCESS[39m (0 secs / 0.922 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 52 of 91[32m SUCCESS[39m (0 secs / 0.924 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 53 of 91[32m SUCCESS[39m (0 secs / 0.927 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 54 of 91[32m SUCCESS[39m (0 secs / 0.929 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 55 of 91[32m SUCCESS[39m (0 secs / 0.931 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 56 of 91[32m SUCCESS[39m (0 secs / 0.933 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 57 of 91[32m SUCCESS[39m (0 secs / 0.935 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 58 of 91[32m SUCCESS[39m (0 secs / 0.938 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 59 of 91[32m SUCCESS[39m (0 secs / 0.94 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 60 of 91[32m SUCCESS[39m (0 secs / 0.942 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 61 of 91[32m SUCCESS[39m (0 secs / 0.943 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 62 of 91[32m SUCCESS[39m (0 secs / 0.944 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 63 of 91[32m SUCCESS[39m (0 secs / 0.946 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 64 of 91[32m SUCCESS[39m (0 secs / 0.948 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 65 of 91[32m SUCCESS[39m (0 secs / 0.95 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 66 of 91[32m SUCCESS[39m (0 secs / 0.952 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 67 of 91[32m SUCCESS[39m (0 secs / 1.021 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 68 of 91[32m SUCCESS[39m (0 secs / 1.035 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 69 of 91[32m SUCCESS[39m (0 secs / 1.045 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 70 of 91[32m SUCCESS[39m (0 secs / 1.058 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 71 of 91[32m SUCCESS[39m (0 secs / 1.07 secs)
+[1A[2KERROR: [36m'[API ERROR]:', 'Unauthorized ΓÇö please login again'[39m
+Chrome Headless 124.0.6367.119 (Windows 10): Executed 71 of 91[32m SUCCESS[39m (0 secs / 1.07 secs)
+ERROR: '[API ERROR]:', 'Unauthorized ΓÇö please login again'
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 72 of 91[32m SUCCESS[39m (0 secs / 1.074 secs)
+[1A[2KERROR: [36m'[API ERROR]:', 'Server error ΓÇö our team is looking into it'[39m
+Chrome Headless 124.0.6367.119 (Windows 10): Executed 72 of 91[32m SUCCESS[39m (0 secs / 1.074 secs)
+ERROR: '[API ERROR]:', 'Server error ΓÇö our team is looking into it'
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 73 of 91[32m SUCCESS[39m (0 secs / 1.076 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 74 of 91[32m SUCCESS[39m (0 secs / 1.079 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 75 of 91[32m SUCCESS[39m (0 secs / 1.081 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 76 of 91[32m SUCCESS[39m (0 secs / 1.083 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 77 of 91[32m SUCCESS[39m (0 secs / 1.085 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 78 of 91[32m SUCCESS[39m (0 secs / 1.088 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 79 of 91[32m SUCCESS[39m (0 secs / 1.09 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 80 of 91[32m SUCCESS[39m (0 secs / 1.092 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 81 of 91[32m SUCCESS[39m (0 secs / 1.095 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 82 of 91[32m SUCCESS[39m (0 secs / 1.098 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 83 of 91[32m SUCCESS[39m (0 secs / 1.1 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 84 of 91[32m SUCCESS[39m (0 secs / 1.102 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 85 of 91[32m SUCCESS[39m (0 secs / 1.104 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 86 of 91[32m SUCCESS[39m (0 secs / 1.106 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 87 of 91[32m SUCCESS[39m (0 secs / 1.108 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 88 of 91[32m SUCCESS[39m (0 secs / 1.109 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 89 of 91[32m SUCCESS[39m (0 secs / 1.111 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 90 of 91[32m SUCCESS[39m (0 secs / 1.113 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 91 of 91[32m SUCCESS[39m (0 secs / 1.115 secs)
+[1A[2KChrome Headless 124.0.6367.119 (Windows 10): Executed 91 of 91[32m SUCCESS[39m (1.243 secs / 1.115 secs)
+[32mTOTAL: 91 SUCCESS[39m
