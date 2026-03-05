@@ -18,6 +18,7 @@ import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 import { AUTH_FACADE, TOAST_FACADE } from './core/tokens/app.tokens';
 import { AuthService } from './core/services/auth.service';
 import { ToastService } from './core/services/toast.service';
+import { MessageService } from 'primeng/api';
 
 // Map design-system primary tokens (blue) to PrimeNG semantic tokens
 const MyPreset = definePreset(Aura, {
@@ -56,5 +57,6 @@ export const appConfig: ApplicationConfig = {
     MessageService,
     { provide: AUTH_FACADE, useExisting: AuthService },
     { provide: TOAST_FACADE, useExisting: ToastService },
+    MessageService,
   ],
 };

@@ -85,6 +85,8 @@
 | TASK-F02 | HTTP Interceptors (auth, error, loading) | Fathi | 2026-03-02 |
 | TASK-M01 | StorageService + AuthService | Mostafa | 2026-03-02 |
 | TASK-M02 | LoadingService + ToastService | Mostafa | 2026-03-02 |
+| TASK-K02 | Main Layout Component | Mokhtar | 2026-03-03 |
+| TASK-K01 | App Routing Configuration | Mokhtar | 2026-03-03 |
 | TASK-M03 | Category Service & Management | Mostafa | 2026-03-03 |
 | TASK-K01 | App Routing Configuration | Mokhtar | 2026-03-02 |
 | TASK-I03 | Review Service | Issac | 2026-03-03 |
@@ -114,8 +116,8 @@ _None yet._
 
 - **Date:** 2026-03-05
 - **Who:** Antigravity (Agent)
-- **What was done:** Completed TASK-K07 (Login & Register Pages) with shared component refactoring. Initiated and tested TASK-I04 (Reviews Section Component) with zoneless signal patterns.
-- **What is next:** Complete TASK-I04 implementation and tests.
+- **What was done:** Refined `MainLayoutComponent` with "ITI Shop" branding, responsive mobile drawer, and signal-based state management (Cart count, Wishlist count, Auth status). Verified `App Routing Configuration` (TASK-K01) and ensured zero compilation errors across core layouts.
+- **What is next:** Proceed with Phase 1/2 feature work (Product Service, Cart Service, or Shared Components like Product Cards).
 
 ---
 
@@ -136,3 +138,4 @@ _None yet._
 | 2026-03-03 | UX/Fix | Fixed label association accessibility error in Category Management |
 | 2026-03-05 | Task K07 | Login & Register pages completed (TASK-K07) |
 | 2026-03-05 | Task I04 | Reviews Section Component in progress (TASK-I04) |
+| 2026-03-03 | Task K01/K02 | Routing and Main Layout refined with "ITI Shop" branding; Memory updated |

@@ -30,9 +30,7 @@ describe('guestGuard', () => {
   });
 
   it('should redirect to home if user is already logged in', () => {
-    (
-      Object.getOwnPropertyDescriptor(authServiceSpy, 'isLoggedIn')?.get as jasmine.Spy
-    ).and.returnValue(signal(true));
+    (authServiceSpy.isLoggedIn as any).set(true);
     const mockUrlTree = {} as UrlTree;
     routerSpy.parseUrl.and.returnValue(mockUrlTree);
 
