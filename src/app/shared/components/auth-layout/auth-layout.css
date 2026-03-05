@@ -18,6 +18,7 @@
     0 20px 25px -5px rgba(0, 0, 0, 0.1),
     0 10px 10px -5px rgba(0, 0, 0, 0.04);
   border: 1px solid #f1f5f9;
+  margin: 32px 0;
 }
 
 .auth-layout-header {
@@ -31,7 +32,7 @@
 .auth-layout-logo-container {
   width: 56px;
   height: 56px;
-  background-color: #4f46e5;
+  background-color: var(--color-primary-700);
   border-radius: 12px;
   display: flex;
   align-items: center;

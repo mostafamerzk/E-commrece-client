@@ -3,8 +3,15 @@
   subtitle="Log in to your shopper account"
   [errorMessage]="errorMessage()"
 >
-  <form #loginForm="ngForm" (ngSubmit)="onSubmit(loginForm)" class="flex flex-col gap-5" auth-form>
+  <form
+    #loginForm="ngForm"
+    (ngSubmit)="onSubmit(loginForm)"
+    class="flex flex-col gap-5"
+    auth-form
+    style="padding-bottom: 1rem; margin-bottom: 1rem"
+  >
     <!-- Email -->
+    <br />
     <app-form-field label="Email Address" inputId="email">
       <app-text-input
         id="email"
@@ -22,16 +29,11 @@
         <span class="text-[11px] text-red-500 mt-0.5">Please enter a valid email</span>
       }
     </app-form-field>
-
+    <br />
     <!-- Password -->
     <div>
       <div class="flex justify-between items-center mb-1.5">
         <label for="password" class="text-[14px] font-semibold text-[#334155]">Password</label>
-        <a
-          routerLink="/auth/forgot-password"
-          class="text-xs font-semibold text-indigo-600 no-underline"
-          >Forgot?</a
-        >
       </div>
       <app-password-input
         id="password"
@@ -43,15 +45,22 @@
       >
       </app-password-input>
     </div>
+    <!--forgot password-->
+    <a
+      routerLink="/auth/forgot-password"
+      class="text-xs font-semibold no-underline hover:underline transition-colors"
+    >
+      Forgot Password?
+    </a>
 
     <!-- Remember Me -->
-    <div class="flex items-center gap-2.5">
+    <div class="flex items-center gap-2.5 mb-5" style="margin-top: 1rem">
       <input
         id="rememberMe"
         name="rememberMe"
         type="checkbox"
         [(ngModel)]="rememberMe"
-        class="w-4 h-4 rounded border-slate-300 cursor-pointer accent-indigo-600"
+        class="w-4 h-4 rounded border-slate-300 cursor-pointer accent-(--color-primary-700) hover:accent-(--color-primary-600) transition-all duration-200"
       />
       <label for="rememberMe" class="text-sm text-slate-500 cursor-pointer select-none">
         Keep me signed in
@@ -69,7 +78,12 @@
 
   <ng-container auth-footer>
     Don't have an account?
-    <a routerLink="/auth/register" class="text-indigo-600 font-bold no-underline hover:underline">
+    <a
+      routerLink="/auth/register"
+      class="text-xs font-semibold no-underline hover:underline transition-colors"
+      style="text-decoration: none; color: var(--color-primary-600)"
+      hover="color: var(--color-primary-500) transition-colors 0.3s"
+    >
       Join for free
     </a>
   </ng-container>

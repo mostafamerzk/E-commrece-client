@@ -77,6 +77,16 @@ export interface RegisterPayload {
   confirmPassword: string;
 }
 
+/**
+ * The body sent to POST /auth/resetPass.
+ */
+export interface ResetPasswordPayload {
+  otp: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+}
+
 // ─── Response Shapes ──────────────────────────────────────────────────────────
 // These describe the shape of data we RECEIVE from the backend.
 

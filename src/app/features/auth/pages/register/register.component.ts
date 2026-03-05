@@ -21,6 +21,7 @@ import { PasswordInputComponent } from '../../../../shared/components/password-i
     PasswordInputComponent,
   ],
   templateUrl: './register.component.html',
+  styleUrls: ['../auth.css'],
 })
 export class RegisterComponent {
   private authService = inject(AuthService);

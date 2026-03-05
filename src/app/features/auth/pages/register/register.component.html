@@ -74,7 +74,7 @@
         type="checkbox"
         required
         [(ngModel)]="acceptTerms"
-        class="w-4 h-4 rounded border-slate-300 cursor-pointer accent-indigo-600"
+        class="w-4 h-4 rounded border-slate-300 cursor-pointer accent-(--color-primary-700) hover:accent-(--color-primary-600) transition-all"
       />
       <label for="acceptTerms" class="text-sm text-slate-500 cursor-pointer select-none">
         I agree to the Terms & Conditions
@@ -93,7 +93,10 @@
 
   <ng-container auth-footer>
     Already have an account?
-    <a routerLink="/auth/login" class="text-indigo-600 font-bold no-underline hover:underline">
+    <a
+      routerLink="/auth/login"
+      class="text-xs font-semibold no-underline hover:underline transition-colors"
+    >
       Sign in instead
     </a>
   </ng-container>

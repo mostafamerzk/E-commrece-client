@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AuthLayout } from '../../../../shared/components/auth-layout/auth-layout';
 import { PrimaryButton } from '../../../../shared/components/primary-button/primary-button';
@@ -19,9 +19,11 @@ import { TextInputComponent } from '../../../../shared/components/text-input/tex
     TextInputComponent,
   ],
   templateUrl: './forgot-password.component.html',
+  styleUrls: ['../auth.css'],
 })
 export class ForgotPasswordComponent {
   private authService = inject(AuthService);
+  private router = inject(Router);
 
   email = '';
 
@@ -37,8 +39,14 @@ export class ForgotPasswordComponent {
     this.successMessage.set('');
 
     try {
-      await this.authService.forgotPassword(this.email);
-      this.successMessage.set('Password reset instructions sent to your email.');
+      const res = await this.authService.forgotPassword(this.email);
+      this.successMessage.set(res.message);
+      const email = this.email.toString();
+      // Redirect to reset password page with email parameter
+      setTimeout(() => {
+        this.router.navigate([`/auth/reset-password?email=${email}`]);
+      }, 2000);
+
       this.email = '';
       form.resetForm();
     } catch (error: unknown) {

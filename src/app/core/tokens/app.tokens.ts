@@ -1,6 +1,6 @@
 import { InjectionToken, Signal } from '@angular/core';
 import { LoginResponse } from '../services/auth.service';
-import { User } from '../models/auth.model';
+import { User, ResetPasswordPayload } from '../models/auth.model';
 
 export interface AuthFacade {
   login(email: string, password: string): Promise<LoginResponse>;
@@ -10,6 +10,11 @@ export interface AuthFacade {
   getAccessToken(): string | null;
   isAdmin: Signal<boolean>;
   isSeller: Signal<boolean>;
+  forgetPassword(email: string): Promise<{ message: string }>;
+  resetPassword(
+    email: string,
+    payload: Omit<ResetPasswordPayload, 'email'>
+  ): Promise<{ message: string }>;
 }
 
 export const AUTH_FACADE = new InjectionToken<AuthFacade>('AUTH_FACADE');

@@ -3,7 +3,7 @@ import { Injectable, inject, signal, computed } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { User, RegisterPayload, AuthResponse } from '../models/auth.model';
+import { User, RegisterPayload, AuthResponse, ResetPasswordPayload } from '../models/auth.model';
 import { StorageService } from './storage.service';
 
 // AuthFacade is defined in app.tokens.ts
@@ -68,7 +68,18 @@ export class AuthService {
 
   async forgotPassword(email: string): Promise<{ message: string }> {
     const response = await firstValueFrom(
-      this.http.post<{ message: string }>(`${this.baseUrl}/auth/forgot-password`, { email })
+      this.http.post<{ message: string }>(`${this.baseUrl}/auth/forgetPass`, { email })
+    );
+    console.log(response);
+    return response;
+  }
+
+  async resetPassword(
+    email: string,
+    payload: Omit<ResetPasswordPayload, 'email'>
+  ): Promise<{ message: string }> {
+    const response = await firstValueFrom(
+      this.http.post<{ message: string }>(`${this.baseUrl}/auth/resetPass?email=${email}`, payload)
     );
     return response;
   }
