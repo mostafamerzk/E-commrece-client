@@ -2,35 +2,126 @@
 @import 'primeicons/primeicons.css';
 @import 'primeflex/primeflex.css';
 
+/* ═══════════════════════════════════════════════════════════
+   DESIGN TOKENS — CSS Custom Properties
+   All colors, fonts, radii, shadows & transitions live here.
+   Component CSS references these via var(--token-name).
+   ═══════════════════════════════════════════════════════════ */
+:root {
+  /* ─── Primary (Blue) ─── */
+  --color-primary-50: #eff6ff;
+  --color-primary-100: #dbeafe;
+  --color-primary-200: #bfdbfe;
+  --color-primary-400: #60a5fa;
+  --color-primary-500: #3b82f6;
+  --color-primary-600: #2563eb;
+  --color-primary-700: #1d4ed8;
+
+  /* ─── Neutral (Slate) ─── */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #64748b;
+  --color-slate-600: #475569;
+  --color-slate-700: #334155;
+  --color-slate-800: #1e293b;
+  --color-slate-900: #0f172a;
+  --color-slate-950: #0a1628;
+
+  /* ─── Gray (forms & checkout) ─── */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-700: #374151;
+  --color-gray-900: #111827;
+
+  /* ─── Semantic: Success ─── */
+  --color-success-50: #f0fdf4;
+  --color-success-100: #ecfdf5;
+  --color-success-200: #a7f3d0;
+  --color-success-500: #22c55e;
+  --color-success-600: #16a34a;
+  --color-success-700: #15803d;
+  --color-success-800: #059669;
+
+  /* ─── Semantic: Danger ─── */
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fff1f2;
+  --color-danger-200: #fecaca;
+  --color-danger-300: #fca5a5;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+
+  /* ─── Base ─── */
+  --color-white: #ffffff;
+  --color-black: #000000;
+
+  /* ─── Typography ─── */
+  --font-family-base: 'Outfit', sans-serif;
+  --font-family-mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+
+  /* ─── Border Radius ─── */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 14px;
+  --radius-3xl: 16px;
+  --radius-4xl: 18px;
+  --radius-full: 9999px;
+
+  /* ─── Shadows ─── */
+  --shadow-xs: 0 1px 3px rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 16px rgba(15, 23, 42, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 12px 32px rgba(15, 23, 42, 0.13);
+  --shadow-dialog: 0 24px 64px rgba(0, 0, 0, 0.14);
+  --shadow-primary: 0 2px 8px rgba(37, 99, 235, 0.35);
+  --shadow-primary-lg: 0 4px 12px rgba(37, 99, 235, 0.4);
+  --shadow-primary-hover: 0 4px 12px rgba(37, 99, 235, 0.45);
+
+  /* ─── Transitions ─── */
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
+  --transition-smooth: 280ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 body {
-  font-family: 'Outfit', sans-serif;
-  background-color: #f8f9fa;
+  font-family: var(--font-family-base);
+  background-color: var(--color-slate-50);
 }
 
 /* ─── Global Toast Styles ─── */
 .p-toast .p-toast-message {
-  border-radius: 12px !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
+  border-radius: var(--radius-xl) !important;
+  box-shadow: var(--shadow-lg) !important;
 }
 
 .p-toast .p-toast-message-success {
-  background: #f0fdf4 !important;
-  border-left: 4px solid #22c55e !important;
-  color: #15803d !important;
+  background: var(--color-success-50) !important;
+  border-left: 4px solid var(--color-success-500) !important;
+  color: var(--color-success-700) !important;
 }
 
 .p-toast .p-toast-message-error {
-  background: #fef2f2 !important;
-  border-left: 4px solid #ef4444 !important;
-  color: #b91c1c !important;
+  background: var(--color-danger-50) !important;
+  border-left: 4px solid var(--color-danger-500) !important;
+  color: var(--color-danger-700) !important;
 }
 
 .p-toast .p-toast-message-success .p-toast-message-icon,
 .p-toast .p-toast-message-success .p-toast-summary {
-  color: #16a34a !important;
+  color: var(--color-success-600) !important;
 }
 
 .p-toast .p-toast-message-error .p-toast-message-icon,
 .p-toast .p-toast-message-error .p-toast-summary {
-  color: #dc2626 !important;
+  color: var(--color-danger-600) !important;
 }
