@@ -1,0 +1,248 @@
+<!-- ═══════════════ MOBILE DRAWER ═══════════════ -->
+<aside class="mobile-drawer" [class.open]="mobileMenuOpen()">
+  <div class="drawer-header">
+    <a routerLink="/" class="drawer-logo" (click)="closeMobileMenu()">
+      <div class="logo-icon"><i class="pi pi-shopping-bag"></i></div>
+      <span>ITI<span class="accent">Shop</span></span>
+    </a>
+    <button class="drawer-close" (click)="closeMobileMenu()" aria-label="Close menu">
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
+
+  <!-- Mobile Search -->
+  <div class="drawer-search">
+    <i class="pi pi-search search-icon"></i>
+    <input
+      type="text"
+      placeholder="Search products…"
+      class="drawer-search-input"
+      [(ngModel)]="searchQuery"
+      (input)="onSearchInput()"
+      (keydown)="onSearchKeydown($event)"
+    />
+  </div>
+
+  <nav class="drawer-nav" aria-label="Mobile navigation">
+    <a
+      routerLink="/"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="drawer-link"
+      (click)="closeMobileMenu()"
+    >
+      <i class="pi pi-home"></i> Home
+    </a>
+    <a
+      routerLink="/products"
+      routerLinkActive="active"
+      class="drawer-link"
+      (click)="closeMobileMenu()"
+    >
+      <i class="pi pi-box"></i> Products
+    </a>
+    <a
+      routerLink="/wishlist"
+      routerLinkActive="active"
+      class="drawer-link"
+      (click)="closeMobileMenu()"
+    >
+      <i class="pi pi-heart"></i> Wishlist
+      @if (wishlistCount() > 0) {
+        <span class="drawer-badge">{{ wishlistCount() }}</span>
+      }
+    </a>
+    <a routerLink="/cart" routerLinkActive="active" class="drawer-link" (click)="closeMobileMenu()">
+      <i class="pi pi-shopping-cart"></i> Cart
+      @if (itemCount() > 0) {
+        <span class="drawer-badge">{{ itemCount() }}</span>
+      }
+    </a>
+  </nav>
+
+  <div class="drawer-divider"></div>
+
+  @if (isLoggedIn()) {
+    <div class="drawer-user">
+      <div class="drawer-avatar"><i class="pi pi-user"></i></div>
+      <div class="drawer-user-info">
+        <span class="drawer-user-name">{{ currentUser()?.userName }}</span>
+        <span class="drawer-user-role">Member</span>
+      </div>
+    </div>
+    <nav class="drawer-nav">
+      <a
+        routerLink="/orders"
+        routerLinkActive="active"
+        class="drawer-link"
+        (click)="closeMobileMenu()"
+      >
+        <i class="pi pi-list"></i> My Orders
+      </a>
+      <a
+        routerLink="/seller"
+        routerLinkActive="active"
+        class="drawer-link"
+        (click)="closeMobileMenu()"
+      >
+        <i class="pi pi-chart-bar"></i> Seller Dashboard
+      </a>
+      <button class="drawer-link logout-link" (click)="logout()">
+        <i class="pi pi-sign-out"></i> Logout
+      </button>
+    </nav>
+  } @else {
+    <div class="drawer-auth">
+      <a routerLink="/auth/login" class="btn-outline-full" (click)="closeMobileMenu()">Login</a>
+      <a routerLink="/auth/register" class="btn-primary-full" (click)="closeMobileMenu()"
+        >Create Account</a
+      >
+    </div>
+  }
+</aside>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+<header class="site-header" [class.scrolled]="isScrolled()">
+  <div class="header-inner">
+    <div class="header-left">
+      <button
+        class="hamburger"
+        (click)="toggleMobileMenu()"
+        aria-label="Open menu"
+        [attr.aria-expanded]="mobileMenuOpen()"
+      >
+        <span class="hb-line" [class.open]="mobileMenuOpen()"></span>
+        <span class="hb-line" [class.open]="mobileMenuOpen()"></span>
+        <span class="hb-line" [class.open]="mobileMenuOpen()"></span>
+      </button>
+      <a routerLink="/" class="site-logo">
+        <div class="logo-icon"><i class="pi pi-shopping-bag"></i></div>
+        <span class="logo-text">ITI<span class="logo-accent">Shop</span></span>
+      </a>
+    </div>
+
+    <div class="header-center">
+      <nav class="desktop-nav" aria-label="Main navigation">
+        <a
+          routerLink="/"
+          routerLinkActive="nav-active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="nav-link"
+          >Home</a
+        >
+        <a routerLink="/products" routerLinkActive="nav-active" class="nav-link">Products</a>
+        <a routerLink="/wishlist" routerLinkActive="nav-active" class="nav-link">Wishlist</a>
+      </nav>
+
+      <!-- ── Search Bar ── -->
+      <div class="header-search">
+        <i class="pi pi-search search-prefix"></i>
+        <input
+          type="text"
+          placeholder="Search products, brands…"
+          class="search-input"
+          aria-label="Search products"
+          [(ngModel)]="searchQuery"
+          (input)="onSearchInput()"
+          (keydown)="onSearchKeydown($event)"
+          (focus)="onSearchInput()"
+          autocomplete="off"
+        />
+        <!-- Loading Spinner -->
+        @if (searchLoading()) {
+          <i class="pi pi-spin pi-spinner search-spinner"></i>
+        } @else if (searchQuery) {
+          <button class="search-clear" (click)="closeSearch()" aria-label="Clear search">
+            <i class="pi pi-times"></i>
+          </button>
+        } @else {
+          <kbd class="search-kbd">⌘K</kbd>
+        }
+
+        <!-- ── Search Dropdown ── -->
+        @if (searchOpen()) {
+          <div class="search-dropdown">
+            <!-- Results -->
+            @for (product of searchResults(); track product._id) {
+              <button class="search-result-item" (click)="selectProduct(product._id)">
+                <img
+                  [src]="product.mainImage.secure_url"
+                  [alt]="product.title"
+                  class="result-img"
+                />
+                <div class="result-info">
+                  <span class="result-name">{{ product.title }}</span>
+                  <span class="result-price">${{ product.finalPrice }}</span>
+                </div>
+                @if (product.discount) {
+                  <span class="result-badge">-{{ product.discount }}%</span>
+                }
+              </button>
+            }
+
+            <!-- View All Results -->
+            <button class="search-view-all" (click)="goToSearch()">
+              <i class="pi pi-search"></i>
+              View all results for "<strong>{{ searchQuery }}</strong
+              >"
+              <i class="pi pi-arrow-right"></i>
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="header-right">
+      <a routerLink="/wishlist" class="icon-btn" aria-label="Wishlist">
+        <i class="pi pi-heart"></i>
+        @if (wishlistCount() > 0) {
+          <span class="icon-badge">{{ wishlistCount() }}</span>
+        }
+      </a>
+      <a routerLink="/cart" class="icon-btn" aria-label="Shopping cart">
+        <i class="pi pi-shopping-cart"></i>
+        @if (itemCount() > 0) {
+          <span class="icon-badge">{{ itemCount() }}</span>
+        }
+      </a>
+
+      <div class="user-menu-wrap">
+        @if (isLoggedIn()) {
+          <button class="user-trigger" aria-haspopup="true" aria-label="User menu">
+            <div class="user-avatar"><i class="pi pi-user"></i></div>
+            <span class="user-name">{{ currentUser()?.userName }}</span>
+            <i class="pi pi-chevron-down chevron"></i>
+          </button>
+          <div class="user-dropdown" role="menu">
+            <div class="dropdown-header">
+              <div class="dropdown-avatar"><i class="pi pi-user"></i></div>
+              <div>
+                <p class="dropdown-name">{{ currentUser()?.userName }}</p>
+                <p class="dropdown-meta">Member Account</p>
+              </div>
+            </div>
+            <div class="dropdown-divider"></div>
+            <a routerLink="/orders" class="dropdown-item" role="menuitem">
+              <i class="pi pi-list"></i> My Orders
+            </a>
+            <a routerLink="/seller" class="dropdown-item" role="menuitem">
+              <i class="pi pi-chart-bar"></i> Seller Dashboard
+            </a>
+            <a routerLink="/profile" class="dropdown-item" role="menuitem">
+              <i class="pi pi-cog"></i> Settings
+            </a>
+            <div class="dropdown-divider"></div>
+            <button (click)="logout()" class="dropdown-item logout-item" role="menuitem">
+              <i class="pi pi-sign-out"></i> Logout
+            </button>
+          </div>
+        } @else {
+          <div class="auth-actions">
+            <a routerLink="/auth/login" class="btn-login">Login</a>
+            <a routerLink="/auth/register" class="btn-register">Join Free</a>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+</header>

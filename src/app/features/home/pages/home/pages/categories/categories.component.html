@@ -1,0 +1,83 @@
+<section class="categories-section">
+  <div class="container">
+    <!-- Section Header -->
+    <div class="section-header animate-in">
+      <div class="section-tag">Browse by category</div>
+      <h2 class="section-title">Shop by <span class="accent">Category</span></h2>
+      <p class="section-subtitle">Find exactly what you're looking for, faster.</p>
+    </div>
+
+    <!-- Loading Skeleton -->
+    @if (loading) {
+      <div class="categories-grid">
+        @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+          <div class="category-card skeleton-card">
+            <div class="skeleton skeleton-img"></div>
+            <div class="skeleton-label"></div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Error -->
+    @if (error) {
+      <div class="error-state">
+        <i class="pi pi-exclamation-circle"></i>
+        <p>Could not load categories.</p>
+      </div>
+    }
+
+    <!-- Categories Grid -->
+    @if (!loading && !error) {
+      <div class="categories-grid">
+        @for (cat of visibleCategories; track cat._id) {
+          <a
+            [routerLink]="['/products']"
+            [queryParams]="{ categoryId: cat._id }"
+            class="category-card animate-in"
+          >
+            <div class="category-img-wrap">
+              <img
+                [src]="cat.image.secure_url"
+                [alt]="cat.name"
+                class="category-img"
+                loading="lazy"
+              />
+              <div class="category-overlay"></div>
+            </div>
+            <div class="category-info">
+              <h3 class="category-name">{{ cat.name }}</h3>
+              @if (cat.description) {
+                <span class="category-desc">{{ cat.description }}</span>
+              }
+            </div>
+            <div class="category-arrow">
+              <i class="pi pi-arrow-right"></i>
+            </div>
+          </a>
+        }
+      </div>
+
+      <!-- Pagination Info -->
+      <div class="pagination-info">
+        Showing <strong>{{ visibleCategories.length }}</strong> of
+        <strong>{{ totalCount }}</strong> categories
+      </div>
+
+      <!-- Load More -->
+      @if (hasMore) {
+        <div class="section-cta">
+          <button class="btn-load-more" (click)="loadMore()" [disabled]="loadingMore">
+            @if (loadingMore) {
+              <i class="pi pi-spin pi-spinner"></i>
+              Loading...
+            } @else {
+              Load More Categories
+              <i class="pi pi-arrow-down"></i>
+            }
+          </button>
+        </div>
+      }
+    }
+  </div>
+</section>
