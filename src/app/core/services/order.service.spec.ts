@@ -60,14 +60,14 @@ describe('OrderService', () => {
 
   describe('getUserOrders()', () => {
     it('should call GET /order with params', () => {
-      // const params = { page: 1 };
+      const params = { page: 1, limit: 10 };
       const mockResponse = { message: 'Success', orders: [] };
       apiSpy.get.and.returnValue(of(mockResponse));
 
-      //   service.getUserOrders(params).subscribe((res) => {
-      //     expect(res).toEqual(mockResponse);
-      //     expect(apiSpy.get).toHaveBeenCalledWith(endpoint, params);
-      //   });
+      service.getUserOrders(params).subscribe((res) => {
+        expect(res).toEqual(mockResponse);
+        expect(apiSpy.get).toHaveBeenCalledWith(endpoint, params);
+      });
     });
   });
 

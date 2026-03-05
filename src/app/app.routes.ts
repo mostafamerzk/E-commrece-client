@@ -52,6 +52,13 @@ export const routes: Routes = [
               ),
           },
           {
+            path: 'checkout',
+            loadComponent: () =>
+              import('./features/orders/pages/checkout/checkout.component').then(
+                (m) => m.CheckoutComponent
+              ),
+          },
+          {
             path: ':id',
             loadComponent: () =>
               import('./features/orders/pages/order-detail/order-detail.component').then(

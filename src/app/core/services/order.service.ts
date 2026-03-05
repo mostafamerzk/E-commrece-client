@@ -1,12 +1,13 @@
-import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Injectable, inject } from '@angular/core';
 import { ApiService } from './api.service';
 import { API_ENDPOINTS } from '../constants/api-endpoints';
+import { Observable } from 'rxjs';
 import {
   CheckoutPayload,
   CheckoutSummary,
-  OrderResponse,
   PlaceOrderPayload,
+  OrderResponse,
+  OrdersResponse,
 } from '../models/order.model';
 
 @Injectable({
@@ -34,9 +35,9 @@ export class OrderService {
   /**
    * Retrieve all orders for the currently authenticated user.
    */
-  // getUserOrders(params?:string): Observable<OrdersResponse> {
-  //   return this.api.get<OrdersResponse>(this.endpoint, params);
-  // }
+  getUserOrders(params?: { page?: number; limit?: number }): Observable<OrdersResponse> {
+    return this.api.get<OrdersResponse>(this.endpoint, params);
+  }
 
   /**
    * Fetch details for a specific order by its unique ID.
