@@ -70,6 +70,8 @@
 | TASK-I02 | TypeScript Model Files | Issac | [x] Done | — |
 | TASK-K01 | App Routing Configuration | Mokhtar | [x] Done | task/k01 |
 | TASK-M03 | Category Service & Management (Admin) | Mostafa | [x] Done | feature/category-managment |
+| TASK-I03 | Review Service | Issac | [x] Done | task/i03-review-service |
+| TASK-K07 | Login & Register Pages | Isaac | [x] Done | — |
 
 ---
 
@@ -85,12 +87,14 @@
 | TASK-M02 | LoadingService + ToastService | Mostafa | 2026-03-02 |
 | TASK-M03 | Category Service & Management | Mostafa | 2026-03-03 |
 | TASK-K01 | App Routing Configuration | Mokhtar | 2026-03-02 |
+| TASK-I03 | Review Service | Issac | 2026-03-03 |
+| TASK-K07 | Login & Register Pages | Isaac | 2026-03-05 |
 
 ---
 
 ## Currently In Progress
 
-_Awaiting next assignment in Phase 1 (Core Services & Feature Pages)._
+- **TASK-I04:** Reviews Section Component (Shared component for product reviews)
 
 ---
 
@@ -108,10 +112,10 @@ _None yet._
 
 ## Last Session Summary
 
-- **Date:** 2026-03-03
+- **Date:** 2026-03-05
 - **Who:** Antigravity (Agent)
-- **What was done:** Fixed Category Management UI blowout and compilation errors. Synchronized `CategoriesComponent` (Admin) and `CategoryService` with the new design spec (added `description`, `slug`, `parentCategoryId`). Resolved PrimeNG 18 compatibility issues and restored missing Angular imports.
-- **What is next:** Proceed with Phase 1/2 tasks (Product Service or Shared Components).
+- **What was done:** Completed TASK-K07 (Login & Register Pages) with shared component refactoring. Initiated and tested TASK-I04 (Reviews Section Component) with zoneless signal patterns.
+- **What is next:** Complete TASK-I04 implementation and tests.
 
 ---
 
@@ -128,3 +132,7 @@ _None yet._
 | 2026-03-03 | Docs | Missing Admin Category design spec added |
 | 2026-03-03 | Task M03 | Category Management UI updated to match design spec (added description/slug) |
 | 2026-03-03 | Build Fix | Resolved compilation errors and UI blowout in Categories component |
+| 2026-03-03 | Task I03 | Review Service implemented and verified (TASK-I03) |
+| 2026-03-03 | UX/Fix | Fixed label association accessibility error in Category Management |
+| 2026-03-05 | Task K07 | Login & Register pages completed (TASK-K07) |
+| 2026-03-05 | Task I04 | Reviews Section Component in progress (TASK-I04) |

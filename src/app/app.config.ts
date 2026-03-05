@@ -3,9 +3,10 @@ import {
   provideBrowserGlobalErrorListeners,
   provideZonelessChangeDetection,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
+import { MessageService } from 'primeng/api';
 import Aura from '@primeng/themes/aura';
 import { definePreset } from '@primeng/themes';
 
@@ -41,7 +42,7 @@ export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZonelessChangeDetection(),
-    provideRouter(routes),
+    provideRouter(routes, withComponentInputBinding()),
     provideAnimationsAsync(),
     providePrimeNG({
       theme: {
@@ -52,6 +53,7 @@ export const appConfig: ApplicationConfig = {
       },
     }),
     provideHttpClient(withInterceptors([authInterceptor, errorInterceptor, loadingInterceptor])),
+    MessageService,
     { provide: AUTH_FACADE, useExisting: AuthService },
     { provide: TOAST_FACADE, useExisting: ToastService },
   ],

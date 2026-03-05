@@ -1,46 +1,87 @@
-import { Injectable, signal, inject, computed } from '@angular/core';
-import { AuthFacade } from '../tokens/app.tokens';
+import { Injectable, inject, signal, computed } from '@angular/core';
+
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { User, RegisterPayload, AuthResponse } from '../models/auth.model';
 import { StorageService } from './storage.service';
-import { User, LoginPayload, AuthResponse } from '../models/auth.model';
-import { ApiService } from './api.service';
-import { Observable, tap } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root',
-})
-export class AuthService implements AuthFacade {
+// AuthFacade is defined in app.tokens.ts
+
+export interface LoginPayload {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  success: string;
+  message: string;
+  access_token: string;
+  refresh_token: string;
+}
+
+@Injectable({ providedIn: 'root' })
+export class AuthService {
+  private http = inject(HttpClient);
   private storage = inject(StorageService);
-  private api = inject(ApiService);
+  private baseUrl = environment.apiUrl;
 
-  // Core signals
-  currentUser = signal<User | null>(this.storage.getItem('user'));
-  private _token = signal<string | null>(this.storage.getItem('access_token'));
+  // Core signals for UI reactivity
+  currentUser = signal<User | null>(this.storage.getItem<User>('user'));
+  private _token = signal<string | null>(localStorage.getItem('access_token'));
 
-  // Computed signals for derived state
+  // Computed signals
   isLoggedIn = computed(() => !!this._token());
-  role = computed(() => this.currentUser()?.role || null);
-  isAdmin = computed(() => this.role() === 'admin');
-  isSeller = computed(() => this.role() === 'seller');
+  isAdmin = computed(() => this.currentUser()?.role === 'admin');
+  isSeller = computed(() => this.currentUser()?.role === 'seller');
 
-  login(payload: LoginPayload): Observable<AuthResponse> {
-    return this.api.post<AuthResponse, LoginPayload>('/auth/login', payload).pipe(
-      tap((res) => {
-        this.storage.setItem('access_token', res.token);
-        this.storage.setItem('user', res.user);
-        this.storage.setItem('role', res.user.role);
-
-        this._token.set(res.token);
-        this.currentUser.set(res.user);
-      })
+  async login(email: string, password: string): Promise<LoginResponse> {
+    const payload = { email, password };
+    const response = await firstValueFrom(
+      this.http.post<LoginResponse & { user?: User }>(`${this.baseUrl}/auth/login`, payload)
     );
+
+    if (response?.access_token) {
+      localStorage.setItem('access_token', response.access_token);
+      this._token.set(response.access_token);
+    }
+
+    if (response?.refresh_token) {
+      localStorage.setItem('refresh_token', response.refresh_token);
+    }
+
+    // If API returns user object, store it for UI reactivity
+    if (response?.user) {
+      this.storage.setItem('user', response.user);
+      this.currentUser.set(response.user);
+    }
+
+    return response as LoginResponse;
+  }
+
+  async register(payload: RegisterPayload): Promise<AuthResponse> {
+    const response = await firstValueFrom(
+      this.http.post<AuthResponse>(`${this.baseUrl}/auth/register`, payload)
+    );
+    return response;
+  }
+
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const response = await firstValueFrom(
+      this.http.post<{ message: string }>(`${this.baseUrl}/auth/forgot-password`, { email })
+    );
+    return response;
   }
 
   logout(): void {
-    this.storage.removeItem('access_token');
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
     this.storage.removeItem('user');
-    this.storage.removeItem('role');
-
     this._token.set(null);
     this.currentUser.set(null);
+  }
+
+  getAccessToken(): string | null {
+    return localStorage.getItem('access_token');
   }
 }

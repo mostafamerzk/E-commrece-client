@@ -23,25 +23,26 @@ export interface Review {
   _id: string;
 
   // The MongoDB ObjectId of the user who wrote this review.
-  // The ReviewsSectionComponent checks this against AuthService.currentUser()._id
-  // to decide whether to show edit/delete buttons for this review.
   userId: string;
+
+  // Populated user information for display.
+  user: {
+    _id: string;
+    userName: string;
+  };
 
   productId: string;
 
   // Rating is constrained to 1–5 stars (enforced by the backend).
-  // The frontend form should also enforce this with a min/max validator
-  // so the user gets instant feedback rather than a backend rejection.
   rating: 1 | 2 | 3 | 4 | 5;
 
   // Optional because the API contract marks comment as optional
   comment?: string;
 
   // Optional: present only if this review is a reply to another review.
-  // Contains the MongoDB ObjectId of the parent review.
   parentComment?: string;
 
-  createdAt?: string;
+  createdAt: string;
   updatedAt?: string;
 }
 

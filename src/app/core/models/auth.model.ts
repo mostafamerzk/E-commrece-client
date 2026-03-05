@@ -74,6 +74,7 @@ export interface RegisterPayload {
   userName: string;
   email: string;
   password: string;
+  confirmPassword: string;
 }
 
 // ─── Response Shapes ──────────────────────────────────────────────────────────

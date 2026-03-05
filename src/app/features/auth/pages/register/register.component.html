@@ -1,0 +1,100 @@
+<app-auth-layout
+  title="Create Account"
+  subtitle="Join us for a better shopping experience"
+  [errorMessage]="errorMessage()"
+>
+  <form
+    #registerForm="ngForm"
+    (ngSubmit)="onSubmit(registerForm)"
+    class="flex flex-col gap-5"
+    auth-form
+  >
+    <!-- Full Name -->
+    <app-form-field label="Full Name" inputId="fullName">
+      <app-text-input
+        id="fullName"
+        name="fullName"
+        type="text"
+        placeholder="John Doe"
+        iconPath="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+        [disabled]="isLoading()"
+        [(ngModel)]="fullName"
+        required
+      >
+      </app-text-input>
+    </app-form-field>
+
+    <!-- Email -->
+    <app-form-field label="Email Address" inputId="email">
+      <app-text-input
+        id="email"
+        name="email"
+        type="email"
+        placeholder="alex@example.com"
+        iconPath="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
+        [disabled]="isLoading()"
+        [(ngModel)]="email"
+        required
+        email
+      >
+      </app-text-input>
+    </app-form-field>
+
+    <!-- Password -->
+    <app-form-field label="Password" inputId="password">
+      <app-password-input
+        id="password"
+        name="password"
+        iconPath="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+        [disabled]="isLoading()"
+        [(ngModel)]="password"
+        required
+      >
+      </app-password-input>
+    </app-form-field>
+
+    <!-- Confirm Password -->
+    <app-form-field label="Confirm Password" inputId="confirmPassword">
+      <app-password-input
+        id="confirmPassword"
+        name="confirmPassword"
+        iconPath="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+        [disabled]="isLoading()"
+        [(ngModel)]="confirmPassword"
+        required
+      >
+      </app-password-input>
+    </app-form-field>
+
+    <!-- Terms -->
+    <div class="flex items-center gap-2.5">
+      <input
+        id="acceptTerms"
+        name="acceptTerms"
+        type="checkbox"
+        required
+        [(ngModel)]="acceptTerms"
+        class="w-4 h-4 rounded border-slate-300 cursor-pointer accent-indigo-600"
+      />
+      <label for="acceptTerms" class="text-sm text-slate-500 cursor-pointer select-none">
+        I agree to the Terms & Conditions
+      </label>
+    </div>
+
+    <!-- Submit -->
+    <app-primary-button
+      [isDisabled]="registerForm.invalid || !acceptTerms"
+      [isLoading]="isLoading()"
+      loadingText="Creating Account..."
+    >
+      Sign Up
+    </app-primary-button>
+  </form>
+
+  <ng-container auth-footer>
+    Already have an account?
+    <a routerLink="/auth/login" class="text-indigo-600 font-bold no-underline hover:underline">
+      Sign in instead
+    </a>
+  </ng-container>
+</app-auth-layout>
