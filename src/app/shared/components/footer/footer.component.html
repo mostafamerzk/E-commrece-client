@@ -1,0 +1,73 @@
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <a routerLink="/" class="footer-logo">
+        <i class="pi pi-shopping-bag"></i>
+        <span>ITI<span class="accent">Shop</span></span>
+      </a>
+      <p class="footer-tagline">Premium products. Seamless experience. Your next favourite shop.</p>
+      <div class="footer-socials">
+        <a href="#" class="social-btn" aria-label="Facebook"><i class="pi pi-facebook"></i></a>
+        <a href="#" class="social-btn" aria-label="Twitter"><i class="pi pi-twitter"></i></a>
+        <a href="#" class="social-btn" aria-label="Instagram"><i class="pi pi-instagram"></i></a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-heading">Shop</h4>
+      <ul class="footer-links">
+        <li><a routerLink="/products">All Products</a></li>
+        <li>
+          <a routerLink="/products" [queryParams]="{ category: 'electronics' }">Electronics</a>
+        </li>
+        <li><a routerLink="/products" [queryParams]="{ category: 'fashion' }">Fashion</a></li>
+        <li><a routerLink="/products" [queryParams]="{ category: 'home' }">Home & Living</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-heading">Account</h4>
+      <ul class="footer-links">
+        <li><a routerLink="/auth/login">Login</a></li>
+        <li><a routerLink="/auth/register">Register</a></li>
+        <li><a routerLink="/orders">My Orders</a></li>
+        <li><a routerLink="/wishlist">Wishlist</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h4 class="footer-heading">Support</h4>
+      <ul class="footer-links">
+        <li><a href="#">Contact Us</a></li>
+        <li><a href="#">FAQs</a></li>
+        <li><a href="#">Shipping Policy</a></li>
+        <li><a href="#">Returns</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-newsletter">
+      <h4 class="footer-heading">Stay in the loop</h4>
+      <p class="footer-newsletter-sub">Exclusive deals and new arrivals to your inbox.</p>
+      <div class="newsletter-form">
+        <input
+          type="email"
+          placeholder="your@email.com"
+          class="newsletter-input"
+          aria-label="Email address"
+        />
+        <button class="newsletter-btn" aria-label="Subscribe">
+          <i class="pi pi-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p class="footer-copy">&copy; 2026 ITI Shop. All rights reserved.</p>
+    <div class="footer-legal">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Terms of Service</a>
+      <a href="#">Cookie Policy</a>
+    </div>
+  </div>
+</footer>

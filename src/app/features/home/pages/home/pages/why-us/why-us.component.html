@@ -1,0 +1,24 @@
+<section class="why-us">
+  <div class="container">
+    <div class="section-header underline-center animate-in">
+      <h2 class="section-title">Why Choose <span class="accent">ITI Shop</span>?</h2>
+      <p class="section-subtitle">
+        We combine premium quality with world-class service to ensure your shopping experience is
+        nothing short of exceptional.
+      </p>
+    </div>
+
+    <div class="features-grid">
+      @for (feature of features; track feature.title) {
+        <div class="feature-card animate-in">
+          <div class="icon-wrap">
+            <i [class]="feature.icon"></i>
+          </div>
+          <h3 class="feature-title">{{ feature.title }}</h3>
+          <p class="feature-text">{{ feature.description }}</p>
+          <div class="card-bg"></div>
+        </div>
+      }
+    </div>
+  </div>
+</section>
