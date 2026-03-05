@@ -1,0 +1,44 @@
+<div class="auth-layout-container">
+  <div class="auth-layout-card">
+    <!-- Branding & Header -->
+    <div class="auth-layout-header">
+      <div class="auth-layout-logo-container">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="auth-layout-logo"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+          />
+        </svg>
+      </div>
+      <h2 class="auth-layout-title">{{ title() }}</h2>
+      <p class="auth-layout-subtitle">{{ subtitle() }}</p>
+    </div>
+
+    @if (errorMessage()) {
+    <div class="auth-layout-error">
+      <svg class="auth-layout-error-icon" fill="currentColor" viewBox="0 0 20 20">
+        <path
+          fill-rule="evenodd"
+          d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+          clip-rule="evenodd"
+        ></path>
+      </svg>
+      {{ errorMessage() }}
+    </div>
+    }
+
+    <ng-content select="[auth-form]"></ng-content>
+
+    <div class="auth-layout-footer">
+      <ng-content select="[auth-footer]"></ng-content>
+    </div>
+  </div>
+</div>

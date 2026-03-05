@@ -1,6 +1,5 @@
-@import 'tailwindcss';
 @import 'primeicons/primeicons.css';
-@import 'primeflex/primeflex.css';
+@import 'tailwindcss';
 
 /* ═══════════════════════════════════════════════════════════
    DESIGN TOKENS — CSS Custom Properties

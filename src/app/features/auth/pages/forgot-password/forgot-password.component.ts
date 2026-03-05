@@ -1,15 +1,14 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { RouterLink, Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AuthLayout } from '../../../../shared/components/auth-layout/auth-layout';
 import { PrimaryButton } from '../../../../shared/components/primary-button/primary-button';
 import { FormFieldComponent } from '../../../../shared/components/form-field/form-field';
 import { TextInputComponent } from '../../../../shared/components/text-input/text-input';
-import { PasswordInputComponent } from '../../../../shared/components/password-input/password-input';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-forgot-password',
   standalone: true,
   imports: [
     FormsModule,
@@ -18,39 +17,44 @@ import { PasswordInputComponent } from '../../../../shared/components/password-i
     PrimaryButton,
     FormFieldComponent,
     TextInputComponent,
-    PasswordInputComponent,
   ],
-  templateUrl: './login.component.html',
+  templateUrl: './forgot-password.component.html',
   styleUrls: ['../auth.css'],
 })
-export class LoginComponent {
+export class ForgotPasswordComponent {
   private authService = inject(AuthService);
   private router = inject(Router);
 
   email = '';
-  password = '';
-  rememberMe = false;
 
   isLoading = signal(false);
   errorMessage = signal('');
+  successMessage = signal('');
 
   async onSubmit(form: NgForm) {
     if (form.invalid) return;
 
     this.isLoading.set(true);
     this.errorMessage.set('');
+    this.successMessage.set('');
 
     try {
-      await this.authService.login(this.email, this.password);
+      const res = await this.authService.forgotPassword(this.email);
+      this.successMessage.set(res.message);
+      const email = this.email.toString();
+      // Redirect to reset password page with email parameter
+      setTimeout(() => {
+        this.router.navigate([`/auth/reset-password?email=${email}`]);
+      }, 2000);
 
-      // Navigate to home after successful login
-      this.router.navigate(['/']);
+      this.email = '';
+      form.resetForm();
     } catch (error: unknown) {
       const err = error as { error?: { message?: string } | string; message?: string };
       const message =
         (typeof err.error === 'object' ? err.error?.message : err.error) ||
         err.message ||
-        'Invalid email or password. Please try again.';
+        'Failed to process request. Please try again.';
       this.errorMessage.set(message);
     } finally {
       this.isLoading.set(false);

@@ -1,6 +1,6 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { RouterLink, Router } from '@angular/router';
+import { RouterLink, Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AuthLayout } from '../../../../shared/components/auth-layout/auth-layout';
 import { PrimaryButton } from '../../../../shared/components/primary-button/primary-button';
@@ -9,7 +9,7 @@ import { TextInputComponent } from '../../../../shared/components/text-input/tex
 import { PasswordInputComponent } from '../../../../shared/components/password-input/password-input';
 
 @Component({
-  selector: 'app-login',
+  selector: 'app-reset-password',
   standalone: true,
   imports: [
     FormsModule,
@@ -20,37 +20,61 @@ import { PasswordInputComponent } from '../../../../shared/components/password-i
     TextInputComponent,
     PasswordInputComponent,
   ],
-  templateUrl: './login.component.html',
+  templateUrl: './reset-password.component.html',
   styleUrls: ['../auth.css'],
 })
-export class LoginComponent {
+export class ResetPasswordComponent implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
+  private route = inject(ActivatedRoute);
 
   email = '';
+  otp = '';
   password = '';
-  rememberMe = false;
+  confirmPassword = '';
 
   isLoading = signal(false);
   errorMessage = signal('');
+  successMessage = signal('');
+
+  ngOnInit() {
+    this.email = this.route.snapshot.queryParamMap.get('email') || '';
+    console.log(this.email);
+  }
 
   async onSubmit(form: NgForm) {
     if (form.invalid) return;
 
+    if (this.password !== this.confirmPassword) {
+      this.errorMessage.set('Passwords do not match');
+      return;
+    }
+
     this.isLoading.set(true);
     this.errorMessage.set('');
+    this.successMessage.set('');
 
     try {
-      await this.authService.login(this.email, this.password);
-
-      // Navigate to home after successful login
-      this.router.navigate(['/']);
+      const payload = {
+        otp: this.otp,
+        password: this.password,
+        confirmPassword: this.confirmPassword,
+      };
+      console.log('Reset Password Request:', { email: this.email, payload });
+      const res = await this.authService.resetPassword(this.email, payload);
+      this.successMessage.set(res.message);
+      console.log(payload);
+      console.log(res);
+      // Redirect to login after successful reset after a short delay
+      setTimeout(() => {
+        this.router.navigate(['/auth/login']);
+      }, 3000);
     } catch (error: unknown) {
       const err = error as { error?: { message?: string } | string; message?: string };
       const message =
         (typeof err.error === 'object' ? err.error?.message : err.error) ||
         err.message ||
-        'Invalid email or password. Please try again.';
+        'Failed to reset password. Please try again.';
       this.errorMessage.set(message);
     } finally {
       this.isLoading.set(false);

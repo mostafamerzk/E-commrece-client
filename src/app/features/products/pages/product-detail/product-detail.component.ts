@@ -1,8 +1,17 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
+import { ReviewsSectionComponent } from '../../../../shared/components/reviews-section/reviews-section.component';
 
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  template: '<h1>Product Detail Page</h1>',
+  imports: [ReviewsSectionComponent],
+  template: `
+    <div class="p-6">
+      <h1 class="text-3xl font-bold mb-8">Product Detail Page</h1>
+      <app-reviews-section [productId]="id()" />
+    </div>
+  `,
 })
-export class ProductDetailComponent {}
+export class ProductDetailComponent {
+  id = input.required<string>();
+}
