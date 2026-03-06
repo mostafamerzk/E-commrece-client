@@ -24,35 +24,30 @@ export class CartService {
   private readonly endpoint = API_ENDPOINTS.CART;
   private readonly GUEST_CART_KEY = 'guest_cart';
 
-  // Store the cart state in a signal for reactive updates across the app
   private _cart = signal<Cart | null>(null);
   readonly cart = this._cart.asReadonly();
 
-  // Computed signals for derived state
-  readonly items = computed(() => this._cart()?.products ?? []);
+  readonly items = computed(() => (this._cart()?.products ?? []).filter((item) => !!item.product));
   readonly itemCount = computed(() =>
     this.items().reduce((count, item) => count + item.quantity, 0)
   );
   readonly totalPrice = computed(() => {
     const cart = this._cart();
     if (!cart) return 0;
-    // If backend provided totalPrice, use it, otherwise calculate (for guest cart)
-    return (
-      cart.totalPrice || this.items().reduce((total, item) => total + item.price * item.quantity, 0)
+    return this.items().reduce(
+      (total, item) => total + (item.price || item.product?.finalPrice || 0) * item.quantity,
+      0
     );
   });
 
   constructor() {
-    // Initial load
     this.loadCart();
 
-    // Effect to sync cart when user logs in or reset on logout
     effect(
       () => {
         if (this.authService.isLoggedIn()) {
           this.syncCartWithBackend().subscribe();
         } else {
-          // On logout, reload the cart (which will try to load guest cart)
           this.loadCart();
         }
       },
@@ -82,7 +77,15 @@ export class CartService {
         cart: this._cart() || { userId: 'guest', products: [], totalPrice: 0 },
       } as CartResponse);
     }
-    return this.api.get<CartResponse>(this.endpoint).pipe(tap((res) => this._cart.set(res.cart)));
+    return this.api.get<CartResponse>(this.endpoint).pipe(
+      tap((res) => {
+        if (res?.cart) {
+          this._cart.set(res.cart);
+        } else {
+          console.warn('Backend returned no cart for user');
+        }
+      })
+    );
   }
 
   addItem(payload: AddToCartPayload, product?: Product): Observable<CartResponse> {
@@ -95,7 +98,7 @@ export class CartService {
   }
 
   private addGuestItem(payload: AddToCartPayload, product?: Product): Observable<CartResponse> {
-    const currentItems = [...this.items()];
+    const currentItems = this.items().map((i) => ({ ...i }));
     const existingItemIndex = currentItems.findIndex((i) => i.product._id === payload.productId);
     const quantity = payload.quantity || 1;
 
@@ -115,7 +118,7 @@ export class CartService {
 
   updateQuantity(productId: string, payload: UpdateCartPayload): Observable<CartResponse> {
     if (!this.authService.isLoggedIn()) {
-      const currentItems = [...this.items()];
+      const currentItems = this.items().map((i) => ({ ...i }));
       const itemIndex = currentItems.findIndex((i) => i.product._id === productId);
 
       if (itemIndex > -1) {
@@ -138,7 +141,77 @@ export class CartService {
 
     return this.api
       .patch<CartResponse, UpdateCartPayload>(`${this.endpoint}/${productId}`, payload)
-      .pipe(tap((res) => this._cart.set(res.cart)));
+      .pipe(
+        tap((res) => {
+          if (res?.cart) {
+            this.mergeServerCart(res.cart);
+          } else {
+            console.warn('Backend returned empty cart in PATCH response');
+          }
+        })
+      );
+  }
+
+  /**
+   * Updates multiple products in the cart sequentially to avoid race conditions.
+   * Returns an observable of the final CartResponse.
+   */
+  updateItems(updates: { productId: string; quantity: number }[]): Observable<CartResponse | null> {
+    if (updates.length === 0) return of(null);
+    if (!this.authService.isLoggedIn()) return of(null);
+
+    // We use a recursive approach or a simple chain to ensure sequential updates
+    // since each PATCH returns the "new" cart state.
+    let chain = this.updateQuantity(updates[0].productId, { quantity: updates[0].quantity });
+
+    for (let i = 1; i < updates.length; i++) {
+      const update = updates[i];
+      chain = chain.pipe(
+        switchMap(() => this.updateQuantity(update.productId, { quantity: update.quantity }))
+      );
+    }
+
+    return chain;
+  }
+
+  /**
+   * Merges a server cart response into _cart without losing populated Product objects.
+   *
+   * The backend's PATCH /cart/:id can return products whose `product` field is
+   * either:
+   *   (a) a fully-populated Product object  → use it as-is
+   *   (b) a bare MongoDB ObjectId string    → re-attach the Product we already
+   *                                           have in local state
+   *   (c) null / undefined                  → keep the existing local item
+   *
+   * In all cases, the server's quantities, prices, and totalPrice are adopted so
+   * the local state stays in sync with the source of truth.
+   */
+  private mergeServerCart(serverCart: Cart): void {
+    const currentProducts = this._cart()?.products ?? [];
+
+    const mergedProducts = serverCart.products.map((serverItem) => {
+      // (a) Server returned a proper populated Product object — use it directly
+      if (
+        serverItem.product &&
+        typeof serverItem.product === 'object' &&
+        (serverItem.product as Product)._id
+      ) {
+        return serverItem;
+      }
+
+      // (b/c) Server returned a string ID or null/undefined — find the matching
+      // populated Product from our current local state and re-attach it
+      const productId =
+        typeof serverItem.product === 'string'
+          ? serverItem.product
+          : (serverItem.product as Product)?._id;
+
+      const existing = currentProducts.find((p) => p.product?._id === productId);
+      return existing ? { ...serverItem, product: existing.product } : serverItem;
+    });
+
+    this._cart.set({ ...serverCart, products: mergedProducts });
   }
 
   removeItem(productId: string): Observable<CartResponse> {
@@ -187,8 +260,6 @@ export class CartService {
       return this.getCart().pipe(map((res) => res));
     }
 
-    // Sync each item to backend
-    // Note: Backend might have an endpoint to sync full cart, but standard is POST /cart for each
     const syncRequests = guestCart.map((item) =>
       this.api.post<CartResponse, AddToCartPayload>(this.endpoint, {
         productId: item.product._id,
@@ -208,13 +279,37 @@ export class CartService {
     );
   }
 
-  // Check if product exists in cart
   isInCart(productId: string): boolean {
     return this.items().some((item) => item.product._id === productId);
   }
 
-  // Helper to load cart on app init if needed
   loadInitialCart() {
     this.loadCart();
+  }
+
+  /** Immediately patches the quantity in the local signal without a network call. */
+  optimisticallyUpdateQuantity(productId: string, newQty: number): void {
+    this._cart.update((current) => {
+      if (!current) return current;
+      const updatedProducts = current.products.map((item) => {
+        if (!item.product) return item;
+        return item.product._id === productId ? { ...item, quantity: newQty } : item;
+      });
+
+      return {
+        ...current,
+        products: updatedProducts,
+        totalPrice: updatedProducts.reduce((sum, item) => {
+          if (!item.product) return sum;
+          const qty = item.product._id === productId ? newQty : item.quantity;
+          return sum + (item.price ?? item.product.finalPrice ?? 0) * qty;
+        }, 0),
+      };
+    });
+  }
+
+  /** Reverts the cart signal to a previous snapshot (used on error). */
+  revertCart(snapshot: Cart): void {
+    this._cart.set(snapshot);
   }
 }
