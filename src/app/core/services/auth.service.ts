@@ -27,7 +27,7 @@ export class AuthService {
   private baseUrl = environment.apiUrl;
 
   // Core signals for UI reactivity
-  currentUser = signal<User | null>(this.storage.getItem<User>('user'));
+  currentUser = signal<User | null>(this.storage.getItem<User>('username'));
   private _token = signal<string | null>(localStorage.getItem('access_token'));
 
   // Computed signals
