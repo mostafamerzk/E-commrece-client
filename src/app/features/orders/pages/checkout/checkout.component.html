@@ -1,259 +1,365 @@
-<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
-  <!-- Page header -->
-  <div class="mb-8">
-    <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">Checkout</h1>
-    <p class="mt-1 text-sm text-gray-500">
-      Please review your items and enter your shipping details to complete your order.
-    </p>
-  </div>
+<main class="checkout-page">
+  <div class="checkout-container">
+    <!-- Header — mirrors .cart-header -->
+    <header class="checkout-header">
+      <div class="header-titles">
+        <h1>Checkout</h1>
+        <p class="item-count">
+          Securely complete your purchase. Review your items and provide your delivery information.
+        </p>
+      </div>
+    </header>
 
-  <div class="checkout-grid">
-    <!-- ── Left: Main Content (Shipping + Items) ────────────────────────── -->
-    <div class="checkout-main space-y-8">
-      <!-- Shipping Section -->
-      <section class="checkout-section">
-        <div class="section-header">
-          <span class="section-number">1</span>
-          <h2 class="text-lg font-bold text-gray-900">Shipping Details</h2>
-        </div>
+    <!-- Two-column grid — mirrors .cart-grid -->
+    <div class="checkout-grid">
+      <!-- ── Left: Main Content ──────────────────────────────────────── -->
+      <div class="checkout-main">
+        <!-- 1. Shipping Details — mirrors .cart-item-card card style -->
+        <section class="checkout-card">
+          <div class="card-header">
+            <span class="step-badge">1</span>
+            <h2 class="card-title">Shipping Details</h2>
+          </div>
 
-        <div class="p-6 md:p-8">
-          <form [formGroup]="shippingForm" novalidate>
-            <div class="form-grid-2 mb-5">
-              <!-- Full Name -->
-              <div class="form-group">
-                <label for="recipientName">Full Name</label>
-                <input
-                  id="recipientName"
-                  type="text"
-                  formControlName="recipientName"
-                  placeholder="John Doe"
-                  class="form-input"
-                  [class.error]="fieldInvalid('recipientName')"
-                />
-                @if (fieldInvalid('recipientName')) {
-                  <span class="field-error">
-                    <i class="pi pi-exclamation-circle text-[10px]"></i>
-                    Name is required
-                  </span>
-                }
-              </div>
-              <!-- Phone -->
-              <div class="form-group">
-                <label for="phone">Phone Number</label>
-                <input
-                  id="phone"
-                  type="tel"
-                  formControlName="phone"
-                  placeholder="01xxxxxxxxx"
-                  class="form-input"
-                  [class.error]="fieldInvalid('phone')"
-                />
-                @if (fieldInvalid('phone')) {
-                  <span class="field-error">
-                    <i class="pi pi-exclamation-circle text-[10px]"></i>
-                    @if (shippingForm.get('phone')?.errors?.['required']) {
-                      Phone is required
-                    } @else if (shippingForm.get('phone')?.errors?.['pattern']) {
-                      Must be 11 digits starting with 01
-                    }
-                  </span>
-                }
-              </div>
-            </div>
-
-            <!-- Address -->
-            <div class="form-group mb-5">
-              <label for="address">Shipping Address</label>
-              <input
-                id="address"
-                type="text"
-                formControlName="address"
-                placeholder="Street, building, apartment"
-                class="form-input"
-                [class.error]="fieldInvalid('address')"
-              />
-              @if (fieldInvalid('address')) {
-                <span class="field-error">
-                  <i class="pi pi-exclamation-circle text-[10px]"></i>
-                  Address is required
-                </span>
-              }
-            </div>
-
-            <div class="form-grid-2">
-              <!-- City -->
-              <div class="form-group">
-                <label for="city">City</label>
-                <select
-                  id="city"
-                  formControlName="city"
-                  class="form-select"
-                  [class.error]="fieldInvalid('city')"
-                >
-                  <option value="" disabled>Select city</option>
-                  @for (city of egyptianCities; track city) {
-                    <option [value]="city">{{ city }}</option>
+          <div class="card-body">
+            <form [formGroup]="shippingForm" novalidate>
+              <div class="form-grid-2">
+                <!-- Full Name -->
+                <div class="form-group">
+                  <label for="recipientName">Full Name</label>
+                  <input
+                    type="text"
+                    id="recipientName"
+                    formControlName="recipientName"
+                    placeholder="e.g. John Doe"
+                    class="form-input"
+                    [class.error]="fieldInvalid('recipientName')"
+                  />
+                  @if (fieldInvalid('recipientName')) {
+                    <span class="field-error">
+                      <i class="pi pi-exclamation-circle"></i>
+                      Name is required
+                    </span>
                   }
-                </select>
-                @if (fieldInvalid('city')) {
+                </div>
+
+                <!-- Phone -->
+                <div class="form-group">
+                  <label for="phone">Phone Number</label>
+                  <input
+                    type="tel"
+                    id="phone"
+                    formControlName="phone"
+                    placeholder="e.g. 01xxxxxxxxx"
+                    class="form-input"
+                    [class.error]="fieldInvalid('phone')"
+                  />
+                  @if (fieldInvalid('phone')) {
+                    <span class="field-error">
+                      <i class="pi pi-exclamation-circle"></i>
+                      @if (shippingForm.get('phone')?.errors?.['required']) {
+                        Phone is required
+                      } @else {
+                        Invalid phone format
+                      }
+                    </span>
+                  }
+                </div>
+              </div>
+
+              <!-- Address full-width -->
+              <div class="form-group form-group--full">
+                <label for="street">Shipping Address</label>
+                <input
+                  type="text"
+                  id="street"
+                  formControlName="street"
+                  placeholder="Street address, apartment, suite, etc."
+                  class="form-input"
+                  [class.error]="fieldInvalid('street')"
+                />
+                @if (fieldInvalid('street')) {
                   <span class="field-error">
-                    <i class="pi pi-exclamation-circle text-[10px]"></i>
-                    City is required
+                    <i class="pi pi-exclamation-circle"></i>
+                    Address is required
                   </span>
                 }
               </div>
-              <!-- Postal Code -->
-              <div class="form-group">
-                <label for="postalCode">Postal Code <span class="hint">(Optional)</span></label>
-                <input
-                  id="postalCode"
-                  type="text"
-                  formControlName="postalCode"
-                  placeholder="12345"
-                  class="form-input"
-                />
-              </div>
-            </div>
-          </form>
-        </div>
-      </section>
 
-      <!-- Order Items Section -->
-      <section class="checkout-section">
-        <div class="section-header">
-          <span class="section-number">2</span>
-          <h2 class="text-lg font-bold text-gray-900">Review Items</h2>
-        </div>
-
-        <div class="p-0">
-          <div class="divide-y divide-gray-100">
-            @for (item of cartItems(); track $index) {
-              <div class="item-row">
-                <div class="item-thumb">
-                  <i class="pi pi-box text-gray-300 text-xl"></i>
+              <div class="form-grid-2">
+                <!-- City -->
+                <div class="form-group">
+                  <label for="city">City</label>
+                  <select
+                    id="city"
+                    formControlName="city"
+                    class="form-select"
+                    [class.error]="fieldInvalid('city')"
+                  >
+                    <option value="" disabled selected>Select your city</option>
+                    @for (city of egyptianCities; track city) {
+                      <option [value]="city">{{ city }}</option>
+                    }
+                  </select>
+                  @if (fieldInvalid('city')) {
+                    <span class="field-error">
+                      <i class="pi pi-exclamation-circle"></i>
+                      City is required
+                    </span>
+                  }
                 </div>
-                <div class="item-info">
-                  <p class="item-name">Product #{{ item.productId }}</p>
-                  <p class="item-qty">Quantity: {{ item.quantity }}</p>
+
+                <!-- Postal Code -->
+                <div class="form-group">
+                  <label for="postalCode">
+                    Postal Code
+                    <span class="hint">(Optional)</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="postalCode"
+                    formControlName="postalCode"
+                    placeholder="e.g. 12345"
+                    class="form-input"
+                  />
                 </div>
-                <span class="item-price">{{ item.price * item.quantity | currency: 'EGP' }}</span>
+
+                <!-- Hidden Country (Defaulted to Egypt in Component) -->
+                <input type="hidden" formControlName="country" />
               </div>
-            }
-            @if (cartItems().length === 0) {
-              <div class="text-center py-12">
-                <i class="pi pi-shopping-cart text-4xl text-gray-200 mb-2 block"></i>
-                <p class="text-gray-400">Your cart is empty.</p>
-              </div>
-            }
+            </form>
           </div>
-        </div>
-      </section>
-    </div>
+        </section>
 
-    <!-- ── Right: Order Summary Sidebar ─────────────────────────────────── -->
-    <aside class="checkout-aside space-y-6">
-      <div class="checkout-section p-6">
-        <h3 class="text-lg font-bold text-gray-900 mb-6">Order Summary</h3>
-
-        <div class="space-y-4">
-          <div class="summary-row text-gray-600">
-            <span>Subtotal</span>
-            <span class="font-semibold text-gray-900">{{ subtotal() | currency: 'EGP' }}</span>
-          </div>
-          <div class="summary-row text-gray-600">
-            <span>Shipping</span>
-            <span class="font-semibold text-gray-900">{{ shipping() | currency: 'EGP' }}</span>
+        <!-- 2. Payment Method -->
+        <section class="checkout-card">
+          <div class="card-header">
+            <span class="step-badge">2</span>
+            <h2 class="card-title">Payment Method</h2>
           </div>
 
-          @if (discount() > 0) {
-            <div class="summary-row text-green-600 bg-green-50 px-3 py-2 rounded-lg -mx-3">
-              <span class="flex items-center gap-1.5"
-                ><i class="pi pi-percentage text-xs"></i> Discount</span
-              >
-              <span class="font-bold">-{{ discount() | currency: 'EGP' }}</span>
-            </div>
-          }
-
-          <hr class="summary-divider" />
-
-          <div class="summary-total-row pt-2">
-            <div>
-              <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">
-                Total Amount
-              </p>
-              <p class="text-2xl font-black text-gray-900 leading-none">
-                {{ total() | currency: 'EGP' }}
-              </p>
-            </div>
-            <p class="text-[10px] text-gray-400 text-right leading-tight">
-              Includes all taxes<br />and shipping
-            </p>
-          </div>
-        </div>
-
-        <!-- Coupon Section in Sidebar -->
-        <div class="mt-8 pt-8 border-t border-gray-50">
-          <label class="block text-sm font-semibold text-gray-800 mb-3">Coupon Code</label>
-          <div class="flex gap-2">
-            <input
-              type="text"
-              [(ngModel)]="couponCode"
-              placeholder="Enter code"
-              class="form-input flex-1"
-            />
+          <div class="payment-grid">
             <button
               type="button"
-              class="btn btn-secondary px-4"
-              (click)="applyCoupon()"
-              [disabled]="!couponCode || isApplyingCoupon()"
+              class="payment-card"
+              [class.active]="paymentMethod() === 'creditCard'"
+              (click)="paymentMethod.set('creditCard')"
             >
-              @if (isApplyingCoupon()) {
-                <i class="pi pi-spin pi-spinner text-xs"></i>
-              } @else {
-                Apply
-              }
+              <div class="checkmark"><i class="pi pi-check"></i></div>
+              <div class="payment-icon-box">
+                <i class="pi pi-credit-card"></i>
+              </div>
+              <div>
+                <p class="payment-label">Credit / Debit Card</p>
+                <p class="payment-desc">Secure payment via Stripe.</p>
+              </div>
+            </button>
+
+            <button
+              type="button"
+              class="payment-card"
+              [class.active]="paymentMethod() === 'cod'"
+              (click)="paymentMethod.set('cod')"
+            >
+              <div class="checkmark"><i class="pi pi-check"></i></div>
+              <div class="payment-icon-box">
+                <i class="pi pi-wallet"></i>
+              </div>
+              <div>
+                <p class="payment-label">Cash on Delivery</p>
+                <p class="payment-desc">Pay when your order arrives.</p>
+              </div>
             </button>
           </div>
-          @if (couponError()) {
-            <p class="field-error mt-2">
-              {{ couponError() }}
-            </p>
-          }
-          @if (couponSuccess()) {
-            <p class="text-xs text-green-600 mt-2 font-medium">
-              {{ couponSuccess() }}
-            </p>
-          }
-        </div>
+        </section>
 
-        <div class="mt-8">
+        <!-- 3. Review Items — rows mirror .cart-item-card layout -->
+        <section class="checkout-card">
+          <div class="card-header">
+            <span class="step-badge">3</span>
+            <h2 class="card-title">Review Items</h2>
+          </div>
+
+          <div class="items-list">
+            <!--
+              FIX: track by product._id, not $index.
+              $index causes every DOM node to be destroyed and re-created on any
+              cart change, producing a visible list flash.
+            -->
+            @for (item of cartItems(); track item.product._id) {
+              <div class="checkout-item-row">
+                <div class="item-visual">
+                  @if (item.product.mainImage?.secure_url) {
+                    <img
+                      [src]="item.product.mainImage.secure_url"
+                      [alt]="item.product.title"
+                      class="item-img"
+                    />
+                  } @else {
+                    <i class="pi pi-image text-gray-300 text-2xl"></i>
+                  }
+                </div>
+
+                <div class="item-details">
+                  <div class="item-info-group">
+                    <h4 class="item-title">{{ item.product.title }}</h4>
+                    <div class="meta-row">
+                      <span class="item-category">
+                        {{ item.product.category?.name || 'Uncategorized' }}
+                      </span>
+                      @if (item.product.avgRating) {
+                        <span class="item-rating">
+                          <i class="pi pi-star-fill text-yellow-500"></i>
+                          {{ item.product.avgRating }}
+                        </span>
+                      }
+                    </div>
+                  </div>
+                  <div class="item-bottom-row">
+                    <span class="item-qty-badge">Qty: {{ item.quantity }}</span>
+                    <!--
+                      FIX: use the same safe price expression as the cart —
+                      (item.price || item.product.finalPrice || 0) * (item.quantity || 1)
+                      instead of item.price * item.quantity which throws when price is 0
+                    -->
+                    <p class="item-subtotal">
+                      {{
+                        (item.price || item.product?.finalPrice || 0) * (item.quantity || 1)
+                          | currency: 'EGP'
+                      }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            }
+
+            @if (cartItems().length === 0) {
+              <div class="empty-items">
+                <div class="empty-icon-box">
+                  <i class="pi pi-shopping-cart"></i>
+                </div>
+                <p class="text-gray-900 font-semibold">Your cart is empty</p>
+                <p class="text-gray-500 text-sm">Add items before checking out.</p>
+              </div>
+            }
+          </div>
+        </section>
+      </div>
+
+      <!-- ── Right: Summary Sidebar — mirrors .cart-sidebar > .summary-card ── -->
+      <aside class="checkout-aside">
+        <!-- Summary card uses the exact same class names as the cart -->
+        <div class="summary-card">
+          <h2 class="summary-title">Order Summary</h2>
+
+          <div class="summary-details">
+            <div class="summary-line">
+              <span class="label">Subtotal</span>
+              <span class="value">{{ subtotal() | currency: 'EGP' }}</span>
+            </div>
+            <div class="summary-line">
+              <span class="label flex-center-gap">
+                Shipping
+                <i class="pi pi-question-circle" title="Free shipping on orders over 500 EGP"></i>
+              </span>
+              <span class="value">
+                @if (shipping() === 0) {
+                  <span class="shipping-free">Free</span>
+                } @else {
+                  {{ shipping() | currency: 'EGP' }}
+                }
+              </span>
+            </div>
+
+            @if (discount() > 0) {
+              <div class="summary-line discount-line">
+                <span class="label flex-center-gap">
+                  <i class="pi pi-tag"></i>
+                  <!-- FIX: was "Discount aplicado" (Spanish) -->
+                  Discount Applied
+                </span>
+                <span class="value">-{{ discount() | currency: 'EGP' }}</span>
+              </div>
+            }
+          </div>
+
+          <div class="summary-total-section">
+            <p class="total-label">Total Due</p>
+            <p class="total-amount">{{ total() | currency: 'EGP' }}</p>
+            <p class="total-hint">Taxes &amp; delivery included</p>
+          </div>
+
+          <!-- Coupon — sits between total and CTA, same as summary-footer -->
+          <div class="coupon-section">
+            <p class="coupon-label">Have a promo code?</p>
+            <div class="coupon-row">
+              <input
+                type="text"
+                [(ngModel)]="couponCode"
+                placeholder="Enter code"
+                class="form-input coupon-input"
+              />
+              <button
+                type="button"
+                class="btn-coupon"
+                (click)="applyCoupon()"
+                [disabled]="!couponCode || isApplyingCoupon()"
+              >
+                @if (isApplyingCoupon()) {
+                  <i class="pi pi-spin pi-spinner"></i>
+                } @else {
+                  Apply
+                }
+              </button>
+            </div>
+            @if (couponError()) {
+              <div class="coupon-feedback coupon-feedback--error">
+                <i class="pi pi-times-circle"></i>
+                <span>{{ couponError() }}</span>
+              </div>
+            }
+            @if (couponSuccess()) {
+              <div class="coupon-feedback coupon-feedback--success">
+                <i class="pi pi-check-circle"></i>
+                <span>{{ couponSuccess() }}</span>
+              </div>
+            }
+          </div>
+
+          <!-- CTA — mirrors .btn-checkout -->
           <button
             type="button"
-            class="btn btn-primary btn-full h-12 text-base shadow-lg shadow-blue-100"
+            class="btn-checkout"
             (click)="placeOrder()"
-            [disabled]="cartItems().length === 0 || isPlacingOrder()"
+            [disabled]="isPlacingOrder() || shippingForm.invalid"
           >
             @if (isPlacingOrder()) {
-              <i class="pi pi-spin pi-spinner mr-2"></i>
-              Processing…
+              <i class="pi pi-spin pi-spinner"></i>
+              Processing...
             } @else {
-              Complete Payment
+              <i class="pi pi-lock"></i>
+              Place Order
             }
           </button>
 
-          <div
-            class="mt-4 flex items-center justify-center gap-4 text-[10px] text-gray-400 font-medium"
-          >
-            <span class="flex items-center gap-1"
-              ><i class="pi pi-lock text-[8px]"></i> SSL SECORE</span
-            >
-            <span class="flex items-center gap-1"
-              ><i class="pi pi-shield text-[8px]"></i> SAFE PAYMENT</span
-            >
+          <!-- Footer — mirrors .summary-footer -->
+          <div class="summary-footer">
+            <p>Taxes and shipping calculated at checkout.</p>
+            <p>Secure checkout guaranteed.</p>
           </div>
         </div>
-      </div>
-    </aside>
+
+        <!-- Trust strip — mirrors the cart page's trust feel -->
+        <div class="trust-strip">
+          <div class="trust-icon-box">
+            <i class="pi pi-truck"></i>
+          </div>
+          <div>
+            <p class="trust-title">Free Shipping</p>
+            <p class="trust-desc">On all orders over 1000 EGP</p>
+          </div>
+        </div>
+      </aside>
+    </div>
   </div>
 </main>
