@@ -27,9 +27,13 @@ export class CartService {
   private _cart = signal<Cart | null>(null);
   readonly cart = this._cart.asReadonly();
 
-  readonly items = computed(() => (this._cart()?.products ?? []).filter((item) => !!item.product));
+  readonly items = computed(() => {
+    const cart = this._cart();
+    const products = cart?.products ?? [];
+    return products.filter((item) => !!item.product?._id);
+  });
   readonly itemCount = computed(() =>
-    this.items().reduce((count, item) => count + item.quantity, 0)
+    this.items().reduce((count, item) => count + (item.quantity || 0), 0)
   );
   readonly totalPrice = computed(() => {
     const cart = this._cart();
@@ -92,9 +96,13 @@ export class CartService {
     if (!this.authService.isLoggedIn()) {
       return this.addGuestItem(payload, product);
     }
-    return this.api
-      .post<CartResponse, AddToCartPayload>(this.endpoint, payload)
-      .pipe(tap((res) => this._cart.set(res.cart)));
+    return this.api.post<CartResponse, AddToCartPayload>(this.endpoint, payload).pipe(
+      tap((res) => {
+        if (res?.cart) {
+          this.mergeServerCart(res.cart, product);
+        }
+      })
+    );
   }
 
   private addGuestItem(payload: AddToCartPayload, product?: Product): Observable<CartResponse> {
@@ -177,38 +185,47 @@ export class CartService {
   /**
    * Merges a server cart response into _cart without losing populated Product objects.
    *
-   * The backend's PATCH /cart/:id can return products whose `product` field is
-   * either:
-   *   (a) a fully-populated Product object  → use it as-is
-   *   (b) a bare MongoDB ObjectId string    → re-attach the Product we already
-   *                                           have in local state
-   *   (c) null / undefined                  → keep the existing local item
-   *
-   * In all cases, the server's quantities, prices, and totalPrice are adopted so
-   * the local state stays in sync with the source of truth.
+   * @param serverCart The cart object returned from the server
+   * @param hintProduct An optional Product object to use if the server returns a bare ID
    */
-  private mergeServerCart(serverCart: Cart): void {
+  private mergeServerCart(serverCart: Cart, hintProduct?: Product): void {
     const currentProducts = this._cart()?.products ?? [];
 
-    const mergedProducts = serverCart.products.map((serverItem) => {
-      // (a) Server returned a proper populated Product object — use it directly
-      if (
-        serverItem.product &&
-        typeof serverItem.product === 'object' &&
-        (serverItem.product as Product)._id
-      ) {
+    const mergedProducts = (serverCart.products as unknown as RawCartItem[]).map((serverItem) => {
+      // 1. Extract the ID. Backend might send it as 'productId' OR 'product' (string or object)
+      const productId =
+        serverItem.productId ||
+        (this.isProductObject(serverItem.product) ? serverItem.product._id : serverItem.product);
+
+      if (!productId) {
         return serverItem;
       }
 
-      // (b/c) Server returned a string ID or null/undefined — find the matching
-      // populated Product from our current local state and re-attach it
-      const productId =
-        typeof serverItem.product === 'string'
-          ? serverItem.product
-          : (serverItem.product as Product)?._id;
+      // 2. Try to find populated product object from:
+      //    (a) The server item itself (if it's already an object)
+      //    (b) Our hintProduct (if we just added something)
+      //    (c) Our current local state
+      let populatedProduct: Product | undefined;
 
-      const existing = currentProducts.find((p) => p.product?._id === productId);
-      return existing ? { ...serverItem, product: existing.product } : serverItem;
+      if (this.isProductObject(serverItem.product)) {
+        populatedProduct = serverItem.product;
+      } else if (hintProduct?._id === productId) {
+        populatedProduct = hintProduct;
+      } else {
+        const existing = currentProducts.find((p) => p.product?._id === productId);
+        populatedProduct = existing?.product;
+      }
+
+      // 3. If still not found, create a minimal Product object so the UI doesn't crash
+      if (!populatedProduct) {
+        populatedProduct = { _id: productId } as Product;
+      }
+
+      return {
+        product: populatedProduct,
+        quantity: serverItem.quantity,
+        price: serverItem.price,
+      };
     });
 
     this._cart.set({ ...serverCart, products: mergedProducts });
@@ -220,9 +237,13 @@ export class CartService {
       this.saveGuestCart(currentItems);
       return of(this.getGuestCartResponse(currentItems));
     }
-    return this.api
-      .delete<CartResponse>(`${this.endpoint}/${productId}`)
-      .pipe(tap((res) => this._cart.set(res.cart)));
+    return this.api.delete<CartResponse>(`${this.endpoint}/${productId}`).pipe(
+      tap((res) => {
+        if (res?.cart) {
+          this.mergeServerCart(res.cart);
+        }
+      })
+    );
   }
 
   clearCart(): Observable<MessageResponse> {
@@ -272,8 +293,7 @@ export class CartService {
         this.storage.removeItem(this.GUEST_CART_KEY);
         return this.getCart();
       }),
-      catchError((err) => {
-        console.error('Error syncing cart:', err);
+      catchError(() => {
         return of(null);
       })
     );

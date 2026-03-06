@@ -51,7 +51,7 @@
 
                 <div class="item-visual">
                   <img
-                    [src]="item.product.mainImage?.secure_url"
+                    [src]="item.product.mainImage.secure_url"
                     [alt]="item.product.title"
                     class="item-img"
                   />
@@ -64,11 +64,11 @@
                         class="item-title text-black"
                         [routerLink]="['/products', item.product._id]"
                       >
-                        {{ item.product.title }}
+                        {{ item.product.title || 'Product' }}
                       </h3>
                       <div class="meta-row">
                         <span class="item-category text-gray-400">{{
-                          item.product.category?.name || 'Uncategorized'
+                          item.product.category.name || 'Uncategorized'
                         }}</span>
                         @if (item.product.avgRating) {
                           <span class="item-rating text-black">

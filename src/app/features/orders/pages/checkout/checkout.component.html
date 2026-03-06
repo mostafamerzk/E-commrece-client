@@ -189,7 +189,7 @@
             @for (item of cartItems(); track item.product._id) {
               <div class="checkout-item-row">
                 <div class="item-visual">
-                  @if (item.product.mainImage?.secure_url) {
+                  @if (item.product.mainImage.secure_url) {
                     <img
                       [src]="item.product.mainImage.secure_url"
                       [alt]="item.product.title"
@@ -205,7 +205,7 @@
                     <h4 class="item-title">{{ item.product.title }}</h4>
                     <div class="meta-row">
                       <span class="item-category">
-                        {{ item.product.category?.name || 'Uncategorized' }}
+                        {{ item.product.category.name || 'Uncategorized' }}
                       </span>
                       @if (item.product.avgRating) {
                         <span class="item-rating">
@@ -224,7 +224,7 @@
                     -->
                     <p class="item-subtotal">
                       {{
-                        (item.price || item.product?.finalPrice || 0) * (item.quantity || 1)
+                        (item.price || item.product.finalPrice || 0) * (item.quantity || 1)
                           | currency: 'EGP'
                       }}
                     </p>
