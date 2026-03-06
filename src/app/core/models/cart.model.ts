@@ -6,6 +6,8 @@
 //          ProductCardComponent (add to cart button).
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { Product } from './product.model';
+
 /**
  * A single line item inside the cart.
  * Notice that productId here is a string (the MongoDB ObjectId), NOT a full
@@ -18,7 +20,7 @@
 export interface CartItem {
   // The product's MongoDB ObjectId — or a populated Product object
   // if the backend populates this field (check with backend team)
-  productId: string;
+  product: Product;
 
   quantity: number;
 

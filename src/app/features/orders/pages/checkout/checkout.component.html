@@ -119,10 +119,50 @@
         </div>
       </section>
 
-      <!-- Order Items Section -->
+      <!-- Payment Section -->
       <section class="checkout-section">
         <div class="section-header">
           <span class="section-number">2</span>
+          <h2 class="text-lg font-bold text-gray-900">Payment Method</h2>
+        </div>
+
+        <div class="payment-grid">
+          <div
+            class="payment-card"
+            [class.active]="paymentMethod() === 'card'"
+            (click)="paymentMethod.set('card')"
+          >
+            <div class="checkmark"><i class="pi pi-check"></i></div>
+            <div class="payment-icon-box">
+              <i class="pi pi-credit-card"></i>
+            </div>
+            <div>
+              <p class="payment-label">Credit / Debit Card</p>
+              <p class="payment-desc">Safe & secure online payment via Stripe</p>
+            </div>
+          </div>
+
+          <div
+            class="payment-card"
+            [class.active]="paymentMethod() === 'cash'"
+            (click)="paymentMethod.set('cash')"
+          >
+            <div class="checkmark"><i class="pi pi-check"></i></div>
+            <div class="payment-icon-box">
+              <i class="pi pi-money-bill"></i>
+            </div>
+            <div>
+              <p class="payment-label">Cash on Delivery</p>
+              <p class="payment-desc">Pay with cash when your order arrives</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Order Items Section -->
+      <section class="checkout-section">
+        <div class="section-header">
+          <span class="section-number">3</span>
           <h2 class="text-lg font-bold text-gray-900">Review Items</h2>
         </div>
 
@@ -131,10 +171,18 @@
             @for (item of cartItems(); track $index) {
               <div class="item-row">
                 <div class="item-thumb">
-                  <i class="pi pi-box text-gray-300 text-xl"></i>
+                  @if (item.product.mainImage.secure_url) {
+                    <img
+                      [src]="item.product.mainImage.secure_url"
+                      [alt]="item.product.title"
+                      class="w-full h-full object-cover rounded-lg"
+                    />
+                  } @else {
+                    <i class="pi pi-box text-gray-300 text-xl"></i>
+                  }
                 </div>
                 <div class="item-info">
-                  <p class="item-name">Product #{{ item.productId }}</p>
+                  <p class="item-name">{{ item.product.title }}</p>
                   <p class="item-qty">Quantity: {{ item.quantity }}</p>
                 </div>
                 <span class="item-price">{{ item.price * item.quantity | currency: 'EGP' }}</span>
@@ -168,9 +216,7 @@
 
           @if (discount() > 0) {
             <div class="summary-row text-green-600 bg-green-50 px-3 py-2 rounded-lg -mx-3">
-              <span class="flex items-center gap-1.5"
-                ><i class="pi pi-percentage text-xs"></i> Discount</span
-              >
+              <span class="discount-label"><i class="pi pi-percentage text-xs"></i> Discount</span>
               <span class="font-bold">-{{ discount() | currency: 'EGP' }}</span>
             </div>
           }
@@ -195,7 +241,7 @@
         <!-- Coupon Section in Sidebar -->
         <div class="mt-8 pt-8 border-t border-gray-50">
           <label class="block text-sm font-semibold text-gray-800 mb-3">Coupon Code</label>
-          <div class="flex gap-2">
+          <div class="coupon-row-wrap">
             <input
               type="text"
               [(ngModel)]="couponCode"
@@ -238,19 +284,13 @@
               <i class="pi pi-spin pi-spinner mr-2"></i>
               Processing…
             } @else {
-              Complete Payment
+              {{ paymentMethod() === 'card' ? 'Complete Payment' : 'Place Order' }}
             }
           </button>
 
-          <div
-            class="mt-4 flex items-center justify-center gap-4 text-[10px] text-gray-400 font-medium"
-          >
-            <span class="flex items-center gap-1"
-              ><i class="pi pi-lock text-[8px]"></i> SSL SECORE</span
-            >
-            <span class="flex items-center gap-1"
-              ><i class="pi pi-shield text-[8px]"></i> SAFE PAYMENT</span
-            >
+          <div class="checkout-footer-badges">
+            <span class="badge-item"><i class="pi pi-lock text-[8px]"></i> SSL SECURE</span>
+            <span class="badge-item"><i class="pi pi-shield text-[8px]"></i> SAFE PAYMENT</span>
           </div>
         </div>
       </div>

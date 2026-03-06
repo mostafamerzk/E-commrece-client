@@ -37,6 +37,7 @@ export class CheckoutComponent implements OnInit {
   readonly apiError = signal<string | null>(null);
 
   couponCode = '';
+  readonly paymentMethod = signal<'card' | 'cash'>('card');
 
   readonly cartItems = this.cartService.items;
 
@@ -122,7 +123,7 @@ export class CheckoutComponent implements OnInit {
 
     this.orderService
       .placeOrder({
-        paymentMethod: 'card',
+        paymentMethod: this.paymentMethod(),
         shippingAddress: this.shippingForm.value as ShippingAddress,
         couponCode: this.couponCode || undefined,
       })

@@ -1,0 +1,171 @@
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+  <!-- Page header -->
+  <div class="cart-header-actions">
+    <div>
+      <h1 class="text-2xl sm:text-3xl font-extrabold text-gray-900 tracking-tight">
+        Shopping Cart
+      </h1>
+      <p class="mt-1 text-sm text-gray-500">You have {{ itemCount() }} items in your cart.</p>
+    </div>
+    @if (items().length > 0) {
+      <button (click)="clearCart()" class="btn-clear-cart">
+        <i class="pi pi-trash text-xs"></i>
+        Clear Shopping Cart
+      </button>
+    }
+  </div>
+
+  @if (items().length > 0) {
+    <div class="checkout-grid">
+      <!-- ── Left: Cart Items ────────────────────────────────────────── -->
+      <div class="checkout-main space-y-6">
+        <div class="checkout-section divide-y divide-gray-100">
+          @for (item of items(); track item.product._id) {
+            <div class="item-row py-6 px-4 md:px-8">
+              <button
+                (click)="removeItem(item.product._id)"
+                class="btn-remove"
+                aria-label="Remove item"
+              >
+                <i class="pi pi-times text-lg"></i>
+              </button>
+
+              <div class="item-thumb">
+                <img
+                  [src]="item.product.mainImage.secure_url"
+                  [alt]="item.product.title"
+                  class="w-full h-full object-contain"
+                />
+              </div>
+
+              <div class="item-info flex-1 ml-4 md:ml-6">
+                <div class="flex justify-between items-start gap-4">
+                  <div>
+                    <h3
+                      class="text-sm md:text-base font-bold text-gray-900 mb-1 hover:text-primary-600 cursor-pointer transition-colors"
+                      [routerLink]="['/products', item.product._id]"
+                    >
+                      {{ item.product.title }}
+                    </h3>
+                    <p class="text-xs text-gray-500 mb-2">{{ item.product.category.name }}</p>
+                    <p class="text-sm font-black text-gray-900">
+                      {{ item.price | currency: 'EGP' }}
+                    </p>
+                  </div>
+                </div>
+
+                <div class="item-row-footer">
+                  <div class="qty-control">
+                    <button
+                      (click)="updateQuantity(item.product._id, item.quantity, -1)"
+                      [disabled]="item.quantity <= 1"
+                      class="qty-btn"
+                      aria-label="Decrease quantity"
+                    >
+                      <i class="pi pi-minus"></i>
+                    </button>
+                    <span class="qty-val">{{ item.quantity }}</span>
+                    <button
+                      (click)="updateQuantity(item.product._id, item.quantity, 1)"
+                      class="qty-btn"
+                      aria-label="Increase quantity"
+                    >
+                      <i class="pi pi-plus"></i>
+                    </button>
+                  </div>
+
+                  <span class="text-sm md:text-base font-bold text-gray-900">
+                    {{ item.price * item.quantity | currency: 'EGP' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          }
+        </div>
+
+        <div class="flex items-center justify-between pt-4">
+          <a
+            routerLink="/products"
+            class="btn btn-ghost text-primary-600 px-0 hover:bg-transparent"
+          >
+            <i class="pi pi-arrow-left mr-2"></i>
+            Continue Shopping
+          </a>
+        </div>
+      </div>
+
+      <!-- ── Right: Summary ────────────────────────────────────────────── -->
+      <aside class="checkout-aside space-y-6">
+        <div class="checkout-section p-6 md:p-8">
+          <h3 class="text-lg font-bold text-gray-900 mb-6">Order Summary</h3>
+
+          <div class="space-y-4">
+            <div class="summary-row text-gray-600">
+              <span>Subtotal</span>
+              <span class="font-semibold text-gray-900">{{ totalPrice() | currency: 'EGP' }}</span>
+            </div>
+            <div class="summary-row text-gray-600">
+              <span class="flex items-center gap-1.5">
+                Shipping
+                <i
+                  class="pi pi-question-circle text-[10px] text-gray-400 cursor-help"
+                  title="Free shipping on orders over 500 EGP"
+                ></i>
+              </span>
+              <span class="font-semibold text-gray-900">
+                @if (shipping() === 0) {
+                  <span class="text-success-600 font-bold">Free</span>
+                } @else {
+                  {{ shipping() | currency: 'EGP' }}
+                }
+              </span>
+            </div>
+
+            <hr class="summary-divider" />
+
+            <div class="summary-total-row pt-2">
+              <div>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">
+                  Estimated Total
+                </p>
+                <p class="text-2xl font-black text-gray-900 leading-none">
+                  {{ finalTotal() | currency: 'EGP' }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-8">
+            <button
+              routerLink="/orders/checkout"
+              class="btn btn-primary btn-full h-12 text-base shadow-lg shadow-blue-100"
+            >
+              Proceed to Checkout
+              <i class="pi pi-arrow-right ml-2 text-xs"></i>
+            </button>
+
+            <p class="mt-4 text-[11px] text-gray-400 text-center leading-relaxed">
+              Taxes and shipping calculated at checkout.<br />
+              Secure checkout guaranteed.
+            </p>
+          </div>
+        </div>
+      </aside>
+    </div>
+  } @else {
+    <!-- Empty State -->
+    <div class="cart-empty-state">
+      <div class="cart-empty-icon">
+        <i class="pi pi-shopping-cart text-3xl"></i>
+      </div>
+
+      <h2 class="cart-empty-title">Your cart is empty</h2>
+      <p class="cart-empty-text">
+        Looks like you haven't added anything to your cart yet. Explore our latest products and find
+        something special.
+      </p>
+
+      <a routerLink="/products" class="cart-empty-btn"> Start Shopping </a>
+    </div>
+  }
+</main>

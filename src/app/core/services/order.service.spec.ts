@@ -48,7 +48,8 @@ describe('OrderService', () => {
         paymentMethod: 'card',
         shippingAddress: { street: '123 St', city: 'NY', country: 'USA', phone: '123' },
       };
-      const mockResponse = { message: 'Success', order: { _id: '1' } as Order };
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      const mockResponse = { message: 'Success', order: { _id: '1' } as any as Order };
       apiSpy.post.and.returnValue(of(mockResponse));
 
       service.placeOrder(payload).subscribe((res) => {
@@ -74,7 +75,8 @@ describe('OrderService', () => {
   describe('getById()', () => {
     it('should call GET /order/:id', () => {
       const id = '123';
-      const mockResponse = { message: 'Success', order: { _id: id } as Order };
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      const mockResponse = { message: 'Success', order: { _id: id } as any as Order };
       apiSpy.get.and.returnValue(of(mockResponse));
 
       service.getById(id).subscribe((res) => {
@@ -87,7 +89,8 @@ describe('OrderService', () => {
   describe('cancelOrder()', () => {
     it('should call PATCH /order/:id/cancel', () => {
       const id = '123';
-      const mockResponse = { message: 'Cancelled', order: { _id: id } as Order };
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      const mockResponse = { message: 'Cancelled', order: { _id: id } as any as Order };
       apiSpy.patch.and.returnValue(of(mockResponse));
 
       service.cancelOrder(id).subscribe((res) => {

@@ -1,6 +1,6 @@
 /* ─── Page grid ──────────────────────────────────────────────────────────── */
 .checkout-grid {
-  display: grid;
+  display: grid !important;
   grid-template-columns: 1fr;
   gap: 2rem;
   align-items: start;
@@ -32,10 +32,14 @@
   border-radius: 1.5rem;
   border: 1px solid var(--color-gray-100);
   box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
+  overflow: hidden !important;
   transition:
     transform 0.3s cubic-bezier(0.4, 0, 0.2, 1),
     box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.checkout-main .checkout-section:not(:last-child) {
+  margin-bottom: 2rem !important;
 }
 
 .checkout-section:hover {
@@ -149,6 +153,95 @@
 }
 .field-error svg {
   flex-shrink: 0;
+}
+
+/* ─── Payment Methods ────────────────────────────────────────────────────── */
+.payment-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  padding: 1.5rem 2rem;
+}
+
+.payment-card {
+  position: relative;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 1rem !important;
+  padding: 1.5rem !important;
+  background: var(--color-white) !important;
+  border: 2px solid var(--color-gray-100) !important;
+  border-radius: 1.25rem !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  text-align: center !important;
+}
+
+.payment-card:hover {
+  border-color: var(--color-primary-200) !important;
+  background: var(--color-gray-50) !important;
+}
+
+.payment-card.active {
+  background: var(--color-primary-50) !important;
+  border-color: var(--color-primary-600) !important;
+  box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.1) !important;
+}
+
+.payment-icon-box {
+  width: 3.5rem;
+  height: 3.5rem;
+  background: var(--color-white);
+  border: 1px solid var(--color-gray-100);
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: var(--color-gray-400);
+  transition: all 0.3s ease;
+}
+
+.payment-card.active .payment-icon-box {
+  color: var(--color-primary-600);
+  border-color: var(--color-primary-100);
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.1);
+}
+
+.checkmark {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 1.25rem;
+  height: 1.25rem;
+  background: var(--color-primary-600);
+  color: var(--color-white);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.625rem;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.payment-card.active .checkmark {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.payment-label {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: var(--color-gray-900);
+}
+
+.payment-desc {
+  font-size: 0.75rem;
+  color: var(--color-gray-400);
+  line-height: 1.4;
 }
 
 /* ─── Buttons ────────────────────────────────────────────────────────────── */
@@ -294,13 +387,13 @@
 }
 
 /* ─── Coupon block ───────────────────────────────────────────────────────── */
-.coupon-row {
-  display: flex;
-  gap: 0.5rem;
+.coupon-row-wrap {
+  display: flex !important;
+  gap: 0.5rem !important;
 }
-.coupon-row .form-input {
-  flex: 1;
-  min-width: 0;
+.coupon-row-wrap .form-input {
+  flex: 1 !important;
+  min-width: 0 !important;
 }
 
 /* ─── Order Summary card ─────────────────────────────────────────────────── */
@@ -325,6 +418,29 @@
   border: none;
   border-top: 1px solid var(--color-gray-100);
   margin: 1.25rem 0;
+}
+
+.discount-label {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.375rem !important;
+}
+
+.checkout-footer-badges {
+  margin-top: 1rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 1rem !important;
+  font-size: 10px !important;
+  color: var(--color-gray-400) !important;
+  font-weight: 500 !important;
+}
+
+.badge-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.25rem !important;
 }
 
 /* ─── Spinner ────────────────────────────────────────────────────────────── */
