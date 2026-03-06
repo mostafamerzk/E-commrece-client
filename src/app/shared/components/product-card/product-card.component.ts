@@ -4,7 +4,8 @@ import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { Product } from '../../../core/models/product.model';
 // Assume these exist as per instructions
-/* import { CartService } from '../../../../core/services/cart.service';
+import { CartService } from '../../../core/services/cart.service';
+/* 
 import { WishlistService } from '../../../../core/services/wishlist.service';
 import { DiscountPricePipe } from '../../../pipes/discount-price.pipe';
  */
@@ -37,7 +38,7 @@ export class ProductCardComponent {
   readonly isAddingToCart = signal(false);
 
   // Injected services
-  //private cart = inject(CartService);
+  private cart = inject(CartService);
   //private wishlist = inject(WishlistService);
   private router = inject(Router);
 
@@ -53,15 +54,15 @@ export class ProductCardComponent {
     if (this.product().stock === 0) return;
 
     this.isAddingToCart.set(true);
-    /* this.cart.addItem(this.product()._id, 1).subscribe({
+    this.cart.addToCart(this.product()._id, 1).subscribe({
       next: () => {
         // Success handling (Toast is usually handled by CartService or Interceptor)
         this.isAddingToCart.set(false);
       },
       error: () => {
         this.isAddingToCart.set(false);
-      }
-    }); */
+      },
+    });
   }
 
   toggleWishlist(event: Event): void {

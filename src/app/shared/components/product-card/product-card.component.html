@@ -1,102 +1,75 @@
-<div
-  class="group bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 cursor-pointer relative flex flex-col h-full"
-  (click)="navigateToDetail()"
+<a
+  [routerLink]="['/products', product()._id]"
+  class="product-card"
   role="article"
   [attr.aria-label]="product().title"
 >
-  <!-- Image Area — fixed 1:1 aspect ratio, object-contain -->
-  <div class="card-image-wrapper">
+  <!-- Wishlist Button -->
+  <button
+    class="wishlist-btn"
+    [class.active]="isWishlisted()"
+    (click)="toggleWishlist($event)"
+    [attr.aria-label]="isWishlisted() ? 'Remove from wishlist' : 'Add to wishlist'"
+  >
+    <i class="pi" [class.pi-heart]="!isWishlisted()" [class.pi-heart-fill]="isWishlisted()"></i>
+  </button>
+
+  <!-- Discount Badge -->
+  @if (product().discount) {
+    <div class="badge-discount">-{{ product().discount }}%</div>
+  }
+
+  <!-- Out of Stock Overlay -->
+  @if (product().stock === 0) {
+    <div class="out-of-stock-overlay">
+      <span>Out of Stock</span>
+    </div>
+  }
+
+  <!-- Image -->
+  <div class="product-img-wrap">
     <img
       [src]="product().mainImage.secure_url"
       [alt]="product().title"
-      class="group-hover:scale-105"
+      class="product-img"
       [class.grayscale]="product().stock === 0"
       loading="lazy"
     />
-
-    <!-- Out of Stock Overlay -->
-    @if (product().stock === 0) {
-      <div
-        class="absolute inset-0 bg-gray-900/60 flex items-center justify-center"
-        aria-hidden="true"
-      >
-        <span class="text-white font-bold text-sm tracking-widest uppercase">Out of Stock</span>
-      </div>
-    }
-
-    <!-- Discount Badge -->
-    @if (product().discount) {
-      <div
-        class="absolute top-2 left-2 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded-full shadow-sm z-10"
-      >
-        <i class="pi pi-tag mr-1 text-[10px]"></i>
-        {{ product().discount }}% OFF
-      </div>
-    }
-
-    <!-- Wishlist Button -->
-    <button
-      type="button"
-      class="absolute top-2 right-2 p-2 bg-white/80 backdrop-blur-md rounded-full hover:bg-white transition-all shadow-sm z-10"
-      [attr.aria-label]="isWishlisted() ? 'Remove from wishlist' : 'Add to wishlist'"
-      (click)="toggleWishlist($event)"
-    >
-      <i
-        class="pi transition-colors duration-300"
-        [class.pi-heart]="!isWishlisted()"
-        [class.pi-heart-fill]="isWishlisted()"
-        [class.text-red-500]="isWishlisted()"
-        [class.text-gray-400]="!isWishlisted()"
-      ></i>
-    </button>
   </div>
 
-  <!-- Info Section -->
-  <div class="p-3 md:p-4 card-info gap-1.5">
-    <span class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Product</span>
-
-    <h3 class="text-sm font-semibold text-gray-800 line-clamp-2 leading-snug min-h-[2.5rem]">
-      {{ product().title }}
-    </h3>
+  <!-- Info -->
+  <div class="product-info">
+    <h3 class="product-name">{{ product().title }}</h3>
 
     <!-- Rating -->
-    <div class="flex items-center gap-2">
-      <p-rating
-        [(ngModel)]="product().avgRating"
-        [readonly]="true"
-        styleClass="text-yellow-400 text-[10px]"
-      />
-      <span class="text-[10px] text-gray-400 font-medium">(0)</span>
+    <div class="product-rating">
+      <div class="stars">
+        <p-rating [(ngModel)]="product().avgRating" [readonly]="true" />
+      </div>
     </div>
 
-    <!-- Pricing Row -->
-    <div class="flex items-baseline gap-2 mt-1">
-      <span class="text-base font-extrabold text-primary-600">
-        {{ product().finalPrice | currency: 'EGP ' }}
-      </span>
-      @if (product().discount) {
-        <span class="text-xs text-gray-400 line-through decoration-gray-300">
-          {{ product().price | currency: 'EGP ' }}
-        </span>
-      }
+    <!-- Price + Cart -->
+    <div class="product-footer">
+      <div class="price-wrap">
+        <span class="price-current">{{ product().finalPrice | currency: 'EGP ' }}</span>
+        @if (product().discount) {
+          <span class="price-original">{{ product().price | currency: 'EGP ' }}</span>
+        }
+      </div>
+
+      <button
+        class="add-to-cart-btn"
+        [class.loading]="isAddingToCart()"
+        [disabled]="product().stock === 0 || isAddingToCart()"
+        (click)="addToCart($event)"
+        aria-label="Add to cart"
+      >
+        @if (isAddingToCart()) {
+          <i class="pi pi-spin pi-spinner"></i>
+        } @else {
+          <i class="pi pi-shopping-cart"></i>
+        }
+      </button>
     </div>
-
-    <!-- Spacer to push button to bottom -->
-    <div class="flex-1"></div>
-
-    <!-- Add to Cart Button -->
-    <button
-      pButton
-      type="button"
-      class="w-full p-button-sm mt-2 btn-scale shadow-sm"
-      [disabled]="product().stock === 0 || isAddingToCart()"
-      [loading]="isAddingToCart()"
-      (click)="addToCart($event)"
-    >
-      <i class="pi pi-shopping-cart mr-2 text-xs"></i>
-      <span class="text-xs font-bold">{{
-        product().stock > 0 ? 'Add to Cart' : 'Out of Stock'
-      }}</span>
-    </button>
   </div>
-</div>
+</a>

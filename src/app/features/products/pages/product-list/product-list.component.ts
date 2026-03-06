@@ -6,7 +6,7 @@ import { ProductService } from '../../../../core/services/product.service';
 import { Product, ProductQueryParams } from '../../../../core/models/product.model';
 import { Category } from '../../../../core/models/category.model';
 // Assume these exist as per instructions
-//import { CategoryService } from '../../../../core/services/category.service';
+import { CategoryService } from '../../../../core/services/category.service';
 import { ProductCardComponent } from '../../../../shared/components/product-card/product-card.component';
 import { EmptyStateComponent } from '../../../../shared/components/empty-state/empty-state.component';
 
@@ -53,7 +53,7 @@ import { ButtonModule } from 'primeng/button';
 })
 export class ProductListComponent implements OnInit {
   private productService = inject(ProductService);
-  //private categoryService = inject(CategoryService); // Future implementation
+  private categoryService = inject(CategoryService); // Future implementation
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
@@ -114,16 +114,15 @@ export class ProductListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    //this.loadCategories();
-    console.log('Loading categories');
+    this.loadCategories();
   }
 
-  //loadCategories(): void {
-  //this.categoryService.getAll().subscribe({
-  //next: (res: any) => this.categories.set(res.categories),
-  //error: (err) => console.error('Error loading categories', err)
-  //});
-  //}
+  loadCategories(): void {
+    this.categoryService.getAll().subscribe({
+      next: (res) => this.categories.set(res.categories),
+      error: (err) => console.error('Error loading categories', err),
+    });
+  }
 
   loadProducts(): void {
     this.isLoading.set(true);

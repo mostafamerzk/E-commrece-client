@@ -8,8 +8,9 @@ import { toSignal } from '@angular/core/rxjs-interop';
 import { ProductService } from '../../../../core/services/product.service';
 import { Product } from '../../../../core/models/product.model';
 // Assume these exist as per instructions
-//import { CartService } from '../../../../core/services/cart.service';
+import { CartService } from '../../../../core/services/cart.service';
 //import { WishlistService } from '../../../../core/services/wishlist.service';
+import { CategoryService } from '../../../../core/services/category.service';
 import { ToastService } from '../../../../core/services/toast.service';
 
 // PrimeNG Imports
@@ -21,7 +22,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 
 // Shared Components
-// import { ReviewsSectionComponent } from '../../../reviews/components/reviews-section/reviews-section.component';
+//import { ReviewsSectionComponent } from '../../../reviews/components/reviews-section/reviews-section.component';
 
 @Component({
   selector: 'app-product-detail',
@@ -47,7 +48,8 @@ export class ProductDetailComponent {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private productService = inject(ProductService);
-  //private cart = inject(CartService);
+  private cart = inject(CartService);
+  private categoryService = inject(CategoryService);
   //private wishlist = inject(WishlistService);
   private toast = inject(ToastService);
 
@@ -56,6 +58,7 @@ export class ProductDetailComponent {
 
   // State Signals
   product = signal<Product | null>(null);
+  categoryName = signal<string>('Loading...');
   isLoading = signal(true);
   quantity = signal(1);
   isAddingToCart = signal(false);
@@ -86,7 +89,11 @@ export class ProductDetailComponent {
     }
     return images;
   });
-
+  isInCart = computed(() => {
+    const p = this.product();
+    if (!p) return false;
+    return this.cart.isInCart(p._id);
+  });
   constructor() {
     this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
@@ -104,6 +111,7 @@ export class ProductDetailComponent {
       .subscribe({
         next: (res) => {
           this.product.set(res.product);
+          this.loadCategoryName(res.product.categoryId);
         },
         error: (err) => {
           console.error('Error loading product', err);
@@ -116,20 +124,36 @@ export class ProductDetailComponent {
       });
   }
 
+  private loadCategoryName(categoryId: string): void {
+    this.categoryService.getById(categoryId).subscribe({
+      next: (res) => this.categoryName.set(res.category.name),
+      error: () => this.categoryName.set('Unknown Category'),
+    });
+  }
+
   addToCart(): void {
     const p = this.product();
     if (!p || p.stock === 0) return;
 
     this.isAddingToCart.set(true);
-    //this.cart.addItem(p._id, this.quantity()).subscribe({
-    //next: () => {
-    //this.isAddingToCart.set(false);
-    //this.toast.success('Successfully added to cart!');
-    //},
-    //error: () => {
-    //this.isAddingToCart.set(false);
-    //}
-    //});
+
+    const request$ = this.isInCart()
+      ? this.cart.updateQuantity(p._id, this.quantity())
+      : this.cart.addToCart(p._id, this.quantity());
+
+    request$.subscribe({
+      next: () => {
+        this.isAddingToCart.set(false);
+
+        this.toast.success(
+          this.isInCart() ? 'Cart quantity updated!' : 'Successfully added to cart!'
+        );
+      },
+      error: () => {
+        this.isAddingToCart.set(false);
+        this.toast.error('Failed to update cart!');
+      },
+    });
   }
 
   toggleWishlist(): void {

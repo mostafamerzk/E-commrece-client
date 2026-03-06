@@ -49,7 +49,14 @@ export class ProductService {
   update(id: string, formData: FormData): Observable<ProductResponse> {
     return this.api.patch<ProductResponse, FormData>(`${API_ENDPOINTS.PRODUCTS}/${id}`, formData);
   }
-
+  private readonly endpoint = API_ENDPOINTS.PRODUCTS;
+  getFeatured(page = 1, limit = 8): Observable<ProductsResponse> {
+    return this.api.get<ProductsResponse>(this.endpoint, {
+      sort: '-createdAt',
+      page: String(page),
+      limit: String(limit),
+    });
+  }
   /**
    * Delete a product (Soft Delete).
    * @param id The product MongoDB ObjectId.

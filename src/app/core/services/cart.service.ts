@@ -39,8 +39,8 @@ export class CartService {
   }
 
   // Update quantity (+ / -)
-  updateQuantity(productId: string, operator: '+' | '-'): Observable<CartResponse> {
-    const payload: UpdateCartPayload = { operator };
+  updateQuantity(productId: string, quantity: number): Observable<CartResponse> {
+    const payload: UpdateCartPayload = { quantity };
 
     return this.api
       .patch<CartResponse, UpdateCartPayload>(`${this.endpoint}/${productId}`, payload)
