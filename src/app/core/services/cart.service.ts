@@ -95,6 +95,11 @@ export class CartService {
       .pipe(tap((res) => this._cart.set(res.cart)));
   }
 
+  // Alias for backward compatibility
+  addToCart(productId: string, quantity = 1): Observable<CartResponse> {
+    return this.addItem({ productId, quantity });
+  }
+
   private addGuestItem(payload: AddToCartPayload, product?: Product): Observable<CartResponse> {
     const currentItems = [...this.items()];
     const existingItemIndex = currentItems.findIndex((i) => i.product._id === payload.productId);
@@ -210,14 +215,10 @@ export class CartService {
     );
   }
 
-  // Backward compatibility aliases
-  addToCart(productId: string, quantity = 1): Observable<CartResponse> {
-    return this.addItem({ productId, quantity });
-  }
-
   isInCart(productId: string): boolean {
     return this.items().some((item) => item.product._id === productId);
   }
+
   loadInitialCart() {
     this.loadCart();
   }
