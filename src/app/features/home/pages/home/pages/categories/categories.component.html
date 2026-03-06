@@ -12,8 +12,9 @@
       <div class="categories-grid">
         @for (item of [1, 2, 3, 4, 5, 6]; track item) {
           <div class="category-card skeleton-card">
-            <div class="skeleton skeleton-img"></div>
+            <div class="skeleton skeleton-circle"></div>
             <div class="skeleton-label"></div>
+            <div class="skeleton-sub"></div>
           </div>
         }
       </div>
@@ -43,16 +44,12 @@
                 class="category-img"
                 loading="lazy"
               />
-              <div class="category-overlay"></div>
             </div>
             <div class="category-info">
               <h3 class="category-name">{{ cat.name }}</h3>
-              @if (cat.description) {
-                <span class="category-desc">{{ cat.description }}</span>
-              }
-            </div>
-            <div class="category-arrow">
-              <i class="pi pi-arrow-right"></i>
+              <!-- @if (cat.productCount) {
+                <span class="category-count">{{ cat.productCount }} items</span>
+              } -->
             </div>
           </a>
         }
@@ -64,7 +61,7 @@
         <strong>{{ totalCount }}</strong> categories
       </div>
 
-      <!-- Load More -->
+      <!-- Load More — centered -->
       @if (hasMore) {
         <div class="section-cta">
           <button class="btn-load-more" (click)="loadMore()" [disabled]="loadingMore">

@@ -3,16 +3,18 @@
 }
 
 $blue: #2563eb;
-$blue-dark: #1d4ed8;
+$blue-light: #eff6ff;
+$blue-border: #dbeafe;
 $slate-900: #0f172a;
+$slate-700: #334155;
 $slate-500: #64748b;
-$slate-100: #f1f5f9;
+$slate-200: #e2e8f0;
 $slate-50: #f8fafc;
 $white: #ffffff;
 
 // ── Section ───────────────────────────────────────────────
 .categories-section {
-  padding: 6rem 1.5rem;
+  padding: 5rem 1.5rem;
   background: $slate-50;
 }
 
@@ -24,13 +26,13 @@ $white: #ffffff;
 // ── Header ────────────────────────────────────────────────
 .section-header {
   text-align: center;
-  margin-bottom: 3.5rem;
+  margin-bottom: 3rem;
 }
 
 .section-tag {
   display: inline-block;
   padding: 0.375rem 1rem;
-  background: #eff6ff;
+  background: $blue-light;
   color: $blue;
   font-size: 0.75rem;
   font-weight: 700;
@@ -38,117 +40,121 @@ $white: #ffffff;
   text-transform: uppercase;
   border-radius: 9999px;
   margin-bottom: 1rem;
-  border: 1px solid #dbeafe;
+  border: 1px solid $blue-border;
 }
 
 .section-title {
-  font-size: clamp(2rem, 5vw, 2.5rem);
+  font-size: clamp(1.75rem, 4vw, 2.25rem);
   font-weight: 800;
   color: $slate-900;
   margin-bottom: 0.75rem;
   letter-spacing: -0.02em;
+
   .accent {
     color: $blue;
   }
 }
 
 .section-subtitle {
-  font-size: 1.0625rem;
+  font-size: 1rem;
   color: $slate-500;
 }
 
 // ── Grid ──────────────────────────────────────────────────
 .categories-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 1.25rem;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  @media (max-width: 640px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 400px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 // ── Card ──────────────────────────────────────────────────
 .category-card {
-  position: relative;
-  border-radius: 18px;
-  overflow: hidden;
-  text-decoration: none;
-  color: inherit;
-  background: $white;
-  border: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
-  transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 0.75rem;
+  background: $white;
+  border: 1px solid $slate-200;
+  border-radius: 16px;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.05);
 
   &:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 16px 32px -12px rgba(37, 99, 235, 0.18);
-    border-color: #bfdbfe;
+    transform: translateY(-4px);
+    border-color: $blue-border;
+    box-shadow: 0 10px 24px -6px rgba(37, 99, 235, 0.15);
+
+    .category-img-wrap {
+      background: #dbeafe;
+    }
 
     .category-img {
-      transform: scale(1.06);
+      transform: scale(1.08);
     }
-    .category-overlay {
-      opacity: 0.25;
-    }
-    .category-arrow {
-      opacity: 1;
-      transform: translate(0, -50%) scale(1);
+
+    .category-name {
+      color: $blue;
     }
   }
 }
 
+// ── Image Circle ──────────────────────────────────────────
 .category-img-wrap {
-  position: relative;
-  aspect-ratio: 3/2;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: $blue-light;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   overflow: hidden;
+  flex-shrink: 0;
+  transition: background 0.25s ease;
 }
 
 .category-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.5s ease;
+  transition: transform 0.35s ease;
 }
 
-.category-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom, transparent 40%, rgba(15, 23, 42, 0.5));
-  opacity: 0.15;
-  transition: opacity 0.3s ease;
-}
-
+// ── Info ──────────────────────────────────────────────────
 .category-info {
-  padding: 1rem 1rem 0.75rem;
-  flex: 1;
+  text-align: center;
 }
 
 .category-name {
-  font-size: 0.9375rem;
+  font-size: 0.875rem;
   font-weight: 700;
   color: $slate-900;
-  margin: 0 0 0.25rem;
+  margin: 0 0 0.2rem;
+  transition: color 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100px;
 }
 
-.category-desc {
+.category-count {
   font-size: 0.75rem;
   color: $slate-500;
-}
-
-.category-arrow {
-  position: absolute;
-  top: 50%;
-  right: 0.875rem;
-  transform: translate(4px, -50%) scale(0.8);
-  opacity: 0;
-  width: 30px;
-  height: 30px;
-  background: $blue;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: $white;
-  font-size: 0.7rem;
-  transition: all 0.3s ease;
 }
 
 // ── Skeleton ──────────────────────────────────────────────
@@ -162,15 +168,25 @@ $white: #ffffff;
   animation: shimmer 1.5s infinite;
 }
 
-.skeleton-img {
-  aspect-ratio: 3/2;
+.skeleton-circle {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
 }
+
 .skeleton-label {
-  height: 16px;
-  width: 60%;
-  margin: 1rem;
+  height: 12px;
+  width: 60px;
   border-radius: 6px;
   background: #e2e8f0;
+}
+
+.skeleton-sub {
+  height: 10px;
+  width: 44px;
+  border-radius: 6px;
+  background: #e8edf4;
+  margin-top: 0.3rem;
 }
 
 @keyframes shimmer {
@@ -196,14 +212,71 @@ $white: #ffffff;
   }
 }
 
-// ── Animation ─────────────────────────────────────────────
+// ── Pagination Info ───────────────────────────────────────
+.pagination-info {
+  text-align: center;
+  margin-top: 1.75rem;
+  font-size: 0.8125rem;
+  color: $slate-500;
+
+  strong {
+    color: $slate-700;
+    font-weight: 600;
+  }
+}
+
+// ── Load More Button ──────────────────────────────────────
+.section-cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.btn-load-more {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 2rem;
+  background: $blue;
+  color: $white;
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28);
+
+  &:hover:not(:disabled) {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.35);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+
+  i {
+    font-size: 0.8rem;
+  }
+}
+
+// ── Animation (using `both` instead of `forwards` to fix scroll bug) ──
 .animate-in {
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 @keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
   to {
     opacity: 1;
     transform: translateY(0);
