@@ -190,9 +190,9 @@
   gap: 1.5rem;
   min-width: 0;
 
-  @media (max-width: 767px) {
-    display: none;
-  }
+  // @media (max-width: 767px) {
+  //   display: none;
+  // }
 }
 
 .header-right {
@@ -977,5 +977,38 @@
   &:hover {
     background: #eff6ff;
     color: #2563eb;
+  }
+}
+@media (max-width: 767px) {
+  .header-inner {
+    gap: 0.5rem;
+  }
+
+  .desktop-nav {
+    display: none;
+  }
+
+  .header-center {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .header-search {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  // إخفاء الـ login/register بس، وتخلي الـ icons تظهر
+  .auth-actions {
+    display: none;
+  }
+  .pi-heart {
+    display: block;
+  }
+  .user-menu-wrap {
+    margin-left: 0;
+
+    padding-left: 0;
+    border-left: none;
   }
 }
