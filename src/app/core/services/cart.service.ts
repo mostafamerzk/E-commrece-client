@@ -152,11 +152,6 @@ export class CartService {
       .pipe(tap((res) => this._cart.set(res.cart)));
   }
 
-  // Check if product is already in cart
-  isInCart(productId: string): boolean {
-    return this.items().some((item) => item.product._id === productId);
-  }
-
   clearCart(): Observable<MessageResponse> {
     if (!this.authService.isLoggedIn()) {
       this.storage.removeItem(this.GUEST_CART_KEY);
@@ -211,6 +206,11 @@ export class CartService {
         return of(null);
       })
     );
+  }
+
+  // Check if product exists in cart
+  isInCart(productId: string): boolean {
+    return this.items().some((item) => item.product._id === productId);
   }
 
   // Helper to load cart on app init if needed
