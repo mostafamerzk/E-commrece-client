@@ -29,7 +29,7 @@
 
 ## Current Project Phase
 
-**Phase 0 — Project Scaffolded. No features implemented yet.**
+**Phase 1 — Core Services. Category management and shared components in progress.**
 
 ---
 
@@ -48,10 +48,10 @@
 ## File Structure State
 
 ```
-[SCAFFOLD COMPLETE]
-All folders created with .gitkeep.
-Configuration files generated and committed.
-No feature files exist yet.
+[PHASE 1 INITIATED]
+- Category feature files implemented (service, component, tests).
+- Shared components (empty-state, spinner) and pipes (truncate, discount) in progress.
+- All core configuration files are stable.
 ```
 
 ---
@@ -68,7 +68,10 @@ No feature files exist yet.
 | TASK-M02 | LoadingService + ToastService | Mostafa | [x] Done | fix-m01-m02 |
 | TASK-I01 | Route Guards | Issac | [x] Done | — |
 | TASK-I02 | TypeScript Model Files | Issac | [x] Done | — |
-| TASK-K01 | App Routing Configuration | Mokhtar | [ ] Not started | — |
+| TASK-K01 | App Routing Configuration | Mokhtar | [x] Done | task/k01 |
+| TASK-M03 | Category Service & Management (Admin) | Mostafa | [x] Done | feature/category-managment |
+| TASK-I03 | Review Service | Issac | [x] Done | task/i03-review-service |
+| TASK-K07 | Login & Register Pages | Isaac | [x] Done | — |
 
 ---
 
@@ -82,12 +85,18 @@ No feature files exist yet.
 | TASK-F02 | HTTP Interceptors (auth, error, loading) | Fathi | 2026-03-02 |
 | TASK-M01 | StorageService + AuthService | Mostafa | 2026-03-02 |
 | TASK-M02 | LoadingService + ToastService | Mostafa | 2026-03-02 |
+| TASK-K02 | Main Layout Component | Mokhtar | 2026-03-03 |
+| TASK-K01 | App Routing Configuration | Mokhtar | 2026-03-03 |
+| TASK-M03 | Category Service & Management | Mostafa | 2026-03-03 |
+| TASK-K01 | App Routing Configuration | Mokhtar | 2026-03-02 |
+| TASK-I03 | Review Service | Issac | 2026-03-03 |
+| TASK-K07 | Login & Register Pages | Isaac | 2026-03-05 |
 
 ---
 
 ## Currently In Progress
 
-_Nothing in progress. Awaiting team to begin Phase 0 tasks._
+- **TASK-I04:** Reviews Section Component (Shared component for product reviews)
 
 ---
 
@@ -105,10 +114,10 @@ _None yet._
 
 ## Last Session Summary
 
-- **Date:** 2026-03-03
-- **Who:** Fathi
-- **What was done:** Implemented `ProductListComponent` (TASK-F04) with reactive filtering, URL query parameter sync, and responsive design. Used real component references for missing dependencies for forward compatibility.
-- **What is next:** Implement missing shared components (`ProductCardComponent`, `EmptyStateComponent`) and `CategoryService`.
+- **Date:** 2026-03-05
+- **Who:** Antigravity (Agent)
+- **What was done:** Refined `MainLayoutComponent` with "ITI Shop" branding, responsive mobile drawer, and signal-based state management (Cart count, Wishlist count, Auth status). Verified `App Routing Configuration` (TASK-K01) and ensured zero compilation errors across core layouts.
+- **What is next:** Proceed with Phase 1/2 feature work (Product Service, Cart Service, or Shared Components like Product Cards).
 
 ---
 
@@ -121,4 +130,12 @@ _None yet._
 | 2026-03-01 | Task I02 | TypeScript Model Files completed by Issac |
 | 2026-03-02 | Task M01/M02 | Storage, Auth, Loading, and Toast services completed + Zoneless tests fixed |
 | 2026-03-02 | Task I01 | Route Guards completed by Issac |
-| 2026-03-03 | Task F04 | Product Listing Page implemented by Fathi |
+| 2026-03-03 | Task M03 | Category Management and Empty State completed by Mostafa on branch `a` |
+| 2026-03-03 | Docs | Missing Admin Category design spec added |
+| 2026-03-03 | Task M03 | Category Management UI updated to match design spec (added description/slug) |
+| 2026-03-03 | Build Fix | Resolved compilation errors and UI blowout in Categories component |
+| 2026-03-03 | Task I03 | Review Service implemented and verified (TASK-I03) |
+| 2026-03-03 | UX/Fix | Fixed label association accessibility error in Category Management |
+| 2026-03-05 | Task K07 | Login & Register pages completed (TASK-K07) |
+| 2026-03-05 | Task I04 | Reviews Section Component in progress (TASK-I04) |
+| 2026-03-03 | Task K01/K02 | Routing and Main Layout refined with "ITI Shop" branding; Memory updated |

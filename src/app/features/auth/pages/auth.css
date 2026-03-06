@@ -1,0 +1,68 @@
+.auth-link {
+  text-decoration: none;
+  color: var(--color-primary-600);
+  transition: color 0.3s;
+}
+
+.auth-link:hover {
+  color: var(--color-primary-500);
+}
+.auth-link:active {
+  color: var(--color-primary-700);
+}
+a:hover {
+  text-decoration: underline;
+}
+.auth-button {
+  background-color: var(--color-primary-700);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-primary);
+}
+.auth-button:hover {
+  background-color: var(--color-primary-600);
+  box-shadow: var(--shadow-primary-hover);
+  transform: translateY(-2px);
+}
+.auth-button:active {
+  transform: translateY(2px);
+}
+.auth-button:disabled {
+  background-color: var(--color-primary-700);
+  box-shadow: var(--shadow-primary);
+  transform: translateY(3px);
+}
+.auth-button:disabled:hover {
+  background-color: var(--color-primary-700);
+  box-shadow: var(--shadow-primary);
+  transform: translateY(3px);
+}
+.auth-button:disabled:active {
+  background-color: var(--color-primary-700);
+  box-shadow: var(--shadow-primary);
+  transform: translateY(3px);
+}
+.auth-button:disabled:focus {
+  background-color: var(--color-primary-700);
+  box-shadow: var(--shadow-primary);
+  transform: translateY(3px);
+}
+.auth-button:disabled:focus:hover {
+  background-color: var(--color-primary-700);
+  box-shadow: var(--shadow-primary);
+  transform: translateY(3px);
+}
+.auth-button:disabled:focus:active {
+  background-color: var(--color-primary-700);
+  box-shadow: var(--shadow-primary);
+  transform: translateY(3px);
+}

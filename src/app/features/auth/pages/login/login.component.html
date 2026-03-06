@@ -1,0 +1,90 @@
+<app-auth-layout
+  title="Welcome Back"
+  subtitle="Log in to your shopper account"
+  [errorMessage]="errorMessage()"
+>
+  <form
+    #loginForm="ngForm"
+    (ngSubmit)="onSubmit(loginForm)"
+    class="flex flex-col gap-5"
+    auth-form
+    style="padding-bottom: 1rem; margin-bottom: 1rem"
+  >
+    <!-- Email -->
+    <br />
+    <app-form-field label="Email Address" inputId="email">
+      <app-text-input
+        id="email"
+        name="email"
+        type="email"
+        placeholder="alex@example.com"
+        iconPath="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
+        [disabled]="isLoading()"
+        [(ngModel)]="email"
+        required
+        email
+      >
+      </app-text-input>
+      @if (loginForm.controls['email']?.invalid && loginForm.controls['email']?.touched) {
+        <span class="text-[11px] text-red-500 mt-0.5">Please enter a valid email</span>
+      }
+    </app-form-field>
+    <br />
+    <!-- Password -->
+    <div>
+      <div class="flex justify-between items-center mb-1.5">
+        <label for="password" class="text-[14px] font-semibold text-[#334155]">Password</label>
+      </div>
+      <app-password-input
+        id="password"
+        name="password"
+        iconPath="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+        [disabled]="isLoading()"
+        [(ngModel)]="password"
+        required
+      >
+      </app-password-input>
+    </div>
+    <!--forgot password-->
+    <a
+      routerLink="/auth/forgot-password"
+      class="text-xs font-semibold no-underline hover:underline transition-colors"
+    >
+      Forgot Password?
+    </a>
+
+    <!-- Remember Me -->
+    <div class="flex items-center gap-2.5 mb-5" style="margin-top: 1rem">
+      <input
+        id="rememberMe"
+        name="rememberMe"
+        type="checkbox"
+        [(ngModel)]="rememberMe"
+        class="w-4 h-4 rounded border-slate-300 cursor-pointer accent-(--color-primary-700) hover:accent-(--color-primary-600) transition-all duration-200"
+      />
+      <label for="rememberMe" class="text-sm text-slate-500 cursor-pointer select-none">
+        Keep me signed in
+      </label>
+    </div>
+
+    <app-primary-button
+      [isDisabled]="loginForm.invalid || false"
+      [isLoading]="isLoading()"
+      loadingText="Authenticating..."
+    >
+      Sign In
+    </app-primary-button>
+  </form>
+
+  <ng-container auth-footer>
+    Don't have an account?
+    <a
+      routerLink="/auth/register"
+      class="text-xs font-semibold no-underline hover:underline transition-colors"
+      style="text-decoration: none; color: var(--color-primary-600)"
+      hover="color: var(--color-primary-500) transition-colors 0.3s"
+    >
+      Join for free
+    </a>
+  </ng-container>
+</app-auth-layout>

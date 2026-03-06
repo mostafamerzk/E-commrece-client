@@ -40,6 +40,12 @@ export class ApiService {
       .pipe(catchError((err) => throwError(() => err)));
   }
 
+  patch<T, B extends object>(endpoint: string, body: B): Observable<T> {
+    return this.http
+      .patch<T>(`${this.baseUrl}${endpoint}`, body)
+      .pipe(catchError((err) => throwError(() => err)));
+  }
+
   put<T, B extends object>(endpoint: string, body: B): Observable<T> {
     return this.http
       .put<T>(`${this.baseUrl}${endpoint}`, body)
@@ -49,12 +55,6 @@ export class ApiService {
   delete<T>(endpoint: string): Observable<T> {
     return this.http
       .delete<T>(`${this.baseUrl}${endpoint}`)
-      .pipe(catchError((err) => throwError(() => err)));
-  }
-
-  patch<T, B extends object>(endpoint: string, body: B): Observable<T> {
-    return this.http
-      .patch<T>(`${this.baseUrl}${endpoint}`, body)
       .pipe(catchError((err) => throwError(() => err)));
   }
 }

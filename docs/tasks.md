@@ -175,7 +175,7 @@
 ---
 
 ### [TASK-M03] Category Service & Management (Admin)
-**Status:** [ ]
+**Status:** [x]
 **Phase:** 1 — Core Services
 **Files to create:**
 - src/app/core/services/category.service.ts
@@ -306,7 +306,7 @@
 ---
 
 ### [TASK-I03] Review Service
-**Status:** [ ]
+**Status:** [x]
 **Phase:** 1 — Core Services
 **Files to create:**
 - src/app/core/services/review.service.ts
@@ -320,7 +320,7 @@
 ---
 
 ### [TASK-I04] Reviews Section Component
-**Status:** [ ]
+**Status:** [~]
 **Phase:** 2 — Feature Pages
 **Files to create:**
 - src/app/shared/components/reviews-section/reviews-section.component.ts
@@ -333,6 +333,25 @@
 - Should show edit/delete buttons only for reviews owned by currentUser
 - Should call addReview() on form submit with correct payload
 - Add review form: Should be invalid when rating is missing
+
+---
+### [TASK-K07] Login & Register Pages
+**Status:** [x]
+**Phase:** 2 — Feature Pages
+**Files to create:**
+- src/app/features/auth/pages/login/login.component.ts
+- src/app/features/auth/pages/login/login.component.html
+- src/app/features/auth/pages/register/register.component.ts
+- src/app/features/auth/pages/register/register.component.html
+**Definition of done:** Reactive forms with full validation. Login calls AuthService.login() and redirects to home. Register calls the register API. Form errors display inline.
+**Unit tests required:**
+- Login form: Should be invalid when email or password is empty
+- Login form: Should be invalid with malformed email format
+- Login: Should call AuthService.login() with form values on submit
+- Login: Should navigate to / on success
+- Login: Should display error message on failed login
+- Register form: Should be invalid when passwords do not match
+- Register form: Should require all mandatory fields
 
 ---
 
@@ -428,7 +447,7 @@
 ---
 
 ### [TASK-K02] Main Layout Component (Header + Footer)
-**Status:** [ ]
+**Status:** [x]
 **Phase:** 1 — Layouts
 **Files to create:**
 - src/app/layouts/main-layout/main-layout.component.ts
@@ -511,25 +530,6 @@
 
 ---
 
-### [TASK-K07] Login & Register Pages
-**Status:** [ ]
-**Phase:** 2 — Feature Pages
-**Files to create:**
-- src/app/features/auth/pages/login/login.component.ts
-- src/app/features/auth/pages/login/login.component.html
-- src/app/features/auth/pages/register/register.component.ts
-- src/app/features/auth/pages/register/register.component.html
-**Definition of done:** Reactive forms with full validation. Login calls AuthService.login() and redirects to home. Register calls the register API. Form errors display inline.
-**Unit tests required:**
-- Login form: Should be invalid when email or password is empty
-- Login form: Should be invalid with malformed email format
-- Login: Should call AuthService.login() with form values on submit
-- Login: Should navigate to / on success
-- Login: Should display error message on failed login
-- Register form: Should be invalid when passwords do not match
-- Register form: Should require all mandatory fields
-
----
 
 ## SHARED TASKS (All team members)
 

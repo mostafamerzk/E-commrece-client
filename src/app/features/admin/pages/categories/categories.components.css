@@ -1,0 +1,373 @@
+/* ─── Page Layout ─── */
+.cat-page {
+  padding: 2rem;
+  background: var(--color-slate-50);
+  min-height: 100vh;
+}
+
+/* ─── Page Header ─── */
+.cat-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+}
+
+.cat-header h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--color-slate-800);
+  letter-spacing: -0.02em;
+  margin: 0 0 0.25rem 0;
+}
+
+.cat-header p {
+  font-size: 0.84rem;
+  color: var(--color-slate-500);
+  margin: 0;
+}
+
+/* ─── Search Toolbar ─── */
+.cat-toolbar {
+  background: var(--color-white);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-2xl);
+  padding: 0.9rem 1.25rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-xs);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.search-wrapper {
+  position: relative;
+  flex: 1;
+  max-width: 400px;
+}
+
+.search-wrapper .search-icon {
+  position: absolute;
+  left: 0.9rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--color-slate-400);
+  font-size: 0.85rem;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.55rem 0.9rem 0.55rem 2.5rem;
+  border: 1.5px solid var(--color-slate-200);
+  border-radius: var(--radius-lg);
+  font-size: 0.875rem;
+  background: var(--color-slate-50);
+  color: var(--color-slate-800);
+  outline: none;
+  transition:
+    border-color var(--transition-base),
+    box-shadow var(--transition-base),
+    background var(--transition-base);
+  font-family: inherit;
+}
+
+.search-input:focus {
+  border-color: var(--color-primary-600);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  background: var(--color-white);
+}
+
+.clear-btn {
+  font-size: 0.8rem;
+  color: var(--color-primary-600);
+  cursor: pointer;
+  font-weight: 600;
+  background: none;
+  border: none;
+  padding: 0;
+  white-space: nowrap;
+}
+
+.clear-btn:hover {
+  color: var(--color-primary-700);
+  text-decoration: underline;
+}
+
+/* ─── Table Card ─── */
+.cat-table-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-3xl);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+/* ─── PrimeNG Table Overrides ─── */
+.cat-table .p-datatable-thead > tr > th {
+  background: var(--color-slate-50) !important;
+  color: var(--color-slate-600) !important;
+  font-size: 0.72rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.07em !important;
+  padding: 0.85rem 1rem !important;
+  border-bottom: 1.5px solid var(--color-slate-200) !important;
+  border-color: transparent !important;
+}
+
+.cat-table .p-datatable-tbody > tr {
+  background: var(--color-white) !important;
+  transition: background 0.12s !important;
+  border: none !important;
+}
+
+.cat-table .p-datatable-tbody > tr:nth-child(even) {
+  background: #fafbfc !important;
+}
+
+.cat-table .p-datatable-tbody > tr:hover {
+  background: var(--color-primary-50) !important;
+}
+
+.cat-table .p-datatable-tbody > tr > td {
+  padding: 0.8rem 1rem !important;
+  border-bottom: 1px solid var(--color-slate-100) !important;
+  border-color: var(--color-slate-100) !important;
+  color: var(--color-slate-700) !important;
+  font-size: 0.875rem !important;
+}
+
+.cat-table .p-paginator {
+  background: var(--color-slate-50) !important;
+  border-top: 1.5px solid var(--color-slate-200) !important;
+  padding: 0.6rem 1rem !important;
+}
+
+.cat-table .p-paginator .p-paginator-page.p-highlight {
+  background: var(--color-primary-600) !important;
+  color: var(--color-white) !important;
+  border-color: var(--color-primary-600) !important;
+}
+
+/* ─── Image Cell ─── */
+.img-cell {
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1.5px solid var(--color-slate-200);
+  background: var(--color-slate-100);
+}
+
+.img-cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ─── ID Badge ─── */
+.id-badge {
+  font-family: var(--font-family-mono);
+  font-size: 0.7rem;
+  color: var(--color-slate-500);
+  background: var(--color-slate-100);
+  padding: 0.2rem 0.5rem;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+  border: 1px solid var(--color-slate-200);
+}
+
+/* ─── Slug Tag ─── */
+.slug-tag {
+  font-size: 0.75rem;
+  color: var(--color-primary-600);
+  background: var(--color-primary-50);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  display: inline-block;
+  font-weight: 500;
+  border: 1px solid var(--color-primary-200);
+}
+
+/* ─── Description ─── */
+.desc-cell {
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-slate-500);
+  font-size: 0.82rem;
+  display: block;
+}
+
+/* ─── Empty State ─── */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 4rem 2rem;
+  color: var(--color-slate-400);
+  text-align: center;
+}
+
+.empty-state .empty-icon {
+  font-size: 3rem;
+  color: var(--color-slate-300);
+}
+.empty-state .empty-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-slate-500);
+  margin: 0;
+}
+.empty-state .empty-sub {
+  font-size: 0.84rem;
+  margin: 0;
+}
+
+/* ─── Dialog Overrides ─── */
+.p-dialog {
+  border-radius: var(--radius-4xl) !important;
+  overflow: hidden !important;
+  box-shadow: var(--shadow-dialog) !important;
+  border: 1px solid var(--color-slate-200) !important;
+}
+
+.p-dialog .p-dialog-header {
+  background: var(--color-white) !important;
+  border-bottom: 1.5px solid var(--color-slate-100) !important;
+  padding: 1.2rem 1.5rem !important;
+}
+
+.p-dialog .p-dialog-title {
+  font-size: 1.05rem !important;
+  font-weight: 700 !important;
+  color: var(--color-slate-800) !important;
+}
+
+.p-dialog .p-dialog-content {
+  padding: 1.5rem !important;
+  background: var(--color-white) !important;
+  color: var(--color-slate-700) !important;
+}
+
+.p-dialog .p-dialog-footer {
+  padding: 1rem 1.5rem !important;
+  background: var(--color-slate-50) !important;
+  border-top: 1.5px solid var(--color-slate-100) !important;
+  display: flex !important;
+  gap: 0.5rem !important;
+  justify-content: flex-end !important;
+}
+
+/* ─── Form Fields ─── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-gray-700);
+}
+
+.req {
+  color: var(--color-danger-500);
+  margin-left: 2px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 0.62rem 0.9rem;
+  border: 1.5px solid var(--color-slate-200);
+  border-radius: var(--radius-lg);
+  font-size: 0.875rem;
+  color: var(--color-slate-800);
+  background: var(--color-slate-50);
+  outline: none;
+  transition:
+    border-color var(--transition-base),
+    box-shadow var(--transition-base);
+  font-family: inherit;
+  box-sizing: border-box;
+}
+
+.form-control:focus {
+  border-color: var(--color-primary-600);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  background: var(--color-white);
+}
+
+.form-control:disabled {
+  color: var(--color-slate-400);
+  background: var(--color-slate-100);
+  cursor: not-allowed;
+}
+
+.form-hint {
+  font-size: 0.76rem;
+  color: var(--color-slate-400);
+}
+
+.existing-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1.5px solid var(--color-slate-200);
+  border-radius: var(--radius-lg);
+  background: var(--color-slate-50);
+}
+
+.existing-preview img {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md);
+  object-fit: cover;
+  border: 1px solid var(--color-slate-200);
+  flex-shrink: 0;
+}
+
+.existing-preview p {
+  font-size: 0.8rem;
+  color: var(--color-slate-500);
+  margin: 0;
+}
+
+.file-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  color: var(--color-success-800);
+  background: var(--color-success-100);
+  padding: 0.3rem 0.65rem;
+  border-radius: var(--radius-sm);
+  font-weight: 500;
+  border: 1px solid var(--color-success-200);
+}
+
+/* ─── Confirm Dialog ─── */
+.p-confirmdialog .p-dialog-header {
+  background: var(--color-white) !important;
+}
+.p-confirmdialog .p-dialog-content {
+  background: var(--color-white) !important;
+  color: var(--color-gray-700) !important;
+}
+.p-confirmdialog .p-dialog-footer {
+  background: var(--color-slate-50) !important;
+}
+
+/* ─── Category Name Cell ─── */
+.cat-name-cell {
+  font-weight: 600;
+  color: var(--color-slate-800);
+}

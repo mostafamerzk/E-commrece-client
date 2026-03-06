@@ -7,7 +7,7 @@
 .env
 .env.local
 *.env.*
-
+/.agent
 # IDE
 .idea/
 *.suo
@@ -31,5 +31,6 @@ yarn-error.log*
 # Documentation
 /docs
 /design
-.agent
-
+/.agent
+/agent
+/tests

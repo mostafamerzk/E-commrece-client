@@ -11,6 +11,7 @@
     "test:ci": "ng test --watch=false --browsers=ChromeHeadless",
     "test:single": "ng test --no-watch --browsers=ChromeHeadless --include",
     "test:watch": "ng test --browsers=Chrome",
+    "test:all": "npm run lint && npm run format:check && npm run test:ci",
     "lint": "ng lint",
     "lint:fix": "ng lint --fix",
     "format": "prettier --write \"src/**/*.{ts,html,scss}\"",

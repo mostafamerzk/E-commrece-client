@@ -10,5 +10,6 @@
   "typescript.preferences.importModuleSpecifier": "relative",
   "[html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "cSpell.words": ["primeng", "aura", "primeflex", "primeicons", "lucide", "testuser"]
 }

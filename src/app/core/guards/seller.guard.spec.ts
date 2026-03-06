@@ -26,18 +26,14 @@ describe('sellerGuard', () => {
   });
 
   it('should allow access if user is seller', () => {
-    (
-      Object.getOwnPropertyDescriptor(authServiceSpy, 'isSeller')?.get as jasmine.Spy
-    ).and.returnValue(signal(true));
+    (authServiceSpy.isSeller as any).set(true);
 
     const result = TestBed.runInInjectionContext(() => sellerGuard({} as any, {} as any));
     expect(result).toBeTrue();
   });
 
   it('should allow access if user is admin', () => {
-    (
-      Object.getOwnPropertyDescriptor(authServiceSpy, 'isAdmin')?.get as jasmine.Spy
-    ).and.returnValue(signal(true));
+    (authServiceSpy.isAdmin as any).set(true);
 
     const result = TestBed.runInInjectionContext(() => sellerGuard({} as any, {} as any));
     expect(result).toBeTrue();

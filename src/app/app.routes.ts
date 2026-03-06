@@ -8,7 +8,82 @@ export const routes: Routes = [
   {
     path: '',
     loadComponent: () =>
-      import('./features/home/pages/home/home.component').then((m) => m.HomeComponent),
+      import('./layouts/main-layout/main-layout.component').then((m) => m.MainLayoutComponent),
+    children: [
+      {
+        path: '',
+        loadComponent: () =>
+          import('./features/home/pages/home/home.component').then((m) => m.HomeComponent),
+      },
+      {
+        path: 'products',
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/products/pages/product-list/product-list.component').then(
+                (m) => m.ProductListComponent
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./features/products/pages/product-detail/product-detail.component').then(
+                (m) => m.ProductDetailComponent
+              ),
+          },
+        ],
+      },
+      {
+        path: 'cart',
+        loadComponent: () =>
+          import('./features/cart/pages/cart/cart.component').then((m) => m.CartComponent),
+        canActivate: [authGuard],
+      },
+      {
+        path: 'orders',
+        canActivate: [authGuard],
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/orders/pages/order-list/order-list.component').then(
+                (m) => m.OrderListComponent
+              ),
+          },
+          {
+            path: 'checkout',
+            loadComponent: () =>
+              import('./features/orders/pages/checkout/checkout.component').then(
+                (m) => m.CheckoutComponent
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./features/orders/pages/order-detail/order-detail.component').then(
+                (m) => m.OrderDetailComponent
+              ),
+          },
+        ],
+      },
+      {
+        path: 'wishlist',
+        loadComponent: () =>
+          import('./features/wishlist/pages/wishlist/wishlist.component').then(
+            (m) => m.WishlistComponent
+          ),
+        canActivate: [authGuard],
+      },
+      {
+        path: 'seller',
+        loadComponent: () =>
+          import('./features/seller/pages/dashboard/seller-dashboard.component').then(
+            (m) => m.SellerDashboardComponent
+          ),
+        canActivate: [authGuard, sellerGuard],
+      },
+    ],
   },
   {
     path: 'auth',
@@ -28,68 +103,21 @@ export const routes: Routes = [
             (m) => m.RegisterComponent
           ),
       },
-    ],
-  },
-  {
-    path: 'products',
-    children: [
       {
-        path: '',
+        path: 'forgot-password',
         loadComponent: () =>
-          import('./features/products/pages/product-list/product-list.component').then(
-            (m) => m.ProductListComponent
+          import('./features/auth/pages/forgot-password/forgot-password.component').then(
+            (m) => m.ForgotPasswordComponent
           ),
       },
       {
-        path: ':id',
+        path: 'reset-password',
         loadComponent: () =>
-          import('./features/products/pages/product-detail/product-detail.component').then(
-            (m) => m.ProductDetailComponent
+          import('./features/auth/pages/reset-password/reset-password.component').then(
+            (m) => m.ResetPasswordComponent
           ),
       },
     ],
-  },
-  {
-    path: 'cart',
-    loadComponent: () =>
-      import('./features/cart/pages/cart/cart.component').then((m) => m.CartComponent),
-    canActivate: [authGuard],
-  },
-  {
-    path: 'orders',
-    canActivate: [authGuard],
-    children: [
-      {
-        path: '',
-        loadComponent: () =>
-          import('./features/orders/pages/order-list/order-list.component').then(
-            (m) => m.OrderListComponent
-          ),
-      },
-      {
-        path: ':id',
-        loadComponent: () =>
-          import('./features/orders/pages/order-detail/order-detail.component').then(
-            (m) => m.OrderDetailComponent
-          ),
-      },
-    ],
-  },
-  {
-    path: 'wishlist',
-    loadComponent: () =>
-      import('./features/wishlist/pages/wishlist/wishlist.component').then(
-        (m) => m.WishlistComponent
-      ),
-    canActivate: [authGuard],
-  },
-  {
-    path: 'seller',
-    loadComponent: () =>
-      import('./features/seller/pages/dashboard/seller-dashboard.component').then(
-        (m) => m.SellerDashboardComponent
-      ),
-    canActivate: [authGuard, sellerGuard],
   },
   {
     path: 'admin',
@@ -102,6 +130,13 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/admin/pages/dashboard/dashboard.component').then(
             (m) => m.DashboardComponent
+          ),
+      },
+      {
+        path: 'categories',
+        loadComponent: () =>
+          import('./features/admin/pages/categories/categories.component').then(
+            (m) => m.CategoriesComponent
           ),
       },
     ],

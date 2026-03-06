@@ -1,10 +1,20 @@
-import { InjectionToken } from '@angular/core';
-import { Observable } from 'rxjs';
-import { LoginPayload, AuthResponse } from '../models/auth.model';
+import { InjectionToken, Signal } from '@angular/core';
+import { LoginResponse } from '../services/auth.service';
+import { User, ResetPasswordPayload } from '../models/auth.model';
 
 export interface AuthFacade {
-  login(payload: LoginPayload): Observable<AuthResponse>;
+  login(email: string, password: string): Promise<LoginResponse>;
   logout(): void;
+  isLoggedIn: Signal<boolean>;
+  currentUser: Signal<User | null>;
+  getAccessToken(): string | null;
+  isAdmin: Signal<boolean>;
+  isSeller: Signal<boolean>;
+  forgetPassword(email: string): Promise<{ message: string }>;
+  resetPassword(
+    email: string,
+    payload: Omit<ResetPasswordPayload, 'email'>
+  ): Promise<{ message: string }>;
 }
 
 export const AUTH_FACADE = new InjectionToken<AuthFacade>('AUTH_FACADE');
