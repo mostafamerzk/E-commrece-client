@@ -1,0 +1,62 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: var(--gray-50, #f9fafb);
+}
+
+/* ─── PrimeNG Overrides ─── */
+:host ::ng-deep {
+  .p-breadcrumb {
+    background: transparent;
+    border: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .p-slider {
+    .p-slider-range {
+      background: var(--primary-600);
+    }
+    .p-slider-handle {
+      border: 2px solid var(--primary-600);
+    }
+  }
+
+  .p-checkbox {
+    .p-checkbox-box.p-highlight {
+      background: var(--primary-600);
+      border-color: var(--primary-600);
+    }
+  }
+
+  .p-paginator {
+    background: transparent;
+    border: 0;
+    margin-top: 2rem;
+
+    .p-paginator-page.p-highlight {
+      background: var(--primary-50);
+      color: var(--primary-600);
+    }
+  }
+}
+
+/* ─── Skeleton Card — match product-card aspect ratio ─── */
+.skeleton-card {
+  .skeleton-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+  }
+}
+
+/* ─── Mobile: stack layout ─── */
+@media (max-width: 767px) {
+  .filter-sidebar {
+    display: none;
+  }
+}
+
+/* ─── Toolbar responsive ─── */
+.toolbar {
+  flex-wrap: wrap;
+}

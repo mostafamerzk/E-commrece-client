@@ -1,0 +1,258 @@
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" class="mb-6" />
+
+  <div class="flex gap-8">
+    <!-- Filter sidebar (desktop) -->
+    <aside class="hidden md:block w-72 flex-shrink-0" aria-label="Product filters">
+      <div class="sticky top-24">
+        <div class="bg-white rounded-xl border border-gray-200 p-5 mb-4 shadow-sm">
+          <h2 class="text-xs font-bold text-gray-800 mb-4 uppercase tracking-widest">Search</h2>
+          <p-iconfield class="w-full">
+            <p-inputicon styleClass="pi pi-search" />
+            <input
+              pInputText
+              type="search"
+              [(ngModel)]="searchQuery"
+              (ngModelChange)="onFilterChange()"
+              placeholder="Search products…"
+              class="w-full text-sm p-inputtext-sm"
+            />
+          </p-iconfield>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-200 p-5 mb-4 shadow-sm">
+          <h2 class="text-xs font-bold text-gray-800 mb-4 uppercase tracking-widest">Categories</h2>
+          <div class="space-y-3">
+            @for (cat of categories(); track cat._id) {
+              <div class="flex items-center gap-3">
+                <p-checkbox
+                  [(ngModel)]="selectedCategories"
+                  [value]="cat._id"
+                  (onChange)="onFilterChange()"
+                  [inputId]="'cat-' + cat._id"
+                />
+                <label
+                  [for]="'cat-' + cat._id"
+                  class="text-sm text-gray-600 cursor-pointer hover:text-primary-600 transition-colors"
+                >
+                  {{ cat.name }}
+                </label>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-200 p-5 mb-4 shadow-sm">
+          <h2 class="text-xs font-bold text-gray-800 mb-4 uppercase tracking-widest">
+            Price Range
+          </h2>
+          <p class="text-xs text-gray-500 mb-4 font-medium">
+            EGP {{ priceRange()[0] | number }} — EGP {{ priceRange()[1] | number }}
+          </p>
+          <p-slider
+            [(ngModel)]="priceRange"
+            [range]="true"
+            [min]="0"
+            [max]="10000"
+            [step]="50"
+            (onSlideEnd)="onFilterChange()"
+            class="w-full"
+          />
+        </div>
+
+        <div class="bg-white rounded-xl border border-gray-200 p-5 mb-4 shadow-sm">
+          <div class="flex items-center justify-between">
+            <label for="inStock" class="text-sm font-semibold text-gray-700">In Stock Only</label>
+            <p-toggleswitch
+              [(ngModel)]="inStockOnly"
+              (onChange)="onFilterChange()"
+              inputId="inStock"
+            />
+          </div>
+        </div>
+
+        <button
+          pButton
+          type="button"
+          icon="pi pi-refresh"
+          label="Clear All Filters"
+          class="w-full p-button-outlined p-button-sm border-gray-300 text-gray-600 hover:bg-gray-50"
+          (click)="clearFilters()"
+        ></button>
+      </div>
+    </aside>
+
+    <!-- Mobile filter drawer -->
+    <p-drawer
+      [(visible)]="filterDrawerOpen"
+      position="left"
+      header="Filters"
+      styleClass="w-80 md:hidden"
+    >
+      <div class="p-4 space-y-6">
+        <div>
+          <h2 class="text-xs font-bold text-gray-800 mb-3 uppercase tracking-widest">Search</h2>
+          <p-iconfield class="w-full">
+            <p-inputicon styleClass="pi pi-search" />
+            <input
+              pInputText
+              type="search"
+              [(ngModel)]="searchQuery"
+              (ngModelChange)="onFilterChange()"
+              placeholder="Search products…"
+              class="w-full text-sm"
+            />
+          </p-iconfield>
+        </div>
+
+        <div>
+          <h2 class="text-xs font-bold text-gray-800 mb-3 uppercase tracking-widest">Categories</h2>
+          <div class="space-y-3">
+            @for (cat of categories(); track cat._id) {
+              <div class="flex items-center gap-3">
+                <p-checkbox
+                  [(ngModel)]="selectedCategories"
+                  [value]="cat._id"
+                  (onChange)="onFilterChange()"
+                  [inputId]="'cat-mobile-' + cat._id"
+                />
+                <label [for]="'cat-mobile-' + cat._id" class="text-sm text-gray-600">
+                  {{ cat.name }}
+                </label>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div>
+          <h2 class="text-xs font-bold text-gray-800 mb-3 uppercase tracking-widest">
+            Price Range
+          </h2>
+          <p class="text-xs text-gray-500 mb-3">
+            EGP {{ priceRange()[0] | number }} — EGP {{ priceRange()[1] | number }}
+          </p>
+          <p-slider
+            [(ngModel)]="priceRange"
+            [range]="true"
+            [min]="0"
+            [max]="10000"
+            [step]="50"
+            (onSlideEnd)="onFilterChange()"
+            class="w-full"
+          />
+        </div>
+
+        <div class="flex items-center justify-between py-2 border-t border-b border-gray-100">
+          <label for="inStock-mobile" class="text-sm font-semibold text-gray-700"
+            >In Stock Only</label
+          >
+          <p-toggleswitch
+            [(ngModel)]="inStockOnly"
+            (onChange)="onFilterChange()"
+            inputId="inStock-mobile"
+          />
+        </div>
+
+        <button
+          pButton
+          type="button"
+          icon="pi pi-refresh"
+          label="Clear All"
+          class="w-full p-button-outlined p-button-sm"
+          (click)="clearFilters()"
+        ></button>
+      </div>
+    </p-drawer>
+
+    <!-- Main content -->
+    <div class="flex-1 min-w-0">
+      <!-- Top toolbar -->
+      <div
+        class="flex items-center justify-between mb-6 gap-4 bg-white p-4 rounded-xl border border-gray-200 shadow-sm"
+      >
+        <!-- Mobile filter toggle -->
+        <button
+          pButton
+          type="button"
+          icon="pi pi-filter"
+          label="Filters"
+          class="md:hidden p-button-outlined p-button-sm border-gray-300 text-gray-700"
+          (click)="filterDrawerOpen.set(true)"
+        >
+          @if (activeFilterCount() > 0) {
+            <p-badge [value]="activeFilterCount()" class="ml-2" severity="danger" />
+          }
+        </button>
+
+        <!-- Result count -->
+        <div class="text-sm text-gray-500 font-medium">
+          @if (isLoading()) {
+            <p-skeleton width="80px" />
+          } @else {
+            <span class="text-gray-900 font-bold">{{ totalProducts() }}</span> products found
+          }
+        </div>
+
+        <!-- Sort dropdown -->
+        <p-select
+          [options]="sortOptions"
+          [(ngModel)]="selectedSort"
+          (onChange)="onSortChange()"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Sort by"
+          styleClass="text-sm w-44"
+        />
+      </div>
+
+      <!-- Grid Area -->
+      @if (isLoading()) {
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+          @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+            <div class="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+              <div class="w-full aspect-square">
+                <p-skeleton width="100%" height="100%" />
+              </div>
+              <div class="p-4 space-y-3">
+                <p-skeleton width="40%" height="12px" />
+                <p-skeleton width="100%" height="20px" />
+                <p-skeleton width="60%" height="24px" />
+                <p-skeleton width="100%" height="36px" borderRadius="8px" />
+              </div>
+            </div>
+          }
+        </div>
+      } @else if (products().length === 0) {
+        <app-empty-state
+          icon="pi pi-search"
+          title="No products found"
+          description="We couldn't find any products matching your current filters. Try adjusting your search or clearing filters."
+          actionLabel="Clear All Filters"
+          (click)="clearFilters()"
+        />
+      } @else {
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 md:gap-6">
+          @for (product of products(); track product._id) {
+            <app-product-card [product]="product" />
+          }
+        </div>
+
+        <!-- Pagination -->
+        @if (totalProducts() > pageSize) {
+          <br />
+          <br />
+          <div class="flex justify-center mt-10">
+            <p-paginator
+              [first]="(currentPage() - 1) * pageSize"
+              [rows]="pageSize"
+              [totalRecords]="totalProducts()"
+              (onPageChange)="onPageChange($event)"
+              [showCurrentPageReport]="true"
+              currentPageReportTemplate="{first} - {last} of {totalRecords}"
+            />
+          </div>
+        }
+      }
+    </div>
+  </div>
+</main>

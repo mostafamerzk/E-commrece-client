@@ -1,0 +1,193 @@
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <!-- Breadcrumb -->
+  <p-breadcrumb
+    [model]="breadcrumb()"
+    [home]="{ icon: 'pi pi-home', routerLink: '/' }"
+    class="mb-6"
+  />
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-16">
+      <div class="space-y-4">
+        <p-skeleton height="450px" borderRadius="16px" />
+        <div class="flex gap-4">
+          <p-skeleton width="80px" height="80px" />
+          <p-skeleton width="80px" height="80px" />
+          <p-skeleton width="80px" height="80px" />
+        </div>
+      </div>
+      <div class="space-y-6">
+        <p-skeleton width="150px" height="16px" />
+        <p-skeleton width="80%" height="40px" />
+        <p-skeleton width="120px" height="24px" />
+        <div class="flex gap-4">
+          <p-skeleton width="140px" height="32px" />
+          <p-skeleton width="100px" height="32px" />
+        </div>
+        <p-skeleton width="100%" height="150px" />
+        <div class="flex gap-4">
+          <p-skeleton width="120px" height="48px" />
+          <p-skeleton width="200px" height="48px" />
+          <p-skeleton width="60px" height="48px" borderRadius="100px" />
+        </div>
+      </div>
+    </div>
+  } @else if (product()) {
+    <!-- Product Content -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12 mb-16">
+      <!-- Left: Gallery -->
+      <div class="w-full">
+        <p-galleria
+          [value]="galleryImages()"
+          [numVisible]="5"
+          [showThumbnailNavigators]="false"
+          [showItemNavigators]="true"
+          [showItemNavigatorsOnHover]="true"
+          [circular]="true"
+          [fullScreen]="false"
+          containerClass="rounded-2xl overflow-hidden border border-gray-100 shadow-sm"
+        >
+          <ng-template pTemplate="item" let-img>
+            <img
+              [src]="img.src"
+              [alt]="img.alt"
+              class="w-full aspect-square object-contain bg-white cursor-zoom-in"
+            />
+          </ng-template>
+          <ng-template pTemplate="thumbnail" let-img>
+            <div class="p-2">
+              <img
+                [src]="img.src"
+                [alt]="img.alt"
+                class="w-16 h-16 object-cover rounded-lg border border-gray-200"
+              />
+            </div>
+          </ng-template>
+        </p-galleria>
+      </div>
+
+      <!-- Right: Product Info -->
+      <div class="flex flex-col gap-6">
+        <div class="space-y-2">
+          <span class="text-xs font-bold uppercase tracking-widest text-primary-600">
+            Category
+          </span>
+          <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 leading-tight">
+            {{ product()?.title }}
+          </h1>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <p-rating [ngModel]="product()?.avgRating" [readonly]="true" />
+          <!-- cancel="false" -->
+          <span class="text-sm font-semibold text-gray-500">
+            {{ product()?.avgRating | number: '1.1-1' }}
+            <span class="text-gray-400 font-normal">(0 reviews)</span>
+          </span>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <span class="text-4xl font-black text-primary-600">
+            {{ product()?.finalPrice | currency: 'EGP ' }}
+          </span>
+          @if (product()?.discount) {
+            <span class="text-xl text-gray-400 line-through decoration-gray-300">
+              {{ product()?.price | currency: 'EGP ' }}
+            </span>
+            <span
+              class="bg-red-50 text-red-600 text-xs font-black px-3 py-1.5 rounded-full shadow-sm ring-1 ring-red-100"
+            >
+              {{ product()?.discount }}% OFF
+            </span>
+          }
+        </div>
+
+        <div class="flex items-center gap-2">
+          <i
+            [class]="
+              product()!.stock > 0
+                ? 'pi pi-check-circle text-green-500'
+                : 'pi pi-times-circle text-red-500'
+            "
+            class="text-lg"
+          ></i>
+          <span
+            [class]="product()!.stock > 0 ? 'text-green-600 font-bold' : 'text-red-500 font-bold'"
+            class="text-sm uppercase tracking-wide"
+          >
+            {{ product()!.stock > 0 ? product()!.stock + ' In Stock' : 'Out of Stock' }}
+          </span>
+        </div>
+
+        <div class="pt-6 border-t border-gray-100">
+          <h2 class="text-xs font-bold text-gray-800 mb-3 uppercase tracking-widest">
+            Description
+          </h2>
+          <p class="text-base text-gray-600 leading-relaxed max-w-2xl">
+            {{ product()?.description || 'No description available for this product.' }}
+          </p>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex flex-col gap-6 pt-6 border-t border-gray-100">
+          <div class="flex items-center gap-4">
+            <label class="text-sm font-bold text-gray-700 uppercase tracking-wide">Quantity</label>
+            <p-inputnumber
+              [(ngModel)]="quantity"
+              [showButtons]="true"
+              buttonLayout="horizontal"
+              inputId="horizontal"
+              spinnerMode="horizontal"
+              [step]="1"
+              decrementButtonClass="p-button-secondary p-button-outlined"
+              incrementButtonClass="p-button-secondary p-button-outlined"
+              incrementButtonIcon="pi pi-plus"
+              decrementButtonIcon="pi pi-minus"
+              [min]="1"
+              [max]="product()!.stock"
+              [disabled]="product()!.stock === 0"
+            />
+          </div>
+
+          <div class="flex gap-4">
+            <button
+              pButton
+              type="button"
+              class="flex-1 p-button-lg font-bold btn-scale shadow-lg shadow-primary-500/20"
+              [disabled]="product()!.stock === 0 || isAddingToCart()"
+              [loading]="isAddingToCart()"
+              (click)="addToCart()"
+            >
+              <i class="pi pi-shopping-cart mr-2"></i>
+              {{ product()!.stock > 0 ? 'Add to Cart' : 'Out of Stock' }}
+            </button>
+
+            <!-- <button pButton type="button"
+                    class="p-button-outlined p-button-rounded p-button-lg w-16"
+                    [class.p-button-danger]="isWishlisted()"
+                    [attr.aria-label]="isWishlisted() ? 'Remove from wishlist' : 'Add to wishlist'"
+                    (click)="toggleWishlist()">
+              <i [class]="isWishlisted() ? 'pi pi-heart-fill' : 'pi pi-heart'"></i>
+            </button> -->
+            <button
+              pButton
+              type="button"
+              class="p-button-outlined p-button-rounded p-button-lg w-16"
+            >
+              <i class="pi pi-heart"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Reviews Section Placeholder
+    <div id="reviews" class="pt-16 border-t border-gray-100">
+      <h2 class="text-2xl font-black text-gray-900 mb-8">Customer Reviews</h2>
+        Assume this is rendered here 
+      <app-reviews-section [productId]="product()!._id"></app-reviews-section>
+    </div>
+    -->
+  }
+</main>

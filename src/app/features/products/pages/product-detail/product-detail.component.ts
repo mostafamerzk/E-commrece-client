@@ -1,8 +1,140 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal, computed } from '@angular/core';
+import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
+import { ActivatedRoute, RouterModule, Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { map, finalize } from 'rxjs';
+import { toSignal } from '@angular/core/rxjs-interop';
+
+import { ProductService } from '../../../../core/services/product.service';
+import { Product } from '../../../../core/models/product.model';
+// Assume these exist as per instructions
+//import { CartService } from '../../../../core/services/cart.service';
+//import { WishlistService } from '../../../../core/services/wishlist.service';
+import { ToastService } from '../../../../core/services/toast.service';
+
+// PrimeNG Imports
+import { GalleriaModule } from 'primeng/galleria';
+import { RatingModule } from 'primeng/rating';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { ButtonModule } from 'primeng/button';
+import { SkeletonModule } from 'primeng/skeleton';
+import { BreadcrumbModule } from 'primeng/breadcrumb';
+
+// Shared Components
+// import { ReviewsSectionComponent } from '../../../reviews/components/reviews-section/reviews-section.component';
 
 @Component({
   selector: 'app-product-detail',
   standalone: true,
-  template: '<h1>Product Detail Page</h1>',
+  imports: [
+    CommonModule,
+    RouterModule,
+    FormsModule,
+    CurrencyPipe,
+    DecimalPipe,
+    GalleriaModule,
+    RatingModule,
+    InputNumberModule,
+    ButtonModule,
+    SkeletonModule,
+    BreadcrumbModule,
+    // ReviewsSectionComponent
+  ],
+  templateUrl: './product-detail.component.html',
+  styleUrl: './product-detail.component.scss',
 })
-export class ProductDetailComponent {}
+export class ProductDetailComponent {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  private productService = inject(ProductService);
+  //private cart = inject(CartService);
+  //private wishlist = inject(WishlistService);
+  private toast = inject(ToastService);
+
+  // ID from Route
+  readonly productId = toSignal(this.route.paramMap.pipe(map((p) => p.get('id')!)));
+
+  // State Signals
+  product = signal<Product | null>(null);
+  isLoading = signal(true);
+  quantity = signal(1);
+  isAddingToCart = signal(false);
+
+  // Computed State
+  //readonly isWishlisted = computed(() =>
+  //this.wishlist.items().some(p => p._id === this.product()?._id)
+  //);
+
+  readonly breadcrumb = computed(() => [
+    { label: 'Products', routerLink: '/products' },
+    { label: this.product()?.title || 'Loading...' },
+  ]);
+
+  readonly discountPercent = computed(() => {
+    const p = this.product();
+    if (!p?.discount) return 0;
+    return p.discount;
+  });
+
+  readonly galleryImages = computed(() => {
+    const p = this.product();
+    if (!p) return [];
+
+    const images = [{ src: p.mainImage.secure_url, alt: p.title }];
+    if (p.images) {
+      images.push(...p.images.map((img) => ({ src: img.secure_url, alt: p.title })));
+    }
+    return images;
+  });
+
+  constructor() {
+    this.route.paramMap.subscribe((params) => {
+      const id = params.get('id');
+      if (id) {
+        this.loadProduct(id);
+      }
+    });
+  }
+
+  private loadProduct(id: string): void {
+    this.isLoading.set(true);
+    this.productService
+      .getById(id)
+      .pipe(finalize(() => this.isLoading.set(false)))
+      .subscribe({
+        next: (res) => {
+          this.product.set(res.product);
+        },
+        error: (err) => {
+          console.error('Error loading product', err);
+          // If it's not a 404, we don't necessarily want to redirect.
+          // But for 404, we go to the not-found page.
+          if (err.status === 404) {
+            this.router.navigate(['/404']);
+          }
+        },
+      });
+  }
+
+  addToCart(): void {
+    const p = this.product();
+    if (!p || p.stock === 0) return;
+
+    this.isAddingToCart.set(true);
+    //this.cart.addItem(p._id, this.quantity()).subscribe({
+    //next: () => {
+    //this.isAddingToCart.set(false);
+    //this.toast.success('Successfully added to cart!');
+    //},
+    //error: () => {
+    //this.isAddingToCart.set(false);
+    //}
+    //});
+  }
+
+  toggleWishlist(): void {
+    const p = this.product();
+    if (!p) return;
+    //this.wishlist.toggle(p._id);
+  }
+}

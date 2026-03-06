@@ -16,6 +16,8 @@ import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 import { AUTH_FACADE, TOAST_FACADE } from './core/tokens/app.tokens';
 import { AuthService } from './core/services/auth.service';
 import { ToastService } from './core/services/toast.service';
+import { MessageService } from 'primeng/api';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
@@ -28,6 +30,7 @@ export const appConfig: ApplicationConfig = {
       },
     }),
     provideHttpClient(withInterceptors([authInterceptor, errorInterceptor, loadingInterceptor])),
+    MessageService,
     { provide: AUTH_FACADE, useExisting: AuthService },
     { provide: TOAST_FACADE, useExisting: ToastService },
   ],

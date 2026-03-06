@@ -1,0 +1,108 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #fff;
+}
+
+/* ─── Utilities ─── */
+.btn-scale {
+  transition: transform 0.1s ease;
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+/* ─── Gallery: constrain image sizes ─── */
+.gallery-wrapper {
+  width: 100%;
+
+  img.gallery-main {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    background: #f9fafb;
+  }
+
+  img.gallery-thumb {
+    width: 64px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+  }
+}
+
+/* ─── PrimeNG Overrides ─── */
+:host ::ng-deep {
+  .p-breadcrumb {
+    background: transparent;
+    border: 0;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .p-galleria {
+    border: 0;
+
+    .p-galleria-items-container {
+      background: #f9fafb;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .p-galleria-item {
+      img {
+        width: 100%;
+        aspect-ratio: 1 / 1;
+        object-fit: contain;
+        background: #f9fafb;
+      }
+    }
+
+    .p-galleria-thumbnail-container {
+      background: transparent;
+      padding: 0.75rem 0 0 0;
+    }
+
+    .p-galleria-thumbnail-item {
+      opacity: 0.5;
+      transition: opacity 0.2s;
+
+      &.p-galleria-thumbnail-item-current,
+      &:hover {
+        opacity: 1;
+      }
+    }
+  }
+
+  .p-rating {
+    .p-rating-item.p-rating-item-active .pi {
+      color: #fbbf24;
+    }
+  }
+
+  .p-inputnumber {
+    .p-inputnumber-button {
+      background: transparent;
+      color: #374151;
+      border-color: #d1d5db;
+
+      &:hover {
+        background: #f3f4f6;
+      }
+    }
+
+    .p-inputnumber-input {
+      text-align: center;
+      width: 3rem;
+    }
+  }
+}
+
+/* ─── Responsive: stack on mobile ─── */
+@media (max-width: 767px) {
+  .product-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+}

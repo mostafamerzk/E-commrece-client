@@ -31,5 +31,5 @@ yarn-error.log*
 # Documentation
 /docs
 /design
-/agent
+.agent
 
