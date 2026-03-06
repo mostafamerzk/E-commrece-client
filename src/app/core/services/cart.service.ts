@@ -209,6 +209,15 @@ export class CartService {
       })
     );
   }
+
+  // Backward compatibility aliases
+  addToCart(productId: string, quantity = 1): Observable<CartResponse> {
+    return this.addItem({ productId, quantity });
+  }
+
+  isInCart(productId: string): boolean {
+    return this.items().some((item) => item.product._id === productId);
+  }
   loadInitialCart() {
     this.loadCart();
   }
