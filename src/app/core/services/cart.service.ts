@@ -14,7 +14,9 @@ import { StorageService } from './storage.service';
 import { AuthService } from './auth.service';
 import { Product } from '../models/product.model';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root',
+})
 export class CartService {
   private api = inject(ApiService);
   private storage = inject(StorageService);
@@ -22,12 +24,12 @@ export class CartService {
   private readonly endpoint = API_ENDPOINTS.CART;
   private readonly GUEST_CART_KEY = 'guest_cart';
 
-  // ── State ────────────────────────────────────────────────
+  // Store the cart state in a signal for reactive updates across the app
   private _cart = signal<Cart | null>(null);
   readonly cart = this._cart.asReadonly();
 
+  // Computed signals for derived state
   readonly items = computed(() => this._cart()?.products ?? []);
-
   readonly itemCount = computed(() =>
     this.items().reduce((count, item) => count + item.quantity, 0)
   );
@@ -73,9 +75,6 @@ export class CartService {
     }
   }
 
-  // ── API Calls ────────────────────────────────────────────
-
-  // Get cart
   getCart(): Observable<CartResponse> {
     if (!this.authService.isLoggedIn()) {
       return of({
@@ -93,11 +92,6 @@ export class CartService {
     return this.api
       .post<CartResponse, AddToCartPayload>(this.endpoint, payload)
       .pipe(tap((res) => this._cart.set(res.cart)));
-  }
-
-  // Alias for backward compatibility
-  addToCart(productId: string, quantity = 1): Observable<CartResponse> {
-    return this.addItem({ productId, quantity });
   }
 
   private addGuestItem(payload: AddToCartPayload, product?: Product): Observable<CartResponse> {
@@ -158,7 +152,6 @@ export class CartService {
       .pipe(tap((res) => this._cart.set(res.cart)));
   }
 
-  // Clear cart (server)
   clearCart(): Observable<MessageResponse> {
     if (!this.authService.isLoggedIn()) {
       this.storage.removeItem(this.GUEST_CART_KEY);
@@ -215,10 +208,7 @@ export class CartService {
     );
   }
 
-  isInCart(productId: string): boolean {
-    return this.items().some((item) => item.product._id === productId);
-  }
-
+  // Helper to load cart on app init if needed
   loadInitialCart() {
     this.loadCart();
   }

@@ -6,7 +6,7 @@ import { CheckoutComponent } from './features/orders/pages/checkout/checkout.com
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, CartComponent, CheckoutComponent],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
