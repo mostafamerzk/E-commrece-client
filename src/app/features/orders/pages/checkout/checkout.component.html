@@ -69,16 +69,16 @@
 
               <!-- Address full-width -->
               <div class="form-group form-group--full">
-                <label for="address">Shipping Address</label>
+                <label for="street">Shipping Address</label>
                 <input
                   type="text"
-                  id="address"
-                  formControlName="address"
+                  id="street"
+                  formControlName="street"
                   placeholder="Street address, apartment, suite, etc."
                   class="form-input"
-                  [class.error]="fieldInvalid('address')"
+                  [class.error]="fieldInvalid('street')"
                 />
-                @if (fieldInvalid('address')) {
+                @if (fieldInvalid('street')) {
                   <span class="field-error">
                     <i class="pi pi-exclamation-circle"></i>
                     Address is required
@@ -123,6 +123,9 @@
                     class="form-input"
                   />
                 </div>
+
+                <!-- Hidden Country (Defaulted to Egypt in Component) -->
+                <input type="hidden" formControlName="country" />
               </div>
             </form>
           </div>
@@ -139,8 +142,8 @@
             <button
               type="button"
               class="payment-card"
-              [class.active]="paymentMethod() === 'card'"
-              (click)="paymentMethod.set('card')"
+              [class.active]="paymentMethod() === 'creditCard'"
+              (click)="paymentMethod.set('creditCard')"
             >
               <div class="checkmark"><i class="pi pi-check"></i></div>
               <div class="payment-icon-box">
@@ -155,8 +158,8 @@
             <button
               type="button"
               class="payment-card"
-              [class.active]="paymentMethod() === 'cash'"
-              (click)="paymentMethod.set('cash')"
+              [class.active]="paymentMethod() === 'cod'"
+              (click)="paymentMethod.set('cod')"
             >
               <div class="checkmark"><i class="pi pi-check"></i></div>
               <div class="payment-icon-box">
