@@ -8,6 +8,7 @@ import {
   AddToCartPayload,
   UpdateCartPayload,
   CartItem,
+  RawCartItem,
 } from '../models/cart.model';
 import { MessageResponse } from '../models/shared.model';
 import { StorageService } from './storage.service';
@@ -205,7 +206,7 @@ export class CartService {
       //    (a) The server item itself (if it's already an object)
       //    (b) Our hintProduct (if we just added something)
       //    (c) Our current local state
-      let populatedProduct: Product | undefined;
+      let populatedProduct: Product;
 
       if (this.isProductObject(serverItem.product)) {
         populatedProduct = serverItem.product;
@@ -213,22 +214,17 @@ export class CartService {
         populatedProduct = hintProduct;
       } else {
         const existing = currentProducts.find((p) => p.product?._id === productId);
-        populatedProduct = existing?.product;
-      }
-
-      // 3. If still not found, create a minimal Product object so the UI doesn't crash
-      if (!populatedProduct) {
-        populatedProduct = { _id: productId } as Product;
+        populatedProduct = existing?.product ?? ({ _id: productId } as Product);
       }
 
       return {
         product: populatedProduct,
-        quantity: serverItem.quantity,
-        price: serverItem.price,
+        quantity: serverItem.quantity || 1,
+        price: serverItem.price || populatedProduct.finalPrice || 0,
       };
     });
 
-    this._cart.set({ ...serverCart, products: mergedProducts });
+    this._cart.set({ ...serverCart, products: mergedProducts as CartItem[] });
   }
 
   removeItem(productId: string): Observable<CartResponse> {
@@ -305,6 +301,10 @@ export class CartService {
 
   loadInitialCart() {
     this.loadCart();
+  }
+
+  private isProductObject(p: Product | string | undefined): p is Product {
+    return !!p && typeof p === 'object' && '_id' in p;
   }
 
   /** Immediately patches the quantity in the local signal without a network call. */
