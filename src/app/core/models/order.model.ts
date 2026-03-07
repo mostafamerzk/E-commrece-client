@@ -43,7 +43,7 @@ export type PaymentStatus = 'unpaid' | 'paid' | 'refunded';
  * 'paypal' → PayPal integration (bonus feature)
  * 'wallet' → deduct from user's stored wallet balance (bonus feature)
  */
-export type PaymentMethod = 'card' | 'cash' | 'paypal' | 'wallet';
+export type PaymentMethod = 'creditCard' | 'cod' | 'paypal' | 'wallet';
 
 /**
  * The shipping address the user provides at checkout.

@@ -67,7 +67,7 @@
       <div class="drawer-avatar"><i class="pi pi-user"></i></div>
       <div class="drawer-user-info">
         <span class="drawer-user-name">{{ currentUser()?.userName }}</span>
-        <span class="drawer-user-role">Member</span>
+        <span class="drawer-user-role">{{ currentUser()?.role }}</span>
       </div>
     </div>
     <nav class="drawer-nav">
@@ -79,14 +79,16 @@
       >
         <i class="pi pi-list"></i> My Orders
       </a>
-      <a
-        routerLink="/seller"
-        routerLinkActive="active"
-        class="drawer-link"
-        (click)="closeMobileMenu()"
-      >
-        <i class="pi pi-chart-bar"></i> Seller Dashboard
-      </a>
+      @if (currentUser()?.role === 'seller') {
+        <a
+          routerLink="/seller"
+          routerLinkActive="active"
+          class="drawer-link"
+          (click)="closeMobileMenu()"
+        >
+          <i class="pi pi-chart-bar"></i> Seller Dashboard
+        </a>
+      }
       <button class="drawer-link logout-link" (click)="logout()">
         <i class="pi pi-sign-out"></i> Logout
       </button>
@@ -218,16 +220,18 @@
               <div class="dropdown-avatar"><i class="pi pi-user"></i></div>
               <div>
                 <p class="dropdown-name">{{ currentUser()?.userName }}</p>
-                <p class="dropdown-meta">Member Account</p>
+                <p class="dropdown-meta">{{ currentUser()?.role }}</p>
               </div>
             </div>
             <div class="dropdown-divider"></div>
             <a routerLink="/orders" class="dropdown-item" role="menuitem">
               <i class="pi pi-list"></i> My Orders
             </a>
-            <a routerLink="/seller" class="dropdown-item" role="menuitem">
-              <i class="pi pi-chart-bar"></i> Seller Dashboard
-            </a>
+            @if (currentUser()?.role === 'seller') {
+              <a routerLink="/seller" class="dropdown-item" role="menuitem">
+                <i class="pi pi-chart-bar"></i> Seller Dashboard
+              </a>
+            }
             <a routerLink="/profile" class="dropdown-item" role="menuitem">
               <i class="pi pi-cog"></i> Settings
             </a>

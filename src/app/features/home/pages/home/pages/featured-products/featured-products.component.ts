@@ -80,9 +80,13 @@ export class FeaturedProductsComponent implements OnInit {
     if (this.cartService.isInCart(product._id)) return;
 
     this.addingToCart.add(product._id);
-    this.cartService.addToCart(product._id).subscribe({
-      next: () => this.addingToCart.delete(product._id),
-      error: () => this.addingToCart.delete(product._id),
+    this.cartService.addItem({ productId: product._id }, product).subscribe({
+      next: () => {
+        this.addingToCart.delete(product._id);
+      },
+      error: () => {
+        this.addingToCart.delete(product._id);
+      },
     });
   }
 

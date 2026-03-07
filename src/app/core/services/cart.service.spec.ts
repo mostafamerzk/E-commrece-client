@@ -51,7 +51,8 @@ describe('CartService', () => {
     const payload: AddToCartPayload = { productId: 'p1', quantity: 2 };
     const mockCart = {
       userId: '1',
-      products: [{ productId: 'p1', quantity: 2, price: 50 }],
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      products: [{ product: { _id: 'p1' } as any, quantity: 2, price: 50 }],
       totalPrice: 100,
     };
     const mockResponse = { message: 'Added', cart: mockCart };
@@ -71,7 +72,8 @@ describe('CartService', () => {
     const productId = 'p1';
     const mockCart = {
       userId: '1',
-      products: [{ productId: 'p1', quantity: 5, price: 50 }],
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      products: [{ product: { _id: 'p1' } as any, quantity: 5, price: 50 }],
       totalPrice: 250,
     };
     const mockResponse = { message: 'Updated', cart: mockCart };

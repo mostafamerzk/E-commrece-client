@@ -1,0 +1,199 @@
+<main class="cart-page">
+  <div class="cart-container">
+    <!-- Header Section -->
+    <header class="cart-header">
+      <div class="header-titles">
+        <h1>Shopping Cart</h1>
+        <p class="item-count">You have {{ itemCount() || 0 }} items in your cart.</p>
+      </div>
+      @if (items().length > 0) {
+        <button
+          type="button"
+          (click)="clearCart()"
+          [disabled]="isClearing()"
+          class="btn-clear text-black"
+        >
+          <i
+            class="pi"
+            [class.pi-trash]="!isClearing()"
+            [class.pi-spin]="isClearing()"
+            [class.pi-spinner]="isClearing()"
+          ></i>
+          {{ isClearing() ? 'Clearing...' : 'Clear Shopping Cart' }}
+        </button>
+      }
+    </header>
+
+    @if (items().length > 0) {
+      <div class="cart-grid">
+        <!-- Main: Cart Items -->
+        <div class="cart-main">
+          <div class="items-list">
+            <!--
+              FIX (Bug #5): Removed the `|| $index` fallback from track.
+              Falling back to $index means Angular uses position-based identity
+              when _id is missing, which causes every item to be destroyed and
+              re-created on any cart change — visible as a full list flash.
+              If _id is ever missing the data model itself is broken; hiding
+              that with $index just masks the real problem.
+            -->
+            @for (item of items(); track item.product._id) {
+              <div class="cart-item-card">
+                <button
+                  type="button"
+                  (click)="removeItem(item.product._id)"
+                  class="btn-remove-item"
+                  aria-label="Remove item"
+                  [disabled]="isItemUpdating(item.product._id)"
+                >
+                  <i class="pi pi-times"></i>
+                </button>
+
+                <div class="item-visual">
+                  <img
+                    [src]="item.product.mainImage.secure_url"
+                    [alt]="item.product.title"
+                    class="item-img"
+                  />
+                </div>
+
+                <div class="item-details text-black">
+                  <div class="details-top">
+                    <div class="info-group">
+                      <h3
+                        class="item-title text-black"
+                        [routerLink]="['/products', item.product._id]"
+                      >
+                        {{ item.product.title || 'Product' }}
+                      </h3>
+                      <div class="meta-row">
+                        <span class="item-category text-gray-400">{{
+                          item.product.category.name || 'Uncategorized'
+                        }}</span>
+                        @if (item.product.avgRating) {
+                          <span class="item-rating text-black">
+                            <i class="pi pi-star-fill text-yellow-500"></i>
+                            {{ item.product.avgRating }}
+                          </span>
+                        }
+                      </div>
+                    </div>
+                  </div>
+                  <div class="details-bottom">
+                    <div
+                      class="qty-control-v2"
+                      [class.is-updating]="isItemUpdating(item.product._id)"
+                    >
+                      <!--
+                        Both +/- buttons are disabled while this specific item
+                        is in-flight so the user cannot fire a second request
+                        before the first one settles and potentially race the
+                        per-product switchMap.
+                      -->
+                      <button
+                        type="button"
+                        (click)="updateQuantity(item.product._id, item.quantity, -1)"
+                        [disabled]="item.quantity <= 1 || isItemUpdating(item.product._id)"
+                        class="qty-action"
+                      >
+                        <i class="pi pi-minus"></i>
+                      </button>
+                      <span class="qty-number text-black">{{ item.quantity || 1 }}</span>
+                      <button
+                        type="button"
+                        (click)="updateQuantity(item.product._id, item.quantity, 1)"
+                        [disabled]="isItemUpdating(item.product._id)"
+                        class="qty-action"
+                      >
+                        <i class="pi pi-plus"></i>
+                      </button>
+                    </div>
+                    <p class="item-subtotal text-black">
+                      {{
+                        (item.price || item.product.finalPrice || 0) * (item.quantity || 1)
+                          | currency: 'EGP'
+                      }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="cart-footer-actions">
+            <a routerLink="/products" class="btn-back">
+              <i class="pi pi-arrow-left"></i>
+              Continue Shopping
+            </a>
+          </div>
+        </div>
+
+        <!-- Sidebar: Summary -->
+        <aside class="cart-sidebar">
+          <div class="summary-card text-black">
+            <h2 class="summary-title text-black">Order Summary</h2>
+
+            <div class="summary-details">
+              <div class="summary-line">
+                <span class="label text-gray-400">Subtotal</span>
+                <span class="value text-black">{{ totalPrice() || 0 | currency: 'EGP' }}</span>
+              </div>
+              <div class="summary-line">
+                <span class="label flex items-center gap-1 text-gray-400">
+                  Shipping
+                  <i class="pi pi-question-circle" title="Free shipping on orders over 500 EGP"></i>
+                </span>
+                <span class="value text-black">
+                  @if (shipping() === 0) {
+                    <span class="shipping-free text-green-600">Free</span>
+                  } @else {
+                    {{ shipping() || 0 | currency: 'EGP' }}
+                  }
+                </span>
+              </div>
+            </div>
+
+            <div class="summary-total-section">
+              <p class="total-label text-gray-400">Estimated Total</p>
+              <!-- FIX: removed the trailing space from 'EGP ' -->
+              <p class="total-amount text-black">{{ finalTotal() || 0 | currency: 'EGP' }}</p>
+            </div>
+
+            <button
+              type="button"
+              (click)="proceedToCheckout()"
+              [disabled]="isSyncing()"
+              class="btn-checkout"
+            >
+              @if (isSyncing()) {
+                <i class="pi pi-spin pi-spinner"></i>
+                Syncing Cart...
+              } @else {
+                Proceed to Checkout
+                <i class="pi pi-arrow-right"></i>
+              }
+            </button>
+
+            <div class="summary-footer">
+              <p class="text-gray-400">Taxes and shipping calculated at checkout.</p>
+              <p class="text-gray-400">Secure checkout guaranteed.</p>
+            </div>
+          </div>
+        </aside>
+      </div>
+    } @else {
+      <!-- Empty State -->
+      <div class="cart-empty">
+        <div class="empty-icon-box">
+          <i class="pi pi-shopping-cart"></i>
+        </div>
+        <h2 class="text-black">Your cart is empty</h2>
+        <p class="text-gray-500">
+          Looks like you haven't added anything to your cart yet. Explore our latest products and
+          find something special.
+        </p>
+        <a routerLink="/products" class="btn-start-shopping"> Start Shopping </a>
+      </div>
+    }
+  </div>
+</main>

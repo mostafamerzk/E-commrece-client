@@ -10,7 +10,11 @@ import {
 import { OrderService } from '../../../../core/services/order.service';
 import { CartService } from '../../../../core/services/cart.service';
 import { ToastService } from '../../../../core/services/toast.service';
-import { CheckoutSummary, ShippingAddress } from '../../../../core/models/order.model';
+import {
+  CheckoutSummary,
+  PaymentMethod,
+  ShippingAddress,
+} from '../../../../core/models/order.model';
 
 interface PlaceOrderResponse {
   session?: { url: string };
@@ -37,22 +41,26 @@ export class CheckoutComponent implements OnInit {
   readonly apiError = signal<string | null>(null);
 
   couponCode = '';
+  readonly paymentMethod = signal<PaymentMethod>('creditCard');
 
   readonly cartItems = this.cartService.items;
 
-  readonly subtotal = computed(() =>
-    this.cartItems().reduce((s, i) => s + i.price * i.quantity, 0)
+  readonly subtotal = computed(
+    () => this.checkoutSummary()?.subtotal ?? this.cartService.totalPrice()
   );
   readonly discount = computed(() => this.checkoutSummary()?.discount ?? 0);
   readonly shipping = computed(() => this.checkoutSummary()?.shipping ?? 0);
-  readonly total = computed(() => this.subtotal() - this.discount() + this.shipping());
+  readonly total = computed(
+    () => this.checkoutSummary()?.total ?? this.subtotal() - this.discount() + this.shipping()
+  );
 
   shippingForm = new FormGroup({
     recipientName: new FormControl('', Validators.required),
     phone: new FormControl('', [Validators.required, Validators.pattern(/^01[0125]\d{8}$/)]),
-    address: new FormControl('', Validators.required),
+    street: new FormControl('', Validators.required),
     city: new FormControl('', Validators.required),
-    postalCode: new FormControl(''),
+    country: new FormControl('Egypt', Validators.required),
+    postalCode: new FormControl('', Validators.required),
   });
 
   readonly egyptianCities = [
@@ -76,10 +84,18 @@ export class CheckoutComponent implements OnInit {
   }
 
   updateCheckoutSummary() {
+    const val = this.shippingForm.value;
+    const address = {
+      street: val.street!,
+      city: val.city!,
+      country: val.country!,
+      phone: val.phone!,
+      postalCode: val.postalCode!,
+    };
     this.orderService
       .checkout({
         couponCode: this.couponCode || undefined,
-        shippingAddress: this.shippingForm.value as Partial<ShippingAddress>,
+        shippingAddress: address as Partial<ShippingAddress>,
       })
       .subscribe({
         next: (res) => this.checkoutSummary.set(res),
@@ -93,10 +109,19 @@ export class CheckoutComponent implements OnInit {
     this.couponError.set(null);
     this.couponSuccess.set(null);
 
+    const val = this.shippingForm.value;
+    const address = {
+      street: val.street!,
+      city: val.city!,
+      country: val.country!,
+      phone: val.phone!,
+      postalCode: val.postalCode!,
+    };
+
     this.orderService
       .checkout({
         couponCode: this.couponCode,
-        shippingAddress: this.shippingForm.value as Partial<ShippingAddress>,
+        shippingAddress: address as Partial<ShippingAddress>,
       })
       .subscribe({
         next: (res) => {
@@ -120,10 +145,19 @@ export class CheckoutComponent implements OnInit {
     this.isPlacingOrder.set(true);
     this.apiError.set(null);
 
+    const val = this.shippingForm.value;
+    const address = {
+      street: val.street!,
+      city: val.city!,
+      country: val.country!,
+      phone: val.phone!,
+      postalCode: val.postalCode!,
+    };
+
     this.orderService
       .placeOrder({
-        paymentMethod: 'card',
-        shippingAddress: this.shippingForm.value as ShippingAddress,
+        paymentMethod: this.paymentMethod(),
+        shippingAddress: address as ShippingAddress,
         couponCode: this.couponCode || undefined,
       })
       .subscribe({

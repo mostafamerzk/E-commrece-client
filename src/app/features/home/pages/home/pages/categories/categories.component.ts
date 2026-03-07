@@ -31,9 +31,13 @@ export class CategoriesComponent implements OnInit {
   ngOnInit(): void {
     this.homeService.getCategories().subscribe({
       next: (res) => {
-        this.allCategories = res.categories; // خزن كل حاجة
-        this.showMore(true); // عرض أول 6
-        this.loading = false;
+        // Wrap in setTimeout to avoid ExpressionChangedAfterItHasBeenCheckedError
+        // if this happens too quickly during initial check.
+        setTimeout(() => {
+          this.allCategories = res.categories;
+          this.showMore(true);
+          this.loading = false;
+        });
       },
       error: () => {
         this.error = true;
