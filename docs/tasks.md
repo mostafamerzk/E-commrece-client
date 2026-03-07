@@ -320,7 +320,7 @@
 ---
 
 ### [TASK-I04] Reviews Section Component
-**Status:** [~]
+**Status:** [x]
 **Phase:** 2 — Feature Pages
 **Files to create:**
 - src/app/shared/components/reviews-section/reviews-section.component.ts
