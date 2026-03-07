@@ -4,6 +4,7 @@ import { StorageService } from './storage.service';
 import { HttpClient } from '@angular/common/http';
 import { of } from 'rxjs';
 import { User } from '../models/auth.model';
+import { environment } from '../../../environments/environment';
 import { provideZonelessChangeDetection } from '@angular/core';
 
 describe('AuthService', () => {
@@ -32,7 +33,7 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     storageSpy = jasmine.createSpyObj('StorageService', ['getItem', 'setItem', 'removeItem']);
-    httpSpy = jasmine.createSpyObj('HttpClient', ['post']);
+    httpSpy = jasmine.createSpyObj('HttpClient', ['post', 'get']);
 
     // Clear localStorage before each test
     localStorage.clear();
@@ -81,19 +82,21 @@ describe('AuthService', () => {
       service = TestBed.inject(AuthService);
     });
 
-    it('should call http.post and update state/localStorage on success', async () => {
+    it('should call http.post, fetch profile, and update state/localStorage on success', async () => {
       httpSpy.post.and.returnValue(of(mockLoginResponse));
+      httpSpy.get.and.returnValue(of(mockUser));
 
       const result = await service.login('test@example.com', 'password');
 
       expect(httpSpy.post).toHaveBeenCalled();
+      expect(httpSpy.get).toHaveBeenCalledWith(`${environment.apiUrl}/user/profile`);
       expect(localStorage.getItem('access_token')).toBe('mock-access-token');
       expect(localStorage.getItem('refresh_token')).toBe('mock-refresh-token');
       expect(storageSpy.setItem).toHaveBeenCalledWith('user', mockUser);
 
       expect(service.currentUser()).toEqual(mockUser);
       expect(service.isLoggedIn()).toBeTrue();
-      expect(result).toEqual(mockLoginResponse as unknown as LoginResponse);
+      expect(result).toEqual(mockLoginResponse);
     });
   });
 

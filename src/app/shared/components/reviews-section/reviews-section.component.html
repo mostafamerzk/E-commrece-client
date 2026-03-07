@@ -1,216 +1,393 @@
-<section class="mt-12 pt-10 border-t border-gray-100" aria-label="Product reviews">
-  <!-- Summary Bar -->
-  <div class="grid grid-cols-1 md:grid-cols-12 gap-8 mb-12 items-center">
-    <!-- Avg Rating column -->
-    <div class="md:col-span-4 flex flex-col items-center md:items-start text-center md:text-left">
-      <h2 class="text-2xl font-bold text-gray-900 mb-2">Customer Reviews</h2>
-      <div class="flex items-center gap-3 mb-1">
-        <span class="text-5xl font-black text-gray-900 tracking-tight">{{
-          avgRating() | number: '1.1-1'
-        }}</span>
-        <div class="flex flex-col">
-          <p-rating [ngModel]="avgRating()" [readonly]="true" />
-          <span class="text-sm font-medium text-gray-400 mt-1"
-            >{{ reviews().length }} verified reviews</span
-          >
+<!-- Premium Review Component Template -->
+<section class="review-section" aria-label="Product reviews">
+  <!-- Review Summary Header -->
+  <div class="summary-container">
+    <!-- Overall Rating Column -->
+    <div class="rating-overview">
+      <div class="section-badge">
+        <span class="badge-dot"></span>
+        <span class="badge-text">Customer Feedback</span>
+      </div>
+
+      <h2 class="section-title">What people are saying</h2>
+
+      <div class="rating-display">
+        <div class="rating-number-wrapper">
+          <span class="rating-number">{{ avgRating() | number: '1.1-1' }}</span>
+          <span class="rating-scale">/5</span>
+        </div>
+
+        <div class="rating-meta">
+          <!-- Premium Star Display -->
+          <div class="stars-readonly">
+            @for (star of [1, 2, 3, 4, 5]; track star) {
+              <svg
+                class="star-icon"
+                [class.star-filled]="avgRating() >= star"
+                [class.star-half]="avgRating() >= star - 0.5 && avgRating() < star"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                  [attr.fill]="getStarFill(star, avgRating())"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <defs>
+                  <linearGradient id="half-gradient">
+                    <stop offset="50%" stop-color="currentColor" />
+                    <stop offset="50%" stop-color="transparent" />
+                  </linearGradient>
+                </defs>
+              </svg>
+            }
+          </div>
+
+          <p class="review-count">{{ reviews().length }} verified reviews</p>
         </div>
       </div>
     </div>
 
-    <!-- Distribution column -->
-    <div class="md:col-span-8 flex flex-col gap-2">
+    <!-- Distribution Bars Column -->
+    <div class="distribution-column">
       @for (item of ratingDistribution(); track $index) {
-        <div class="flex items-center gap-4 group">
-          <span class="text-xs font-semibold text-gray-500 w-12 shrink-0"
-            >{{ 5 - $index }} stars</span
-          >
-          <div class="flex-1 h-2.5 bg-gray-100 rounded-full overflow-hidden">
-            <div
-              class="h-full bg-amber-400 rounded-full transition-all duration-700 ease-out"
-              [style.width.%]="item.percentage"
-            ></div>
+        <div class="distribution-row" [class.has-reviews]="item.percentage > 0">
+          <span class="star-label">{{ 5 - $index }}</span>
+
+          <div class="bar-container">
+            <div class="bar-track">
+              <div
+                class="bar-fill"
+                [style.width.%]="item.percentage"
+                [attr.data-percentage]="item.percentage"
+              ></div>
+            </div>
           </div>
-          <span class="text-xs font-medium text-gray-400 w-10 text-right"
-            >{{ item.percentage | number: '1.0-0' }}%</span
-          >
+
+          <span class="percentage-label">{{ item.percentage | number: '1.0-0' }}%</span>
         </div>
       }
     </div>
   </div>
 
-  <!-- Write Review Form -->
+  <!-- Write Review Section -->
   @if (isLoggedIn()) {
-    <div class="bg-white border border-gray-100 rounded-2xl p-6 md:p-8 mb-12 shadow-sm">
-      <div class="flex items-center gap-3 mb-6">
-        <div
-          class="w-10 h-10 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center"
-        >
-          <i class="pi pi-pencil"></i>
+    <div class="review-form-wrapper">
+      <div class="form-header">
+        <div class="form-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M12 20H21"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+            <path
+              d="M16.5 3.50001C16.8978 3.10219 17.4374 2.87869 18 2.87869C18.2786 2.87869 18.5544 2.93356 18.8118 3.04017C19.0692 3.14677 19.303 3.30303 19.5 3.50001C19.697 3.697 19.8532 3.93085 19.9598 4.18822C20.0665 4.44558 20.1213 4.72142 20.1213 5.00001C20.1213 5.2786 20.0665 5.55444 19.9598 5.81181C19.8532 6.06917 19.697 6.30303 19.5 6.50001L7 19L3 20L4 16L16.5 3.50001Z"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
         </div>
-        <h3 class="text-xl font-bold text-gray-900">Share your thoughts</h3>
+        <div class="form-title-group">
+          <h3 class="form-title">Share your experience</h3>
+          <p class="form-subtitle">Help others make informed decisions with your insights</p>
+        </div>
       </div>
 
-      <form [formGroup]="reviewForm" (ngSubmit)="submitReview()" class="flex flex-col gap-6">
-        <!-- Star rating picker -->
-        <div>
-          <label
-            for="review-rating"
-            class="text-sm font-semibold text-gray-700 mb-2 block tracking-tight"
-            >How would you rate this product? *</label
-          >
-          <p-rating id="review-rating" formControlName="rating" [stars]="5" />
-          @if (reviewForm.get('rating')?.invalid && reviewForm.get('rating')?.touched) {
-            <p class="text-xs font-medium text-red-500 mt-2 flex items-center gap-1">
-              <i class="pi pi-exclamation-circle"></i> Please select a rating
+      <form [formGroup]="reviewForm" (ngSubmit)="submitReview()" class="review-form">
+        <!-- Star Rating Input -->
+        <div class="form-field rating-field">
+          <span id="rating-label" class="field-label">Your Rating</span>
+          <div class="star-input-group" role="radiogroup" aria-labelledby="rating-label">
+            @for (star of [1, 2, 3, 4, 5]; track star) {
+              <button
+                type="button"
+                (click)="reviewForm.patchValue({ rating: star })"
+                (mouseenter)="hoveredRating.set(star)"
+                (mouseleave)="hoveredRating.set(0)"
+                role="radio"
+                [attr.aria-checked]="reviewForm.value.rating === star"
+                [attr.aria-label]="star + ' stars'"
+                class="star-input-btn"
+                [class.is-active]="isPickerStarActive(star)"
+              >
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path
+                    d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                    [attr.fill]="isPickerStarActive(star) ? 'currentColor' : 'none'"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+            }
+          </div>
+          @if (isRatingInvalid) {
+            <p class="field-error" role="alert">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                <path d="M12 8V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                <circle cx="12" cy="16" r="1" fill="currentColor" />
+              </svg>
+              Please select a rating
             </p>
           }
         </div>
 
-        <!-- Comment textarea -->
-        <div class="relative">
-          <label
-            for="review-comment"
-            class="text-sm font-semibold text-gray-700 mb-2 block tracking-tight"
-            >Your review *</label
-          >
+        <!-- Comment Textarea -->
+        <div class="form-field">
+          <label for="review-comment" class="field-label">Your Review</label>
           <textarea
-            pTextarea
             id="review-comment"
             formControlName="comment"
-            rows="4"
-            class="w-full border-gray-200 focus:border-indigo-600 focus:ring-0 transition-all rounded-xl p-4 text-sm resize-none"
-            placeholder="What did you like or dislike? How's the quality?"
+            rows="6"
+            class="field-textarea"
+            placeholder="Share your thoughts on quality, value, and overall experience..."
           ></textarea>
-          @if (reviewForm.get('comment')?.invalid && reviewForm.get('comment')?.touched) {
-            <p class="text-xs font-medium text-red-500 mt-2 flex items-center gap-1">
-              <i class="pi pi-exclamation-circle"></i>
-              @if (reviewForm.get('comment')?.errors?.['required']) {
-                Your comment is required
-              } @else if (reviewForm.get('comment')?.errors?.['minlength']) {
-                Please tell us a bit more (at least 10 characters)
-              }
+          @if (isCommentInvalid) {
+            <p class="field-error" role="alert">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2" />
+                <path d="M12 8V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                <circle cx="12" cy="16" r="1" fill="currentColor" />
+              </svg>
+              {{ commentError }}
             </p>
           }
         </div>
 
-        <div class="flex justify-end">
-          <p-button
-            type="submit"
-            [label]="isSubmitting() ? 'Submitting...' : 'Post Review'"
-            [icon]="isSubmitting() ? 'pi pi-spin pi-spinner' : 'pi pi-send'"
-            [loading]="isSubmitting()"
-            [disabled]="reviewForm.invalid || isSubmitting()"
-            styleClass="p-button-primary px-8 py-3 rounded-xl font-bold shadow-md hover:shadow-lg transition-all"
-          ></p-button>
+        <!-- Submit Actions -->
+        <div class="form-actions">
+          <p class="required-note">All fields are required</p>
+          <div class="submit-btn-wrapper">
+            <app-primary-button
+              type="submit"
+              size="sm"
+              [isDisabled]="reviewForm.invalid"
+              [isLoading]="isSubmitting()"
+              loadingText="Publishing..."
+            >
+              Publish Review
+            </app-primary-button>
+          </div>
         </div>
       </form>
     </div>
   } @else {
-    <div
-      class="bg-indigo-50 border border-indigo-100 text-indigo-800 p-5 rounded-2xl mb-12 flex items-center justify-between gap-4"
-    >
-      <div class="flex items-center gap-4">
-        <div
-          class="w-10 h-10 rounded-full bg-white flex items-center justify-center text-indigo-600 shadow-sm"
-        >
-          <i class="pi pi-lock"></i>
+    <div class="login-prompt">
+      <div class="prompt-content">
+        <div class="prompt-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path
+              d="M21 15C21 15.5304 20.7893 16.0391 20.4142 16.4142C20.0391 16.7893 19.5304 17 19 17H7L3 21V5C3 4.46957 3.21071 3.96086 3.58579 3.58579C3.96086 3.21071 4.46957 3 5 3H19C19.5304 3 20.0391 3.21071 20.4142 3.58579C20.7893 3.96086 21 4.46957 21 5V15Z"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
         </div>
-        <div>
-          <p class="font-bold text-sm">Have you purchased this?</p>
-          <p class="text-xs text-indigo-600/80">
-            Log in to share your experience with other shoppers.
+        <div class="prompt-text">
+          <h3 class="prompt-title">Share your perspective</h3>
+          <p class="prompt-description">
+            Sign in to contribute your valuable review and help others make confident purchasing
+            decisions.
           </p>
         </div>
       </div>
-      <a
-        routerLink="/auth/login"
-        class="px-5 py-2 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-700 transition-colors shadow-sm no-underline"
-      >
-        Log In
-      </a>
+      <app-primary-button routerLink="/auth/login" size="sm" class="w-full md:w-auto">
+        Sign In to Review
+      </app-primary-button>
     </div>
   }
 
-  <!-- Review List -->
-  <div class="flex flex-col gap-8" [attr.aria-busy]="isLoading()">
+  <!-- Reviews List -->
+  <div class="reviews-list" [attr.aria-busy]="isLoading()">
+    <div class="list-header">
+      <div class="list-title-group">
+        <h3 class="list-title">All Reviews</h3>
+        <div class="title-decoration"></div>
+      </div>
+      <div class="sort-controls">
+        <button class="sort-btn" type="button">
+          <span>Newest First</span>
+          <svg viewBox="0 0 24 24" fill="none">
+            <path
+              d="M6 9L12 15L18 9"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+
     @if (isLoading()) {
-      <div class="flex flex-col gap-10">
+      <div class="reviews-grid">
         @for (i of [1, 2, 3]; track i) {
-          <div class="flex flex-col gap-4">
-            <div class="flex items-center gap-4">
-              <p-skeleton shape="circle" size="3rem" />
-              <div class="flex flex-col gap-2">
-                <p-skeleton width="10rem" height="1.25rem" />
-                <p-skeleton width="6rem" height="0.75rem" />
+          <div class="review-skeleton">
+            <div class="skeleton-header">
+              <div class="skeleton-avatar"></div>
+              <div class="skeleton-info">
+                <div class="skeleton-line skeleton-name"></div>
+                <div class="skeleton-line skeleton-date"></div>
               </div>
             </div>
-            <p-skeleton width="100%" height="1.5rem" />
-            <p-skeleton width="85%" height="1.5rem" />
+            <div class="skeleton-content">
+              <div class="skeleton-line skeleton-text"></div>
+              <div class="skeleton-line skeleton-text"></div>
+              <div class="skeleton-line skeleton-text short"></div>
+            </div>
           </div>
         }
       </div>
     } @else if (reviews().length > 0) {
-      @for (review of reviews(); track review._id) {
-        <div class="group py-8 first:pt-0 border-b border-gray-50 last:border-0 fade-in">
-          <!-- Header row -->
-          <div class="flex items-start justify-between mb-4">
-            <div class="flex items-center gap-4">
-              <!-- User Avatar -->
-              <div
-                class="w-12 h-12 rounded-2xl bg-linear-to-br from-indigo-500 to-primary-600 text-white flex items-center justify-center text-lg font-bold shadow-sm"
-              >
-                {{ review.user.userName | slice: 0 : 1 | uppercase }}
-              </div>
-              <div>
-                <div class="flex items-center gap-2">
-                  <span class="text-sm font-bold text-gray-900">{{ review.user.userName }}</span>
-                  <span
-                    class="bg-blue-50 text-blue-600 text-[10px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wider"
-                    >Verified Buyer</span
-                  >
+      <div class="reviews-grid">
+        @for (review of reviews(); track review._id) {
+          <article class="review-card">
+            <!-- Review Header -->
+            <div class="review-header">
+              <div class="reviewer-info">
+                <div class="reviewer-avatar">
+                  <span>{{ review.user.userName | slice: 0 : 1 | uppercase }}</span>
                 </div>
-                <p class="text-xs font-medium text-gray-400 mt-0.5">
-                  {{ review.createdAt | date: 'longDate' }}
-                </p>
+                <div class="reviewer-details">
+                  <div class="reviewer-name-row">
+                    <h4 class="reviewer-name">{{ review.user.userName }}</h4>
+                    @if (true) {
+                      <span class="verified-badge">
+                        <svg viewBox="0 0 24 24" fill="none">
+                          <path
+                            d="M9 12L11 14L15 10M21 12C21 13.1819 20.7672 14.3522 20.3149 15.4442C19.8626 16.5361 19.1997 17.5282 18.364 18.364C17.5282 19.1997 16.5361 19.8626 15.4442 20.3149C14.3522 20.7672 13.1819 21 12 21C10.8181 21 9.64778 20.7672 8.55585 20.3149C7.46392 19.8626 6.47177 19.1997 5.63604 18.364C4.80031 17.5282 4.13738 16.5361 3.68508 15.4442C3.23279 14.3522 3 13.1819 3 12C3 9.61305 3.94821 7.32387 5.63604 5.63604C7.32387 3.94821 9.61305 3 12 3C14.3869 3 16.6761 3.94821 18.364 5.63604C20.0518 7.32387 21 9.61305 21 12Z"
+                            stroke="currentColor"
+                            stroke-width="2"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          />
+                        </svg>
+                        Verified Purchase
+                      </span>
+                    }
+                  </div>
+                  <time class="review-date">{{ review.createdAt | date: 'mediumDate' }}</time>
+                </div>
+              </div>
+
+              <!-- Star Rating Display -->
+              <div class="review-stars">
+                @for (star of [1, 2, 3, 4, 5]; track star) {
+                  <svg
+                    class="star-icon"
+                    [class.star-filled]="review.rating >= star"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <path
+                      d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                      [attr.fill]="getStarFill(star, review.rating)"
+                      stroke="currentColor"
+                      stroke-width="1.5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                }
               </div>
             </div>
-            <!-- Star rating -->
-            <p-rating [ngModel]="review.rating" [readonly]="true" />
-          </div>
 
-          <!-- Comment text -->
-          <div class="pl-0 md:pl-16">
-            <p class="text-base text-gray-700 leading-relaxed font-medium italic">
-              "{{ review.comment }}"
-            </p>
+            <!-- Review Content -->
+            <div class="review-content">
+              <p class="review-text">{{ review.comment }}</p>
+            </div>
 
-            <!-- Actions (Delete) -->
+            <!-- Review Actions -->
             @if (canDelete(review)) {
-              <div
-                class="mt-6 flex justify-end opacity-0 group-hover:opacity-100 transition-opacity"
-              >
-                <button
-                  (click)="confirmDelete(review._id)"
-                  class="flex items-center gap-2 text-xs font-bold text-red-500 hover:text-red-700 transition-colors uppercase tracking-widest"
-                >
-                  <i class="pi pi-trash"></i>
-                  Delete Review
+              <div class="review-actions">
+                <button (click)="confirmDelete(review._id)" class="delete-btn" type="button">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path
+                      d="M3 6H5H21"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                    <path
+                      d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                  <span>Delete</span>
                 </button>
               </div>
             }
-          </div>
-        </div>
-      }
-    } @else {
-      <div class="py-12 flex justify-center">
-        <app-empty-state
-          icon="pi pi-comment"
-          title="No reviews yet"
-          description="Be the first to share your thoughts about this product!"
-        />
+          </article>
+        }
       </div>
+    } @else {
+      <app-empty-state
+        title="No reviews yet"
+        description="Be the first to share your experience with this product"
+      ></app-empty-state>
     }
   </div>
 </section>
 
-<p-confirmdialog />
+<!-- Delete Confirmation Modal -->
+@if (showDeleteModal()) {
+  <div class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+    <div
+      class="modal-backdrop"
+      (click)="cancelDelete()"
+      (keydown.enter)="cancelDelete()"
+      (keydown.space)="$event.preventDefault(); cancelDelete()"
+      tabindex="0"
+      aria-label="Close modal"
+    ></div>
+
+    <div class="modal-content">
+      <div class="modal-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path
+            d="M12 9V13M12 17H12.01M21 12C21 16.9706 16.9706 21 12 21C7.02944 21 3 16.9706 3 12C3 7.02944 7.02944 3 12 3C16.9706 3 21 7.02944 21 12Z"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+      </div>
+
+      <div class="modal-text">
+        <h3 id="delete-modal-title" class="modal-title">Delete Review?</h3>
+        <p class="modal-description">
+          This action cannot be undone. Your review will be permanently removed from this product.
+        </p>
+      </div>
+
+      <div class="modal-actions">
+        <button (click)="acceptDelete()" class="modal-btn modal-btn-danger" type="button">
+          Yes, Delete Review
+        </button>
+        <button (click)="cancelDelete()" class="modal-btn modal-btn-secondary" type="button">
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
+}

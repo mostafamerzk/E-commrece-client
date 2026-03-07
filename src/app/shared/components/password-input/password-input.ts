@@ -1,5 +1,5 @@
-import { Component, Input, forwardRef, signal, ViewEncapsulation } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Component, Input, signal, ViewEncapsulation, inject } from '@angular/core';
+import { ControlValueAccessor, NgControl } from '@angular/forms';
 
 @Component({
   selector: 'app-password-input',
@@ -10,13 +10,6 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
   host: {
     style: 'display: block; width: 100%;',
   },
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => PasswordInputComponent),
-      multi: true,
-    },
-  ],
 })
 export class PasswordInputComponent implements ControlValueAccessor {
   @Input() id: string = '';
@@ -31,6 +24,22 @@ export class PasswordInputComponent implements ControlValueAccessor {
 
   onChange: (value: string) => void = () => {};
   onTouched: () => void = () => {};
+
+  public ngControl = inject(NgControl, { self: true, optional: true });
+
+  constructor() {
+    if (this.ngControl) {
+      this.ngControl.valueAccessor = this;
+    }
+  }
+
+  get isInvalid(): boolean {
+    return !!(
+      this.ngControl &&
+      this.ngControl.invalid &&
+      (this.ngControl.dirty || this.ngControl.touched)
+    );
+  }
 
   togglePassword(): void {
     this.showPassword.update((v) => !v);

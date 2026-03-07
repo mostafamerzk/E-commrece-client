@@ -1,5 +1,5 @@
-import { Component, Input, forwardRef, ViewEncapsulation } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { Component, Input, ViewEncapsulation, inject } from '@angular/core';
+import { ControlValueAccessor, NgControl } from '@angular/forms';
 
 @Component({
   selector: 'app-text-input',
@@ -10,13 +10,6 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
   host: {
     style: 'display: block; width: 100%;',
   },
-  providers: [
-    {
-      provide: NG_VALUE_ACCESSOR,
-      useExisting: forwardRef(() => TextInputComponent),
-      multi: true,
-    },
-  ],
 })
 export class TextInputComponent implements ControlValueAccessor {
   @Input() id: string = '';
@@ -30,6 +23,22 @@ export class TextInputComponent implements ControlValueAccessor {
   value: string = '';
   onChange: (value: string) => void = () => {};
   onTouched: () => void = () => {};
+
+  public ngControl = inject(NgControl, { self: true, optional: true });
+
+  constructor() {
+    if (this.ngControl) {
+      this.ngControl.valueAccessor = this;
+    }
+  }
+
+  get isInvalid(): boolean {
+    return !!(
+      this.ngControl &&
+      this.ngControl.invalid &&
+      (this.ngControl.dirty || this.ngControl.touched)
+    );
+  }
 
   writeValue(value: string | null | undefined): void {
     this.value = value ?? '';
