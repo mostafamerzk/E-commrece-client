@@ -4,7 +4,8 @@ import { ReviewsSectionComponent } from './reviews-section.component';
 import { ReviewService } from '../../../core/services/review.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { ToastService } from '../../../core/services/toast.service';
-import { ConfirmationService } from 'primeng/api';
+import { provideRouter } from '@angular/router';
+
 import { provideZonelessChangeDetection, signal } from '@angular/core';
 import { of } from 'rxjs';
 import { Review } from '../../../core/models/review.model';
@@ -16,7 +17,6 @@ describe('ReviewsSectionComponent', () => {
   let reviewServiceSpy: jasmine.SpyObj<ReviewService>;
   let authServiceSpy: jasmine.SpyObj<AuthService>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
-  let confirmationServiceSpy: jasmine.SpyObj<ConfirmationService>;
 
   const mockUser: User = {
     _id: 'u1',
@@ -48,25 +48,16 @@ describe('ReviewsSectionComponent', () => {
       isAdmin: signal(false),
     });
     toastServiceSpy = jasmine.createSpyObj('ToastService', ['success', 'error']);
-    confirmationServiceSpy = jasmine.createSpyObj('ConfirmationService', ['confirm']);
-
     await TestBed.configureTestingModule({
       imports: [ReviewsSectionComponent],
       providers: [
         provideZonelessChangeDetection(),
+        provideRouter([]),
         { provide: ReviewService, useValue: reviewServiceSpy },
         { provide: AuthService, useValue: authServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
-        // Global provider just in case, but component overrides it
-        { provide: ConfirmationService, useValue: confirmationServiceSpy },
       ],
-    })
-      .overrideComponent(ReviewsSectionComponent, {
-        add: {
-          providers: [{ provide: ConfirmationService, useValue: confirmationServiceSpy }],
-        },
-      })
-      .compileComponents();
+    }).compileComponents();
 
     fixture = TestBed.createComponent(ReviewsSectionComponent);
     component = fixture.componentInstance;
@@ -93,7 +84,7 @@ describe('ReviewsSectionComponent', () => {
       fixture.detectChanges();
       const compiled = fixture.nativeElement as HTMLElement;
       expect(compiled.querySelector('form')).toBeFalsy();
-      expect(compiled.textContent).toContain('log in');
+      expect(compiled.textContent).toContain('Sign in');
     });
 
     it('should show form when logged in', () => {
@@ -166,14 +157,28 @@ describe('ReviewsSectionComponent', () => {
 
     it('should call deleteReview after confirmation', () => {
       reviewServiceSpy.deleteReview.and.returnValue(of({ message: 'Deleted' }));
-      component.confirmDelete('r1');
 
-      // Trigger the accept callback
-      const args = confirmationServiceSpy.confirm.calls.mostRecent().args[0];
-      if (args.accept) args.accept();
+      // 1. Trigger deletion intent
+      component.confirmDelete('r1');
+      expect(component.showDeleteModal()).toBeTrue();
+      expect(component.reviewToDelete()).toBe('r1');
+
+      // 2. Accept deletion
+      component.acceptDelete();
 
       expect(reviewServiceSpy.deleteReview).toHaveBeenCalledWith('r1');
       expect(toastServiceSpy.success).toHaveBeenCalledWith('Review deleted');
+      expect(component.showDeleteModal()).toBeFalse();
+    });
+
+    it('should cancel deletion', () => {
+      component.confirmDelete('r1');
+      expect(component.showDeleteModal()).toBeTrue();
+
+      component.cancelDelete();
+      expect(component.showDeleteModal()).toBeFalse();
+      expect(component.reviewToDelete()).toBeNull();
+      expect(reviewServiceSpy.deleteReview).not.toHaveBeenCalled();
     });
   });
 });

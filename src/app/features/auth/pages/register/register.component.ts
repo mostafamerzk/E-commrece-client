@@ -7,6 +7,7 @@ import { PrimaryButton } from '../../../../shared/components/primary-button/prim
 import { FormFieldComponent } from '../../../../shared/components/form-field/form-field';
 import { TextInputComponent } from '../../../../shared/components/text-input/text-input';
 import { PasswordInputComponent } from '../../../../shared/components/password-input/password-input';
+import { MatchValidatorDirective } from '../../../../core/validators/match.validator';
 
 @Component({
   selector: 'app-register',
@@ -19,6 +20,7 @@ import { PasswordInputComponent } from '../../../../shared/components/password-i
     FormFieldComponent,
     TextInputComponent,
     PasswordInputComponent,
+    MatchValidatorDirective,
   ],
   templateUrl: './register.component.html',
   styleUrls: ['../auth.css'],

@@ -38,25 +38,35 @@ export class AuthService {
   async login(email: string, password: string): Promise<LoginResponse> {
     const payload = { email, password };
     const response = await firstValueFrom(
-      this.http.post<LoginResponse & { user?: User }>(`${this.baseUrl}/auth/login`, payload)
+      this.http.post<LoginResponse>(`${this.baseUrl}/auth/login`, payload)
     );
 
     if (response?.access_token) {
       localStorage.setItem('access_token', response.access_token);
       this._token.set(response.access_token);
+
+      // Fetch profile after successful login
+      try {
+        const user = await this.getProfile();
+        if (user) {
+          this.storage.setItem('user', user);
+          this.currentUser.set(user);
+        }
+      } catch (error) {
+        console.error('Failed to fetch user profile after login', error);
+      }
     }
 
     if (response?.refresh_token) {
       localStorage.setItem('refresh_token', response.refresh_token);
     }
 
-    // If API returns user object, store it for UI reactivity
-    if (response?.user) {
-      this.storage.setItem('user', response.user);
-      this.currentUser.set(response.user);
-    }
+    return response;
+  }
 
-    return response as LoginResponse;
+  async getProfile(): Promise<User> {
+    const response = await firstValueFrom(this.http.get<User>(`${this.baseUrl}/user/profile`));
+    return response;
   }
 
   async register(payload: RegisterPayload): Promise<AuthResponse> {
