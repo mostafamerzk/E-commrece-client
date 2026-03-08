@@ -205,7 +205,7 @@
                     <h4 class="item-title">{{ item.product.title }}</h4>
                     <div class="meta-row">
                       <span class="item-category">
-                        {{ item.product.category.name || 'Uncategorized' }}
+                        {{ getCategoryName(item.product.categoryId) }}
                       </span>
                       @if (item.product.avgRating) {
                         <span class="item-rating">

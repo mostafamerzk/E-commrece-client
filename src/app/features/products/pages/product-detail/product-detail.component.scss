@@ -267,6 +267,28 @@ $white: #ffffff;
   }
 }
 
+.btn-remove-from-cart {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: $white;
+  border: 1px solid $slate-200;
+  border-radius: 14px;
+  color: $slate-500;
+  font-size: 1.125rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+
+  &:hover {
+    border-color: #fca5a5;
+    color: #ef4444;
+    background: #fef2f2;
+    transform: scale(1.05);
+  }
+}
+
 .btn-wishlist {
   width: 56px;
   height: 56px;
@@ -281,7 +303,8 @@ $white: #ffffff;
   cursor: pointer;
   transition: all 0.25s ease;
 
-  &:hover {
+  &:hover,
+  &.active {
     border-color: #fca5a5;
     color: #ef4444;
     background: #fef2f2;
@@ -443,4 +466,10 @@ $white: #ffffff;
     border-radius: 20px;
     overflow: hidden;
   }
+}
+
+.reviews-wrapper {
+  margin-top: 4rem;
+  padding-top: 4rem;
+  border-top: 1px solid $slate-200;
 }

@@ -2,6 +2,7 @@ import { Component, input, signal, inject, computed } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { finalize } from 'rxjs';
 import { Product } from '../../../core/models/product.model';
 // Assume these exist as per instructions
 import { CartService } from '../../../core/services/cart.service';
@@ -47,12 +48,14 @@ export class ProductCardComponent {
     this.wishlist.items().some((p) => p._id === this.product()._id)
   );
 
+  readonly isInCart = computed(() => this.cart.isInCart(this.product()._id));
+
   addToCart(event: Event): void {
     event.stopPropagation();
-    if (this.product().stock === 0) return;
+    if (this.product().stock === 0 || this.isInCart()) return;
 
     this.isAddingToCart.set(true);
-    this.cart.addItem({ productId: this.product()._id, quantity: 1 }).subscribe({
+    this.cart.addItem({ productId: this.product()._id, quantity: 1 }, this.product()).subscribe({
       next: () => {
         // Success handling (Toast is usually handled by CartService or Interceptor)
         this.isAddingToCart.set(false);
@@ -61,6 +64,15 @@ export class ProductCardComponent {
         this.isAddingToCart.set(false);
       },
     });
+  }
+
+  removeFromCart(event: Event): void {
+    event.stopPropagation();
+    this.isAddingToCart.set(true);
+    this.cart
+      .removeItem(this.product()._id)
+      .pipe(finalize(() => this.isAddingToCart.set(false)))
+      .subscribe();
   }
 
   toggleWishlist(event: Event): void {

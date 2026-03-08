@@ -100,7 +100,8 @@
             <div class="quantity-row">
               <label class="quantity-label">Quantity</label>
               <p-inputnumber
-                [(ngModel)]="quantity"
+                [ngModel]="quantity()"
+                (ngModelChange)="quantity.set($event)"
                 [showButtons]="true"
                 buttonLayout="horizontal"
                 inputId="horizontal"
@@ -126,7 +127,11 @@
                 @if (isAddingToCart()) {
                   <i class="pi pi-spin pi-spinner"></i>
                 } @else {
-                  <i class="pi pi-shopping-cart"></i>
+                  <i
+                    class="pi"
+                    [class.pi-shopping-cart]="!isInCart()"
+                    [class.pi-sync]="isInCart()"
+                  ></i>
                 }
 
                 @if (product()!.stock === 0) {
@@ -138,12 +143,36 @@
                 }
               </button>
 
-              <button class="btn-wishlist" (click)="toggleWishlist()">
-                <i class="pi pi-heart"></i>
+              @if (isInCart()) {
+                <button
+                  class="btn-remove-from-cart"
+                  (click)="removeFromCart()"
+                  aria-label="Remove from cart"
+                >
+                  <i class="pi pi-trash"></i>
+                </button>
+              }
+
+              <button
+                class="btn-wishlist"
+                [class.active]="isWishlisted()"
+                (click)="toggleWishlist()"
+                [attr.aria-label]="isWishlisted() ? 'Remove from wishlist' : 'Add to wishlist'"
+              >
+                <i
+                  class="pi"
+                  [class.pi-heart]="!isWishlisted()"
+                  [class.pi-heart-fill]="isWishlisted()"
+                ></i>
               </button>
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Reviews Section -->
+      <div class="reviews-wrapper">
+        <app-reviews-section [productId]="product()?._id || ''" />
       </div>
     }
   </div>

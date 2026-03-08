@@ -7,9 +7,8 @@ import { toSignal } from '@angular/core/rxjs-interop';
 
 import { ProductService } from '../../../../core/services/product.service';
 import { Product } from '../../../../core/models/product.model';
-// Assume these exist as per instructions
 import { CartService } from '../../../../core/services/cart.service';
-//import { WishlistService } from '../../../../core/services/wishlist.service';
+import { WishlistService } from '../../../../core/services/wishlist.service';
 import { CategoryService } from '../../../../core/services/category.service';
 import { ToastService } from '../../../../core/services/toast.service';
 
@@ -22,7 +21,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { BreadcrumbModule } from 'primeng/breadcrumb';
 
 // Shared Components
-//import { ReviewsSectionComponent } from '../../../reviews/components/reviews-section/reviews-section.component';
+import { ReviewsSectionComponent } from '../../../../shared/components/reviews-section/reviews-section.component';
 
 @Component({
   selector: 'app-product-detail',
@@ -39,7 +38,7 @@ import { BreadcrumbModule } from 'primeng/breadcrumb';
     ButtonModule,
     SkeletonModule,
     BreadcrumbModule,
-    // ReviewsSectionComponent
+    ReviewsSectionComponent,
   ],
   templateUrl: './product-detail.component.html',
   styleUrl: './product-detail.component.scss',
@@ -50,7 +49,7 @@ export class ProductDetailComponent {
   private productService = inject(ProductService);
   private cart = inject(CartService);
   private categoryService = inject(CategoryService);
-  //private wishlist = inject(WishlistService);
+  private wishlist = inject(WishlistService);
   private toast = inject(ToastService);
 
   // ID from Route
@@ -64,9 +63,9 @@ export class ProductDetailComponent {
   isAddingToCart = signal(false);
 
   // Computed State
-  //readonly isWishlisted = computed(() =>
-  //this.wishlist.items().some(p => p._id === this.product()?._id)
-  //);
+  readonly isWishlisted = computed(() =>
+    this.wishlist.items().some((p) => p._id === this.product()?._id)
+  );
 
   readonly breadcrumb = computed(() => [
     { label: 'Products', routerLink: '/products' },
@@ -111,7 +110,7 @@ export class ProductDetailComponent {
       .subscribe({
         next: (res) => {
           this.product.set(res.product);
-          this.loadCategoryName(res.product.category._id);
+          this.loadCategoryName(res.product.categoryId);
         },
         error: (err) => {
           console.error('Error loading product', err);
@@ -139,7 +138,7 @@ export class ProductDetailComponent {
 
     const request$ = this.isInCart()
       ? this.cart.updateQuantity(p._id, { quantity: this.quantity() })
-      : this.cart.addItem({ productId: p._id, quantity: this.quantity() });
+      : this.cart.addItem({ productId: p._id, quantity: this.quantity() }, p);
 
     request$.subscribe({
       next: () => {
@@ -155,10 +154,41 @@ export class ProductDetailComponent {
       },
     });
   }
+  updateQuantity(): void {
+    const p = this.product();
+    if (!p) return;
 
+    this.isAddingToCart.set(true);
+    this.cart
+      .updateQuantity(p._id, { quantity: this.quantity() })
+      .pipe(finalize(() => this.isAddingToCart.set(false)))
+      .subscribe({
+        next: () => {
+          this.toast.success('Cart quantity updated!');
+          console.log(this.isInCart(), this.quantity());
+        },
+        error: () => {
+          this.toast.error('Failed to update cart!');
+        },
+      });
+  }
   toggleWishlist(): void {
     const p = this.product();
     if (!p) return;
-    //this.wishlist.toggle(p._id);
+    this.wishlist.toggleWishlist(p._id);
+  }
+
+  removeFromCart(): void {
+    const p = this.product();
+    if (!p) return;
+
+    this.cart.removeItem(p._id).subscribe({
+      next: () => {
+        this.toast.success('Item removed from cart');
+      },
+      error: () => {
+        this.toast.error('Failed to remove item');
+      },
+    });
   }
 }

@@ -1,5 +1,5 @@
-<a
-  [routerLink]="['/products', product()._id]"
+<div
+  (click)="navigateToDetail()"
   class="product-card"
   role="article"
   [attr.aria-label]="product().title"
@@ -60,16 +60,19 @@
       <button
         class="add-to-cart-btn"
         [class.loading]="isAddingToCart()"
+        [class.in-cart]="isInCart()"
         [disabled]="product().stock === 0 || isAddingToCart()"
-        (click)="addToCart($event)"
+        (click)="isInCart() ? removeFromCart($event) : addToCart($event)"
         aria-label="Add to cart"
       >
         @if (isAddingToCart()) {
           <i class="pi pi-spin pi-spinner"></i>
+        } @else if (isInCart()) {
+          <i class="pi pi-check"></i>
         } @else {
           <i class="pi pi-shopping-cart"></i>
         }
       </button>
     </div>
   </div>
-</a>
+</div>

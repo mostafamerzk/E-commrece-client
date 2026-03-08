@@ -23,6 +23,7 @@ $white: #ffffff;
   display: flex;
   flex-direction: column;
   height: 100%;
+  cursor: pointer;
   transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 
   &:hover {
@@ -136,6 +137,7 @@ $white: #ffffff;
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -214,5 +216,8 @@ $white: #ffffff;
   }
   &.loading {
     background: $slate-500;
+  }
+  &.in-cart {
+    background: #16a34a;
   }
 }

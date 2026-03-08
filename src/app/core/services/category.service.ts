@@ -1,9 +1,10 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { API_ENDPOINTS } from '../constants/api-endpoints';
 import { Observable } from 'rxjs';
 import {
   CategoriesResponse,
+  Category,
   CategoryResponse,
   CreateCategoryPayload,
   UpdateCategoryPayload,
@@ -16,6 +17,22 @@ import { MessageResponse } from '../models/shared.model';
 export class CategoryService {
   private api = inject(ApiService);
   private readonly endpoint = API_ENDPOINTS.CATEGORIES;
+
+  // Cache for all categories
+  categories = signal<Category[]>([]);
+
+  loadCategories(): void {
+    if (this.categories().length > 0) return;
+    this.getAll().subscribe({
+      next: (res) => this.categories.set(res.categories),
+      error: (err) => console.error('Error loading categories', err),
+    });
+  }
+
+  getCategoryName(id: string): string {
+    const category = this.categories().find((c) => c._id === id);
+    return category ? category.name : 'Loading...';
+  }
 
   getAll(): Observable<CategoriesResponse> {
     return this.api.get<CategoriesResponse>(this.endpoint);
