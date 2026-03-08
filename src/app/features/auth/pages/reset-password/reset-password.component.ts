@@ -1,24 +1,25 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule, NgForm } from '@angular/forms';
-import { RouterLink, Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { AuthLayout } from '../../../../shared/components/auth-layout/auth-layout';
 import { PrimaryButton } from '../../../../shared/components/primary-button/primary-button';
 import { FormFieldComponent } from '../../../../shared/components/form-field/form-field';
 import { TextInputComponent } from '../../../../shared/components/text-input/text-input';
 import { PasswordInputComponent } from '../../../../shared/components/password-input/password-input';
+import { MatchValidatorDirective } from '../../../../core/validators/match.validator';
 
 @Component({
   selector: 'app-reset-password',
   standalone: true,
   imports: [
     FormsModule,
-    RouterLink,
     AuthLayout,
     PrimaryButton,
     FormFieldComponent,
     TextInputComponent,
     PasswordInputComponent,
+    MatchValidatorDirective,
   ],
   templateUrl: './reset-password.component.html',
   styleUrls: ['../auth.css'],

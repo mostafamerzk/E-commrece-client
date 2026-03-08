@@ -11,8 +11,19 @@
     style="padding-bottom: 1rem; margin-bottom: 1rem"
   >
     <!-- Email -->
-    <br />
-    <app-form-field label="Email Address" inputId="email">
+    <app-form-field
+      label="Email Address"
+      inputId="email"
+      [error]="
+        emailModel.invalid && emailModel.touched
+          ? emailModel.errors?.['required']
+            ? 'Email is required'
+            : emailModel.errors?.['email']
+              ? 'Invalid email format'
+              : ''
+          : null
+      "
+    >
       <app-text-input
         id="email"
         name="email"
@@ -21,30 +32,36 @@
         iconPath="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
         [disabled]="isLoading()"
         [(ngModel)]="email"
+        #emailModel="ngModel"
         required
         email
       >
       </app-text-input>
-      @if (loginForm.controls['email']?.invalid && loginForm.controls['email']?.touched) {
-        <span class="text-[11px] text-red-500 mt-0.5">Please enter a valid email</span>
-      }
     </app-form-field>
-    <br />
+
     <!-- Password -->
-    <div>
-      <div class="flex justify-between items-center mb-1.5">
-        <label for="password" class="text-[14px] font-semibold text-[#334155]">Password</label>
-      </div>
+    <app-form-field
+      label="Password"
+      inputId="password"
+      [error]="
+        passwordModel.invalid && passwordModel.touched
+          ? passwordModel.errors?.['required']
+            ? 'Password is required'
+            : ''
+          : null
+      "
+    >
       <app-password-input
         id="password"
         name="password"
         iconPath="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
         [disabled]="isLoading()"
         [(ngModel)]="password"
+        #passwordModel="ngModel"
         required
       >
       </app-password-input>
-    </div>
+    </app-form-field>
     <!--forgot password-->
     <a
       routerLink="/auth/forgot-password"
@@ -68,6 +85,7 @@
     </div>
 
     <app-primary-button
+      type="submit"
       [isDisabled]="loginForm.invalid || false"
       [isLoading]="isLoading()"
       loadingText="Authenticating..."

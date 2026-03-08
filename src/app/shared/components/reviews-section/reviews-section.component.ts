@@ -1,5 +1,6 @@
 import { Component, input, signal, inject, computed, OnInit } from '@angular/core';
-import { CommonModule, DatePipe, SlicePipe, DecimalPipe } from '@angular/common';
+import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import {
   ReactiveFormsModule,
   FormsModule,
@@ -7,18 +8,13 @@ import {
   FormControl,
   Validators,
 } from '@angular/forms';
-import { RatingModule } from 'primeng/rating';
-import { ButtonModule } from 'primeng/button';
-import { TextareaModule } from 'primeng/textarea';
-import { SkeletonModule } from 'primeng/skeleton';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ConfirmationService } from 'primeng/api';
 import { ReviewService } from '../../../core/services/review.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { Review, AddReviewPayload } from '../../../core/models/review.model';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { ToastService } from '../../../core/services/toast.service';
 import { finalize } from 'rxjs';
+import { PrimaryButton } from '../primary-button/primary-button';
 
 @Component({
   selector: 'app-reviews-section',
@@ -27,30 +23,32 @@ import { finalize } from 'rxjs';
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    RatingModule,
-    ButtonModule,
-    TextareaModule,
-    SkeletonModule,
-    ConfirmDialogModule,
-    DatePipe,
-    SlicePipe,
     DecimalPipe,
+    DatePipe,
+    RouterLink,
+    PrimaryButton,
     EmptyStateComponent,
   ],
-  providers: [ConfirmationService],
   templateUrl: './reviews-section.component.html',
+  styleUrl: './reviews-section.component.css',
 })
 export class ReviewsSectionComponent implements OnInit {
-  productId = input.required<string>();
+  productId = input<string>('test-product-id');
 
-  private reviewService = inject(ReviewService);
-  private authService = inject(AuthService);
-  private toast = inject(ToastService);
-  private confirmationService = inject(ConfirmationService);
+  public reviewService = inject(ReviewService);
+  public authService = inject(AuthService);
+  public toast = inject(ToastService);
 
   reviews = signal<Review[]>([]);
   isLoading = signal(false);
   isSubmitting = signal(false);
+
+  // Custom Rating Logic
+  hoveredRating = signal(0);
+
+  // Custom Confirmation Modal Logic
+  showDeleteModal = signal(false);
+  reviewToDelete = signal<string | null>(null);
 
   isLoggedIn = this.authService.isLoggedIn;
   currentUser = this.authService.currentUser;
@@ -81,6 +79,36 @@ export class ReviewsSectionComponent implements OnInit {
     rating: new FormControl<number | null>(null, [Validators.required, Validators.min(1)]),
     comment: new FormControl('', [Validators.required, Validators.minLength(10)]),
   });
+
+  // --- Validation Helpers ---
+  get isRatingInvalid(): boolean {
+    const ctrl = this.reviewForm.get('rating');
+    return !!(ctrl?.invalid && ctrl?.touched);
+  }
+
+  get isCommentInvalid(): boolean {
+    const ctrl = this.reviewForm.get('comment');
+    return !!(ctrl?.invalid && ctrl?.touched);
+  }
+
+  get commentError(): string {
+    const errors = this.reviewForm.get('comment')?.errors;
+    if (errors?.['required']) return 'Please share your feedback';
+    if (errors?.['minlength']) return 'Minimum 10 characters required';
+    return '';
+  }
+
+  // --- Star Logic Helpers ---
+  getStarFill(star: number, rating: number): 'currentColor' | 'url(#half-gradient)' | 'none' {
+    if (rating >= star) return 'currentColor';
+    if (rating >= star - 0.5) return 'url(#half-gradient)';
+    return 'none';
+  }
+
+  isPickerStarActive(star: number): boolean {
+    const currentRating = this.hoveredRating() || this.reviewForm.value.rating || 0;
+    return currentRating >= star;
+  }
 
   ngOnInit(): void {
     this.loadReviews();
@@ -117,7 +145,6 @@ export class ReviewsSectionComponent implements OnInit {
         next: (res) => {
           this.toast.success('Review submitted successfully');
           this.reviewForm.reset();
-          // Add the new review to the list (backend usually returns the full review object)
           this.reviews.update((prev) => [res.review, ...prev]);
         },
         error: (err) => {
@@ -127,12 +154,21 @@ export class ReviewsSectionComponent implements OnInit {
   }
 
   confirmDelete(reviewId: string): void {
-    this.confirmationService.confirm({
-      message: 'Are you sure you want to delete this review?',
-      header: 'Confirm Deletion',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => this.deleteReview(reviewId),
-    });
+    this.reviewToDelete.set(reviewId);
+    this.showDeleteModal.set(true);
+  }
+
+  cancelDelete(): void {
+    this.showDeleteModal.set(false);
+    this.reviewToDelete.set(null);
+  }
+
+  acceptDelete(): void {
+    const id = this.reviewToDelete();
+    if (id) {
+      this.deleteReview(id);
+    }
+    this.cancelDelete();
   }
 
   private deleteReview(reviewId: string): void {

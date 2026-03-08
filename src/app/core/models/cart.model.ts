@@ -6,26 +6,25 @@
 //          ProductCardComponent (add to cart button).
 // ─────────────────────────────────────────────────────────────────────────────
 
-/**
- * A single line item inside the cart.
- * Notice that productId here is a string (the MongoDB ObjectId), NOT a full
- * Product object. The backend returns the bare ID in most cart responses.
- * If you need the full product details (title, image) alongside cart items,
- * the backend may populate this — confirm with the backend team whether
- * productId is populated or just a string in the actual response.
- * If it IS populated, change productId type to: string | Product
- */
+import { Product } from './product.model';
+
 export interface CartItem {
-  // The product's MongoDB ObjectId — or a populated Product object
-  // if the backend populates this field (check with backend team)
-  productId: string;
-
+  // We normalize raw backend data (which might have productId) into this shape.
+  product: Product;
   quantity: number;
-
-  // The price per unit at the time the item was added to cart.
-  // Stored separately from the product price because product prices
-  // can change — the cart price is locked at the time of adding.
   price: number;
+}
+
+/**
+ * Interface representing the potentially messy data directly from the backend.
+ * Used only during the normalization phase in CartService.
+ */
+export interface RawCartItem {
+  product?: Product | string;
+  productId?: string;
+  quantity: number;
+  price: number;
+  _id?: string;
 }
 
 /**

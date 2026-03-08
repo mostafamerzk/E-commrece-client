@@ -5,8 +5,8 @@ import { FormsModule } from '@angular/forms';
 import { Product } from '../../../core/models/product.model';
 // Assume these exist as per instructions
 import { CartService } from '../../../core/services/cart.service';
+import { WishlistService } from '../../../core/services/wishlist.service';
 /* 
-import { WishlistService } from '../../../../core/services/wishlist.service';
 import { DiscountPricePipe } from '../../../pipes/discount-price.pipe';
  */
 // PrimeNG Imports
@@ -39,14 +39,12 @@ export class ProductCardComponent {
 
   // Injected services
   private cart = inject(CartService);
-  //private wishlist = inject(WishlistService);
+  private wishlist = inject(WishlistService);
   private router = inject(Router);
 
   // Computed state
-  readonly isWishlisted = computed(
-    () =>
-      //this.wishlist.items().some(p => p._id === this.product()._id)
-      false
+  readonly isWishlisted = computed(() =>
+    this.wishlist.items().some((p) => p._id === this.product()._id)
   );
 
   addToCart(event: Event): void {
@@ -54,7 +52,7 @@ export class ProductCardComponent {
     if (this.product().stock === 0) return;
 
     this.isAddingToCart.set(true);
-    this.cart.addToCart(this.product()._id, 1).subscribe({
+    this.cart.addItem({ productId: this.product()._id, quantity: 1 }).subscribe({
       next: () => {
         // Success handling (Toast is usually handled by CartService or Interceptor)
         this.isAddingToCart.set(false);
@@ -67,7 +65,7 @@ export class ProductCardComponent {
 
   toggleWishlist(event: Event): void {
     event.stopPropagation();
-    //this.wishlist.toggle(this.product()._id);
+    this.wishlist.toggleWishlist(this.product()._id);
   }
 
   navigateToDetail(): void {

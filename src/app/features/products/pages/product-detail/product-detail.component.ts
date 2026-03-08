@@ -111,7 +111,7 @@ export class ProductDetailComponent {
       .subscribe({
         next: (res) => {
           this.product.set(res.product);
-          this.loadCategoryName(res.product.categoryId);
+          this.loadCategoryName(res.product.category._id);
         },
         error: (err) => {
           console.error('Error loading product', err);
@@ -138,8 +138,8 @@ export class ProductDetailComponent {
     this.isAddingToCart.set(true);
 
     const request$ = this.isInCart()
-      ? this.cart.updateQuantity(p._id, this.quantity())
-      : this.cart.addToCart(p._id, this.quantity());
+      ? this.cart.updateQuantity(p._id, { quantity: this.quantity() })
+      : this.cart.addItem({ productId: p._id, quantity: this.quantity() });
 
     request$.subscribe({
       next: () => {

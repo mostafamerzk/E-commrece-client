@@ -121,7 +121,9 @@ describe('CheckoutComponent', () => {
 
     component.placeOrder();
 
-    expect(orderServiceMock.placeOrder).toHaveBeenCalled();
+    expect(orderServiceMock.placeOrder).toHaveBeenCalledWith(
+      jasmine.objectContaining({ paymentMethod: 'card' })
+    );
   });
 
   it('should show error if placeOrder fails', () => {
@@ -139,5 +141,38 @@ describe('CheckoutComponent', () => {
 
     expect(component.apiError()).toBe('Failed');
     expect(toastServiceMock.error).toHaveBeenCalled();
+  });
+
+  it('should update button text based on payment method', () => {
+    // Default is card
+    expect(component.paymentMethod()).toBe('card');
+
+    // Check button label (we can check the signal directly or the rendered text)
+    // For simplicity, let's assume the template uses paymentMethod()
+    component.paymentMethod.set('cash');
+    fixture.detectChanges();
+
+    const button = fixture.nativeElement.querySelector('.btn-primary');
+    expect(button.textContent).toContain('Place Order');
+
+    component.paymentMethod.set('card');
+    fixture.detectChanges();
+    expect(button.textContent).toContain('Complete Payment');
+  });
+
+  it('should send cash payment method when selected', () => {
+    component.shippingForm.patchValue({
+      recipientName: 'John',
+      phone: '01012345678',
+      address: 'Street',
+      city: 'Cairo',
+    });
+    component.paymentMethod.set('cash');
+
+    component.placeOrder();
+
+    expect(orderServiceMock.placeOrder).toHaveBeenCalledWith(
+      jasmine.objectContaining({ paymentMethod: 'cash' })
+    );
   });
 });

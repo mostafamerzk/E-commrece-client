@@ -13,4 +13,5 @@ import { Component, Input, ViewEncapsulation } from '@angular/core';
 export class FormFieldComponent {
   @Input({ required: true }) label!: string;
   @Input({ required: true }) inputId!: string;
+  @Input() error?: string | null;
 }

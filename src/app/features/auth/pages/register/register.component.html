@@ -10,7 +10,17 @@
     auth-form
   >
     <!-- Full Name -->
-    <app-form-field label="Full Name" inputId="fullName">
+    <app-form-field
+      label="Full Name"
+      inputId="fullName"
+      [error]="
+        fullNameModel.invalid && fullNameModel.touched
+          ? fullNameModel.errors?.['required']
+            ? 'Name is required'
+            : ''
+          : null
+      "
+    >
       <app-text-input
         id="fullName"
         name="fullName"
@@ -19,13 +29,26 @@
         iconPath="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
         [disabled]="isLoading()"
         [(ngModel)]="fullName"
+        #fullNameModel="ngModel"
         required
       >
       </app-text-input>
     </app-form-field>
 
     <!-- Email -->
-    <app-form-field label="Email Address" inputId="email">
+    <app-form-field
+      label="Email Address"
+      inputId="email"
+      [error]="
+        emailModel.invalid && emailModel.touched
+          ? emailModel.errors?.['required']
+            ? 'Email is required'
+            : emailModel.errors?.['email']
+              ? 'Invalid email format'
+              : ''
+          : null
+      "
+    >
       <app-text-input
         id="email"
         name="email"
@@ -34,6 +57,7 @@
         iconPath="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207"
         [disabled]="isLoading()"
         [(ngModel)]="email"
+        #emailModel="ngModel"
         required
         email
       >
@@ -41,27 +65,55 @@
     </app-form-field>
 
     <!-- Password -->
-    <app-form-field label="Password" inputId="password">
+    <app-form-field
+      label="Password"
+      inputId="password"
+      [error]="
+        passwordModel.invalid && passwordModel.touched
+          ? passwordModel.errors?.['required']
+            ? 'Password is required'
+            : passwordModel.errors?.['minlength']
+              ? 'Password must be at least 6 characters'
+              : ''
+          : null
+      "
+    >
       <app-password-input
         id="password"
         name="password"
         iconPath="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
         [disabled]="isLoading()"
         [(ngModel)]="password"
+        #passwordModel="ngModel"
         required
+        minlength="6"
       >
       </app-password-input>
     </app-form-field>
 
     <!-- Confirm Password -->
-    <app-form-field label="Confirm Password" inputId="confirmPassword">
+    <app-form-field
+      label="Confirm Password"
+      inputId="confirmPassword"
+      [error]="
+        confirmPasswordModel.invalid && confirmPasswordModel.touched
+          ? confirmPasswordModel.errors?.['required']
+            ? 'Please confirm your password'
+            : confirmPasswordModel.errors?.['match']
+              ? 'Passwords do not match'
+              : ''
+          : null
+      "
+    >
       <app-password-input
         id="confirmPassword"
         name="confirmPassword"
         iconPath="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
         [disabled]="isLoading()"
         [(ngModel)]="confirmPassword"
+        #confirmPasswordModel="ngModel"
         required
+        appMatch="password"
       >
       </app-password-input>
     </app-form-field>
@@ -83,6 +135,7 @@
 
     <!-- Submit -->
     <app-primary-button
+      type="submit"
       [isDisabled]="registerForm.invalid || !acceptTerms"
       [isLoading]="isLoading()"
       loadingText="Creating Account..."
