@@ -80,7 +80,7 @@ export class CartService {
     return this.api.get<CartResponse>(this.endpoint).pipe(
       tap((res) => {
         if (res?.cart) {
-          this._cart.set(res.cart);
+          this.mergeServerCart(res.cart);
         } else {
           console.warn('Backend returned no cart for user');
         }

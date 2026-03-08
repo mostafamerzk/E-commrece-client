@@ -1,0 +1,179 @@
+<section class="product-detail-page">
+  <div class="container">
+    <!-- Breadcrumb -->
+    <p-breadcrumb [model]="breadcrumb()" [home]="{ icon: 'pi pi-home', routerLink: '/' }" />
+
+    <!-- Loading State -->
+    @if (isLoading()) {
+      <div class="detail-grid">
+        <div class="gallery-skeleton">
+          <div class="skeleton skeleton-main-img"></div>
+          <div class="skeleton-thumbs">
+            <div class="skeleton skeleton-thumb"></div>
+            <div class="skeleton skeleton-thumb"></div>
+            <div class="skeleton skeleton-thumb"></div>
+          </div>
+        </div>
+        <div class="info-skeleton">
+          <div class="skeleton skeleton-tag"></div>
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-rating"></div>
+          <div class="skeleton skeleton-price-block"></div>
+          <div class="skeleton skeleton-desc"></div>
+          <div class="skeleton skeleton-actions"></div>
+        </div>
+      </div>
+    } @else if (product()) {
+      <!-- Product Content -->
+      <div class="detail-grid">
+        <!-- Left: Gallery -->
+        <div class="gallery-col">
+          <p-galleria
+            [value]="galleryImages()"
+            [numVisible]="5"
+            [showThumbnailNavigators]="false"
+            [showItemNavigators]="true"
+            [showItemNavigatorsOnHover]="true"
+            [circular]="true"
+            [fullScreen]="false"
+            containerClass="gallery-container"
+          >
+            <ng-template pTemplate="item" let-img>
+              <img [src]="img.src" [alt]="img.alt" class="gallery-main-img" />
+            </ng-template>
+            <ng-template pTemplate="thumbnail" let-img>
+              <div class="thumb-wrap">
+                <img [src]="img.src" [alt]="img.alt" class="gallery-thumb" />
+              </div>
+            </ng-template>
+          </p-galleria>
+        </div>
+
+        <!-- Right: Product Info -->
+        <div class="info-col">
+          <!-- Category & Title -->
+          <div class="info-header">
+            <span class="product-category-tag">{{ categoryName() }}</span>
+            <h1 class="product-title">{{ product()?.title }}</h1>
+          </div>
+
+          <!-- Rating -->
+          <div class="rating-row">
+            <p-rating [ngModel]="product()?.avgRating" [readonly]="true" />
+            <span class="rating-text">
+              {{ product()?.avgRating | number: '1.1-1' }}
+              <span class="rating-count">(0 reviews)</span>
+            </span>
+          </div>
+
+          <!-- Price -->
+          <div class="price-row">
+            <span class="price-main">{{ product()?.finalPrice | currency: 'EGP ' }}</span>
+            @if (product()?.discount) {
+              <span class="price-old">{{ product()?.price | currency: 'EGP ' }}</span>
+              <span class="discount-badge">{{ product()?.discount }}% OFF</span>
+            }
+          </div>
+
+          <!-- Stock Status -->
+          <div
+            class="stock-status"
+            [class.in-stock]="product()!.stock > 0"
+            [class.out-of-stock]="product()!.stock === 0"
+          >
+            <i [class]="product()!.stock > 0 ? 'pi pi-check-circle' : 'pi pi-times-circle'"></i>
+            <span>
+              {{ product()!.stock > 0 ? product()!.stock + ' In Stock' : 'Out of Stock' }}
+            </span>
+          </div>
+
+          <!-- Description -->
+          <div class="description-section">
+            <h2 class="description-heading">Description</h2>
+            <p class="description-text">
+              {{ product()?.description || 'No description available for this product.' }}
+            </p>
+          </div>
+
+          <!-- Actions -->
+          <div class="actions-section">
+            <div class="quantity-row">
+              <label class="quantity-label">Quantity</label>
+              <p-inputnumber
+                [ngModel]="quantity()"
+                (ngModelChange)="quantity.set($event)"
+                [showButtons]="true"
+                buttonLayout="horizontal"
+                inputId="horizontal"
+                spinnerMode="horizontal"
+                [step]="1"
+                decrementButtonClass="p-button-secondary p-button-outlined"
+                incrementButtonClass="p-button-secondary p-button-outlined"
+                incrementButtonIcon="pi pi-plus"
+                decrementButtonIcon="pi pi-minus"
+                [min]="1"
+                [max]="product()!.stock"
+                [disabled]="product()!.stock === 0"
+              />
+            </div>
+
+            <div class="btn-row">
+              <button
+                class="btn-add-to-cart"
+                [class.disabled]="product()!.stock === 0 || isAddingToCart()"
+                [disabled]="product()!.stock === 0 || isAddingToCart()"
+                (click)="addToCart()"
+              >
+                @if (isAddingToCart()) {
+                  <i class="pi pi-spin pi-spinner"></i>
+                } @else {
+                  <i
+                    class="pi"
+                    [class.pi-shopping-cart]="!isInCart()"
+                    [class.pi-sync]="isInCart()"
+                  ></i>
+                }
+
+                @if (product()!.stock === 0) {
+                  Out of Stock
+                } @else if (isInCart()) {
+                  Update Quantity
+                } @else {
+                  Add to Cart
+                }
+              </button>
+
+              @if (isInCart()) {
+                <button
+                  class="btn-remove-from-cart"
+                  (click)="removeFromCart()"
+                  aria-label="Remove from cart"
+                >
+                  <i class="pi pi-trash"></i>
+                </button>
+              }
+
+              <button
+                class="btn-wishlist"
+                [class.active]="isWishlisted()"
+                (click)="toggleWishlist()"
+                [attr.aria-label]="isWishlisted() ? 'Remove from wishlist' : 'Add to wishlist'"
+              >
+                <i
+                  class="pi"
+                  [class.pi-heart]="!isWishlisted()"
+                  [class.pi-heart-fill]="isWishlisted()"
+                ></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews Section -->
+      <div class="reviews-wrapper">
+        <app-reviews-section [productId]="product()?._id || ''" />
+      </div>
+    }
+  </div>
+</section>

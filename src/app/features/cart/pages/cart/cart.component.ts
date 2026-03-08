@@ -5,6 +5,7 @@ import { finalize, Observable, of } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { CartService } from '../../../../core/services/cart.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { CategoryService } from '../../../../core/services/category.service';
 
 @Component({
   selector: 'app-cart',
@@ -17,6 +18,15 @@ export class CartComponent implements OnDestroy {
   private cartService = inject(CartService);
   private toastService = inject(ToastService);
   private router = inject(Router);
+  private categoryService = inject(CategoryService);
+
+  constructor() {
+    this.categoryService.loadCategories();
+  }
+
+  getCategoryName(id: string): string {
+    return this.categoryService.getCategoryName(id);
+  }
 
   readonly cart = this.cartService.cart;
   readonly items = this.cartService.items;

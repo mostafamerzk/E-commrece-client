@@ -15,6 +15,7 @@ import {
   PaymentMethod,
   ShippingAddress,
 } from '../../../../core/models/order.model';
+import { CategoryService } from '../../../../core/services/category.service';
 
 interface PlaceOrderResponse {
   session?: { url: string };
@@ -32,6 +33,7 @@ export class CheckoutComponent implements OnInit {
   private orderService = inject(OrderService);
   private cartService = inject(CartService);
   private toastService = inject(ToastService);
+  private categoryService = inject(CategoryService);
 
   readonly isPlacingOrder = signal(false);
   readonly isApplyingCoupon = signal(false);
@@ -77,6 +79,7 @@ export class CheckoutComponent implements OnInit {
   ];
 
   ngOnInit() {
+    this.categoryService.loadCategories();
     if (this.cartItems().length === 0) {
       this.cartService.getCart().subscribe();
     }
@@ -179,5 +182,9 @@ export class CheckoutComponent implements OnInit {
   fieldInvalid(field: string): boolean {
     const control = this.shippingForm.get(field);
     return !!(control && control.invalid && (control.dirty || control.touched));
+  }
+
+  getCategoryName(id: string): string {
+    return this.categoryService.getCategoryName(id);
   }
 }

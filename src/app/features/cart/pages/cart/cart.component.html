@@ -68,7 +68,7 @@
                       </h3>
                       <div class="meta-row">
                         <span class="item-category text-gray-400">{{
-                          item.product.category.name || 'Uncategorized'
+                          getCategoryName(item.product.categoryId)
                         }}</span>
                         @if (item.product.avgRating) {
                           <span class="item-rating text-black">
