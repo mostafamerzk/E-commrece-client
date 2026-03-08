@@ -45,7 +45,7 @@ export class CartComponent implements OnDestroy {
 
   // ─── Quantity update ────────────────────────────────────────────────────────
 
-  updateQuantity(productId: string, currentQty: number, delta: number): void {
+  updateQuantity(productId: string | undefined, currentQty: number, delta: number): void {
     if (!productId) return;
 
     const newQty = currentQty + delta;
@@ -98,7 +98,7 @@ export class CartComponent implements OnDestroy {
 
   // ─── Remove / Clear ─────────────────────────────────────────────────────────
 
-  removeItem(productId: string): void {
+  removeItem(productId: string | undefined): void {
     if (!productId || this.updatingItems().has(productId)) return;
 
     // Remove from dirty list if it was there
@@ -135,11 +135,13 @@ export class CartComponent implements OnDestroy {
 
   // ─── Helpers ────────────────────────────────────────────────────────────────
 
-  isItemUpdating(productId: string): boolean {
+  isItemUpdating(productId: string | undefined): boolean {
+    if (!productId) return false;
     return this.updatingItems().has(productId);
   }
 
-  private clearUpdatingStatus(productId: string): void {
+  private clearUpdatingStatus(productId: string | undefined): void {
+    if (!productId) return;
     this.updatingItems.update((set) => {
       const next = new Set(set);
       next.delete(productId);

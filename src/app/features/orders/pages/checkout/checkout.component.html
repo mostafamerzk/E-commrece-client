@@ -189,14 +189,16 @@
             @for (item of cartItems(); track item.product._id) {
               <div class="checkout-item-row">
                 <div class="item-visual">
-                  @if (item.product.mainImage.secure_url) {
+                  @if (item.product.mainImage?.secure_url) {
                     <img
-                      [src]="item.product.mainImage.secure_url"
+                      [src]="item.product.mainImage?.secure_url"
                       [alt]="item.product.title"
                       class="item-img"
                     />
                   } @else {
-                    <i class="pi pi-image text-gray-300 text-2xl"></i>
+                    <div class="item-img flex items-center justify-center bg-gray-100">
+                      <i class="pi pi-image text-gray-400 text-2xl"></i>
+                    </div>
                   }
                 </div>
 
