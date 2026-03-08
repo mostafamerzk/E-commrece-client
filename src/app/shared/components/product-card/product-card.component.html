@@ -1,0 +1,78 @@
+<div
+  (click)="navigateToDetail()"
+  class="product-card"
+  role="article"
+  [attr.aria-label]="product().title"
+>
+  <!-- Wishlist Button -->
+  <button
+    class="wishlist-btn"
+    [class.active]="isWishlisted()"
+    (click)="toggleWishlist($event)"
+    [attr.aria-label]="isWishlisted() ? 'Remove from wishlist' : 'Add to wishlist'"
+  >
+    <i class="pi" [class.pi-heart]="!isWishlisted()" [class.pi-heart-fill]="isWishlisted()"></i>
+  </button>
+
+  <!-- Discount Badge -->
+  @if (product().discount) {
+    <div class="badge-discount">-{{ product().discount }}%</div>
+  }
+
+  <!-- Out of Stock Overlay -->
+  @if (product().stock === 0) {
+    <div class="out-of-stock-overlay">
+      <span>Out of Stock</span>
+    </div>
+  }
+
+  <!-- Image -->
+  <div class="product-img-wrap">
+    <img
+      [src]="product().mainImage.secure_url"
+      [alt]="product().title"
+      class="product-img"
+      [class.grayscale]="product().stock === 0"
+      loading="lazy"
+    />
+  </div>
+
+  <!-- Info -->
+  <div class="product-info">
+    <h3 class="product-name">{{ product().title }}</h3>
+
+    <!-- Rating -->
+    <div class="product-rating">
+      <div class="stars">
+        <p-rating [(ngModel)]="product().avgRating" [readonly]="true" />
+      </div>
+    </div>
+
+    <!-- Price + Cart -->
+    <div class="product-footer">
+      <div class="price-wrap">
+        <span class="price-current">{{ product().finalPrice | currency: 'EGP ' }}</span>
+        @if (product().discount) {
+          <span class="price-original">{{ product().price | currency: 'EGP ' }}</span>
+        }
+      </div>
+
+      <button
+        class="add-to-cart-btn"
+        [class.loading]="isAddingToCart()"
+        [class.in-cart]="isInCart()"
+        [disabled]="product().stock === 0 || isAddingToCart()"
+        (click)="isInCart() ? removeFromCart($event) : addToCart($event)"
+        aria-label="Add to cart"
+      >
+        @if (isAddingToCart()) {
+          <i class="pi pi-spin pi-spinner"></i>
+        } @else if (isInCart()) {
+          <i class="pi pi-check"></i>
+        } @else {
+          <i class="pi pi-shopping-cart"></i>
+        }
+      </button>
+    </div>
+  </div>
+</div>

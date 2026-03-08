@@ -7,7 +7,9 @@ import { Observable, catchError, throwError } from 'rxjs';
   providedIn: 'root',
 })
 export class ApiService {
-  private baseUrl = environment.apiUrl;
+  private baseUrl = environment.apiUrl.endsWith('/')
+    ? environment.apiUrl.slice(0, -1)
+    : environment.apiUrl;
 
   private http = inject(HttpClient);
 
@@ -16,11 +18,16 @@ export class ApiService {
 
     if (params) {
       Object.entries(params).forEach(([key, value]) => {
-        httpParams = httpParams.set(key, String(value));
+        if (value !== undefined && value !== null && value !== '') {
+          httpParams = httpParams.set(key, String(value));
+        }
       });
     }
 
-    return this.http.get<T>(`${this.baseUrl}${endpoint}`, { params: httpParams }).pipe(
+    const url = endpoint.startsWith('/')
+      ? `${this.baseUrl}${endpoint}`
+      : `${this.baseUrl}/${endpoint}`;
+    return this.http.get<T>(url, { params: httpParams }).pipe(
       catchError((error) => {
         console.error('API Error:', error);
         return throwError(() => error);

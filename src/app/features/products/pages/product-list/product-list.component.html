@@ -1,0 +1,243 @@
+<section class="products-page">
+  <div class="container">
+    <!-- Section Header -->
+    <div class="section-header">
+      <p-breadcrumb [model]="breadcrumbItems" [home]="breadcrumbHome" />
+      <div class="section-tag">Our Collection</div>
+      <h1 class="section-title">All <span class="accent">Products</span></h1>
+      <p class="section-subtitle">Browse our full catalog and find exactly what you need.</p>
+    </div>
+
+    <div class="content-layout">
+      <!-- Filter sidebar (desktop) -->
+      <aside class="filter-sidebar" aria-label="Product filters">
+        <div class="sidebar-sticky">
+          <!-- Search -->
+          <div class="filter-card">
+            <h2 class="filter-heading">Search</h2>
+            <p-iconfield class="search-field">
+              <p-inputicon styleClass="pi pi-search" />
+              <input
+                pInputText
+                type="search"
+                [(ngModel)]="searchQuery"
+                (ngModelChange)="onFilterChange()"
+                placeholder="Search products…"
+                class="search-input"
+              />
+            </p-iconfield>
+          </div>
+
+          <!-- Categories -->
+          <div class="filter-card">
+            <h2 class="filter-heading">Categories</h2>
+            <div class="filter-options">
+              @for (cat of categories(); track cat._id) {
+                <div class="filter-option">
+                  <p-checkbox
+                    [(ngModel)]="selectedCategories"
+                    [value]="cat._id"
+                    (onChange)="onFilterChange()"
+                    [inputId]="'cat-' + cat._id"
+                  />
+                  <label [for]="'cat-' + cat._id" class="filter-label">
+                    {{ cat.name }}
+                  </label>
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Price Range -->
+          <div class="filter-card">
+            <h2 class="filter-heading">Price Range</h2>
+            <p class="price-display">
+              EGP {{ priceRange()[0] | number }} — EGP {{ priceRange()[1] | number }}
+            </p>
+            <p-slider
+              [(ngModel)]="priceRange"
+              [range]="true"
+              [min]="0"
+              [max]="10000"
+              [step]="50"
+              (onSlideEnd)="onFilterChange()"
+              class="price-slider"
+            />
+          </div>
+
+          <!-- In Stock Toggle -->
+          <div class="filter-card">
+            <div class="stock-toggle">
+              <label for="inStock" class="stock-label">In Stock Only</label>
+              <p-toggleswitch
+                [(ngModel)]="inStockOnly"
+                (onChange)="onFilterChange()"
+                inputId="inStock"
+              />
+            </div>
+          </div>
+
+          <button class="btn-clear-filters" (click)="clearFilters()">
+            <i class="pi pi-refresh"></i>
+            Clear All Filters
+          </button>
+        </div>
+      </aside>
+
+      <!-- Mobile filter drawer -->
+      <p-drawer
+        [(visible)]="filterDrawerOpen"
+        position="left"
+        header="Filters"
+        styleClass="filter-drawer"
+      >
+        <div class="drawer-content">
+          <div class="filter-card">
+            <h2 class="filter-heading">Search</h2>
+            <p-iconfield class="search-field">
+              <p-inputicon styleClass="pi pi-search" />
+              <input
+                pInputText
+                type="search"
+                [(ngModel)]="searchQuery"
+                (ngModelChange)="onFilterChange()"
+                placeholder="Search products…"
+                class="search-input"
+              />
+            </p-iconfield>
+          </div>
+
+          <div class="filter-card">
+            <h2 class="filter-heading">Categories</h2>
+            <div class="filter-options">
+              @for (cat of categories(); track cat._id) {
+                <div class="filter-option">
+                  <p-checkbox
+                    [(ngModel)]="selectedCategories"
+                    [value]="cat._id"
+                    (onChange)="onFilterChange()"
+                    [inputId]="'cat-mobile-' + cat._id"
+                  />
+                  <label [for]="'cat-mobile-' + cat._id" class="filter-label">
+                    {{ cat.name }}
+                  </label>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="filter-card">
+            <h2 class="filter-heading">Price Range</h2>
+            <p class="price-display">
+              EGP {{ priceRange()[0] | number }} — EGP {{ priceRange()[1] | number }}
+            </p>
+            <p-slider
+              [(ngModel)]="priceRange"
+              [range]="true"
+              [min]="0"
+              [max]="10000"
+              [step]="50"
+              (onSlideEnd)="onFilterChange()"
+              class="price-slider"
+            />
+          </div>
+
+          <div class="filter-card">
+            <div class="stock-toggle">
+              <label for="inStock-mobile" class="stock-label">In Stock Only</label>
+              <p-toggleswitch
+                [(ngModel)]="inStockOnly"
+                (onChange)="onFilterChange()"
+                inputId="inStock-mobile"
+              />
+            </div>
+          </div>
+
+          <button class="btn-clear-filters" (click)="clearFilters()">
+            <i class="pi pi-refresh"></i>
+            Clear All
+          </button>
+        </div>
+      </p-drawer>
+
+      <!-- Main content -->
+      <div class="main-content">
+        <!-- Top toolbar -->
+        <div class="toolbar">
+          <!-- Mobile filter toggle -->
+          <button class="btn-mobile-filter" (click)="filterDrawerOpen.set(true)">
+            <i class="pi pi-filter"></i>
+            Filters
+            @if (activeFilterCount() > 0) {
+              <span class="filter-badge">{{ activeFilterCount() }}</span>
+            }
+          </button>
+
+          <!-- Result count -->
+          <div class="result-count">
+            @if (isLoading()) {
+              <p-skeleton width="80px" />
+            } @else {
+              <span class="count-value">{{ totalProducts() }}</span> products found
+            }
+          </div>
+
+          <!-- Sort dropdown -->
+          <p-select
+            [options]="sortOptions"
+            [(ngModel)]="selectedSort"
+            (onChange)="onSortChange()"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Sort by"
+            styleClass="sort-select"
+          />
+        </div>
+
+        <!-- Grid Area -->
+        @if (isLoading()) {
+          <div class="products-grid">
+            @for (i of [1, 2, 3, 4, 5, 6, 7, 8]; track i) {
+              <div class="skeleton-card">
+                <div class="skeleton skeleton-img"></div>
+                <div class="skeleton-body">
+                  <div class="skeleton skeleton-text short"></div>
+                  <div class="skeleton skeleton-text"></div>
+                  <div class="skeleton skeleton-price"></div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else if (products().length === 0) {
+          <app-empty-state
+            icon="pi pi-search"
+            title="No products found"
+            description="We couldn't find any products matching your current filters. Try adjusting your search or clearing filters."
+            actionLabel="Clear All Filters"
+            (click)="clearFilters()"
+          />
+        } @else {
+          <div class="products-grid">
+            @for (product of products(); track product._id) {
+              <app-product-card [product]="product" />
+            }
+          </div>
+
+          <!-- Pagination -->
+          @if (totalProducts() > pageSize) {
+            <div class="pagination-wrap">
+              <p-paginator
+                [first]="(currentPage() - 1) * pageSize"
+                [rows]="pageSize"
+                [totalRecords]="totalProducts()"
+                (onPageChange)="onPageChange($event)"
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="{first} - {last} of {totalRecords}"
+              />
+            </div>
+          }
+        }
+      </div>
+    </div>
+  </div>
+</section>

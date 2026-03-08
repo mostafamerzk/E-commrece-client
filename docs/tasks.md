@@ -45,7 +45,7 @@
 **Phase:** 1 — Core Services
 **Files to create:**
 - src/app/core/services/product.service.ts
-- src/app/core/models/product.model.ts
+- src/app/core/models/product.model.ts (this is done)
 **Definition of done:** All five product API methods implemented and typed. Uses API_ENDPOINTS constants.
 **Unit tests required:**
 - getAll() should call GET /product with correct query params
@@ -57,7 +57,7 @@
 ---
 
 ### [TASK-F04] Product Listing Page
-**Status:** [ ]
+**Status:** [x]
 **Phase:** 2 — Feature Pages
 **Files to create:**
 - src/app/features/products/pages/product-list/product-list.component.ts
