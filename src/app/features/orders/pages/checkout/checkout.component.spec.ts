@@ -122,7 +122,7 @@ describe('CheckoutComponent', () => {
     component.placeOrder();
 
     expect(orderServiceMock.placeOrder).toHaveBeenCalledWith(
-      jasmine.objectContaining({ paymentMethod: 'card' })
+      jasmine.objectContaining({ paymentMethod: 'creditCard' })
     );
   });
 
@@ -145,7 +145,7 @@ describe('CheckoutComponent', () => {
 
   it('should update button text based on payment method', () => {
     // Default is card
-    expect(component.paymentMethod()).toBe('card');
+    expect(component.paymentMethod()).toBe('creditCard');
 
     // Check button label (we can check the signal directly or the rendered text)
     // For simplicity, let's assume the template uses paymentMethod()
@@ -155,7 +155,7 @@ describe('CheckoutComponent', () => {
     const button = fixture.nativeElement.querySelector('.btn-primary');
     expect(button.textContent).toContain('Place Order');
 
-    component.paymentMethod.set('card');
+    component.paymentMethod.set('creditCard');
     fixture.detectChanges();
     expect(button.textContent).toContain('Complete Payment');
   });
@@ -172,7 +172,7 @@ describe('CheckoutComponent', () => {
     component.placeOrder();
 
     expect(orderServiceMock.placeOrder).toHaveBeenCalledWith(
-      jasmine.objectContaining({ paymentMethod: 'cash' })
+      jasmine.objectContaining({ paymentMethod: 'cod' })
     );
   });
 });
