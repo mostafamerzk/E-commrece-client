@@ -1,0 +1,234 @@
+/* ============================================================
+   ADMIN LAYOUT — Clean, professional admin interface
+   ============================================================ */
+
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f1f5f9;
+  position: relative;
+}
+
+/* ────────────────────────────────────────────────────────────
+   Header - Fixed at top, spans full width
+   ──────────────────────────────────────────────────────────── */
+.admin-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  z-index: 1000;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* ────────────────────────────────────────────────────────────
+   Sidebar - Fixed on left, below header
+   ──────────────────────────────────────────────────────────── */
+.admin-sidebar {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  width: 280px;
+  height: calc(100vh - 64px);
+  background: white;
+  border-right: 1px solid #e2e8f0;
+  z-index: 900;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s ease;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.admin-sidebar.expanded {
+  transform: translateX(0);
+}
+
+.admin-sidebar:not(.expanded) {
+  width: 80px;
+}
+
+/* ────────────────────────────────────────────────────────────
+   Main Content Area - Flex container with content + footer
+   ──────────────────────────────────────────────────────────── */
+.admin-main {
+  flex: 1;
+  margin-left: 280px;
+  margin-top: 64px;
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100vh - 64px);
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.admin-main > .admin-content {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+/* ────────────────────────────────────────────────────────────
+   Mobile Backdrop - Overlay when sidebar is open on mobile
+   ──────────────────────────────────────────────────────────── */
+.sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 850;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.sidebar-backdrop.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ────────────────────────────────────────────────────────────
+   Close Button for Mobile Sidebar
+   ──────────────────────────────────────────────────────────── */
+.sidebar-close-btn {
+  display: none;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: none;
+  background: #f1f5f9;
+  color: #64748b;
+  cursor: pointer;
+  z-index: 950;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease;
+}
+
+.sidebar-close-btn:hover {
+  background: #e2e8f0;
+}
+
+/* ────────────────────────────────────────────────────────────
+   Responsive - Tablet (769px - 1024px)
+   ──────────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .admin-main {
+    margin-left: 80px;
+  }
+
+  .admin-sidebar:not(.expanded) {
+    transform: translateX(-100%);
+  }
+}
+
+/* ────────────────────────────────────────────────────────────
+   Responsive - Mobile (max-width: 768px)
+   ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Sidebar - Hidden off-screen by default, narrower width */
+  .admin-sidebar {
+    width: 260px;
+    transform: translateX(-100%);
+    box-shadow: 2px 0 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .admin-sidebar.expanded {
+    transform: translateX(0);
+  }
+
+  .admin-sidebar:not(.expanded) {
+    width: 260px;
+  }
+
+  /* Show close button on mobile */
+  .sidebar-close-btn {
+    display: flex;
+  }
+
+  /* Backdrop visible on mobile */
+  .sidebar-backdrop {
+    display: block;
+  }
+
+  /* Main content - full width, no margin */
+  .admin-main {
+    margin-left: 0 !important;
+    width: 100%;
+  }
+
+  .admin-footer-wrapper {
+    display: none;
+  }
+
+  /* Content padding */
+  .admin-content {
+    padding: 1rem;
+  }
+}
+
+/* ────────────────────────────────────────────────────────────
+   Header Responsive - Mobile adaptations
+   ──────────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .header-left .search-container {
+    display: none;
+  }
+
+  .header-right .user-info {
+    display: none;
+  }
+
+  .header-right .user-avatar {
+    margin-right: 8px;
+  }
+}
+
+/* ────────────────────────────────────────────────────────────
+   Animations
+   ──────────────────────────────────────────────────────────── */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ────────────────────────────────────────────────────────────
+   Scrollbar Styling
+   ──────────────────────────────────────────────────────────── */
+.admin-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.admin-content::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.admin-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.admin-content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.admin-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.admin-sidebar::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb {
+  background: #e2e8f0;
+  border-radius: 3px;
+}

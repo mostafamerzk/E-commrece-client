@@ -117,8 +117,8 @@ _None yet._
 
 - **Date:** 2026-03-07
 - **Who:** Antigravity (Agent)
-- **What was done:** Redesigned `ReviewsSectionComponent` with a premium "Slate & Amber" palette and tokenized styling. Refactored `PrimaryButtonComponent` to support size variants (`base`, `sm`). Resolved accessibility issues (label associations). Verified functionality with 10/10 passing unit tests.
-- **What is next:** Proceed with Phase 1/2 feature work (Product Service, Cart Service, or Admin Dashboard/Layouts).
+- **What was done:** Completed **[TASK-I05] Admin Layout + Dashboard**. Implemented a shared `SidebarNavComponent` with mobile drawer, a responsive `AdminLayout`, and the `DashboardComponent` featuring KPI cards and recent orders. Refined `AdminService` and API constants. Verified with a successful production build.
+- **What is next:** Proceed with Phase 2 Admin management pages (Users, Orders, Banners).
 
 ---
 
@@ -139,3 +139,4 @@ _None yet._
 | 2026-03-03 | UX/Fix | Fixed label association accessibility error in Category Management |
 | 2026-03-05 | Task K07 | Login & Register pages completed (TASK-K07) |
 | 2026-03-07 | Task I04 | Reviews Section Component completed; PrimeNG removed, Tailwind design tokens applied, PrimaryButton refactored for variants, 10/10 tests passed |
+| 2026-03-07 | Task I05 | Admin Layout & Dashboard completed; SidebarNav created, AdminService implemented, Responsive layout verified, Build passed |

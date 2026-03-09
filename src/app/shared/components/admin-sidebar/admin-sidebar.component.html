@@ -1,0 +1,61 @@
+<aside class="sidebar" [class.collapsed]="!expanded()">
+  <div class="sidebar-header">
+    @if (expanded()) {
+      <div class="logo-section">
+        <div class="logo-icon">
+          <i class="pi pi-shopping-bag"></i>
+        </div>
+        <span class="logo-text">ITI<span class="logo-accent">Shop</span></span>
+      </div>
+    }
+    @if (!expanded()) {
+      <div class="logo-icon-small">
+        <i class="pi pi-shopping-bag"></i>
+      </div>
+    }
+  </div>
+
+  <nav class="sidebar-nav">
+    @for (item of navItems; track item.label) {
+      <a
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="nav-item"
+        [attr.aria-label]="item.label"
+      >
+        <div class="nav-icon">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              [attr.d]="item.icon"
+            />
+          </svg>
+        </div>
+        @if (expanded()) {
+          <span class="nav-label">{{ item.label }}</span>
+        }
+      </a>
+    }
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="nav-item logout-btn" (click)="logout()" aria-label="Logout">
+      <div class="nav-icon">
+        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+          />
+        </svg>
+      </div>
+      @if (expanded()) {
+        <span class="nav-label">Logout</span>
+      }
+    </button>
+  </div>
+</aside>

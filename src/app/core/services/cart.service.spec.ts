@@ -5,7 +5,7 @@ import { provideHttpClientTesting, HttpTestingController } from '@angular/common
 import { CartService } from './cart.service';
 import { API_ENDPOINTS } from '../constants/api-endpoints';
 import { environment } from '../../../environments/environment.prod';
-import { AddToCartPayload } from '../models/cart.model';
+import { AddToCartPayload, UpdateCartPayload } from '../models/cart.model';
 
 describe('CartService', () => {
   let service: CartService;
@@ -57,7 +57,7 @@ describe('CartService', () => {
     };
     const mockResponse = { message: 'Added', cart: mockCart };
 
-    service.addToCart(payload.productId, payload.quantity).subscribe(() => {
+    service.addItem(payload).subscribe(() => {
       expect(service.cart()).toEqual(mockCart);
       expect(service.itemCount()).toBe(2);
       expect(service.totalPrice()).toBe(100);
@@ -70,6 +70,7 @@ describe('CartService', () => {
 
   it('should update quantity', () => {
     const productId = 'p1';
+    const payload: UpdateCartPayload = { operator: '+' };
     const mockCart = {
       userId: '1',
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
@@ -78,7 +79,7 @@ describe('CartService', () => {
     };
     const mockResponse = { message: 'Updated', cart: mockCart };
 
-    service.updateQuantity(productId, '+').subscribe(() => {
+    service.updateQuantity(productId, payload).subscribe(() => {
       expect(service.cart()).toEqual(mockCart);
     });
 
@@ -92,7 +93,7 @@ describe('CartService', () => {
     const mockCart = { userId: '1', products: [], totalPrice: 0 };
     const mockResponse = { message: 'Removed', cart: mockCart };
 
-    service.removeFromCart(productId).subscribe(() => {
+    service.removeItem(productId).subscribe(() => {
       expect(service.cart()).toEqual(mockCart);
     });
 

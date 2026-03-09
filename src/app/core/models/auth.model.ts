@@ -5,6 +5,7 @@
 // Used by: AuthService, StorageService, all Route Guards, the Header component,
 //          and the error interceptor (which reads the user's role on 401).
 // ─────────────────────────────────────────────────────────────────────────────
+import { CloudinaryImage } from './shared.model';
 
 /**
  * The three roles in this application.
@@ -40,16 +41,32 @@ export interface User {
   // never read it directly from localStorage in a component.
   role: UserRole;
 
-  // When true, the user has been restricted by an admin.
-  // The backend will reject their requests, but the frontend can also
-  // use this to show a "Your account is suspended" message.
-  isBlocked: boolean;
+  /**
+   * profilePicture is returned as a nested object from the backend.
+   */
+  profilePicture?: CloudinaryImage;
+
+  // When true, the account has been disabled or soft-deleted.
+  isDeleted?: boolean;
+
+  /**
+   * backend spelling is 'isAcctivated' (note the extra 'c').
+   * We keep it as is to match the API exactly.
+   */
+  isAcctivated?: boolean;
+
+  isLogged?: boolean;
+  provider?: string;
 
   // Seller-specific fields — only populated when role === 'seller'.
   // Optional because customer and admin users do not have a store.
   storeName?: string;
   storeDescription?: string;
   phone?: string;
+
+  // Timestamps
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 // ─── Request Payloads ─────────────────────────────────────────────────────────
@@ -105,4 +122,13 @@ export interface AuthResponse {
   // The full user object — cached in localStorage so the user stays
   // "logged in" across page refreshes without needing a new login call.
   user: User;
+}
+
+/**
+ * The response specifically from GET /user/profile.
+ * Backend nests the user inside 'data'.
+ */
+export interface ProfileResponse {
+  result: string;
+  data: User;
 }
