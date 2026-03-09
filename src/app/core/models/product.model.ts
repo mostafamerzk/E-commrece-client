@@ -9,7 +9,6 @@
 
 import { CloudinaryImage, Pagination } from './shared.model';
 import { Review } from './review.model';
-import { Category } from './category.model';
 
 /**
  * The full Product object as returned by the backend.
@@ -66,7 +65,7 @@ export interface Product {
 
   // The MongoDB ObjectId of this product's category.
   // The product listing page uses this for category filtering.
-  category: Category;
+  categoryId: string;
 
   // Soft-delete flag. When true, the product is "deleted" but still in the DB.
   // Admin endpoints return products where isDeleted is true so they can be recovered.

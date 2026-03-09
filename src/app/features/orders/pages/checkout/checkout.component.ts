@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
-import { CurrencyPipe } from '@angular/common';
+import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import {
   FormControl,
   FormGroup,
@@ -12,19 +12,19 @@ import { CartService } from '../../../../core/services/cart.service';
 import { ToastService } from '../../../../core/services/toast.service';
 import {
   CheckoutSummary,
+  OrderResponse,
   PaymentMethod,
   ShippingAddress,
 } from '../../../../core/models/order.model';
-
-interface PlaceOrderResponse {
-  session?: { url: string };
-  order?: { _id: string };
-}
+import { PaymentService } from '../../../../core/services/payment.service';
+import { Router } from '@angular/router';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
+import { CategoryService } from '../../../../core/services/category.service';
 
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [FormsModule, ReactiveFormsModule, CurrencyPipe],
+  imports: [FormsModule, ReactiveFormsModule, CurrencyPipe, DecimalPipe],
   templateUrl: './checkout.component.html',
   styleUrls: ['./checkout.component.css'],
 })
@@ -32,8 +32,12 @@ export class CheckoutComponent implements OnInit {
   private orderService = inject(OrderService);
   private cartService = inject(CartService);
   private toastService = inject(ToastService);
+  private categoryService = inject(CategoryService);
+  private paymentService = inject(PaymentService);
+  private router = inject(Router);
 
   readonly isPlacingOrder = signal(false);
+  readonly isRedirecting = signal(false);
   readonly isApplyingCoupon = signal(false);
   readonly couponError = signal<string | null>(null);
   readonly couponSuccess = signal<string | null>(null);
@@ -77,21 +81,38 @@ export class CheckoutComponent implements OnInit {
   ];
 
   ngOnInit() {
+    this.categoryService.loadCategories();
     if (this.cartItems().length === 0) {
       this.cartService.getCart().subscribe();
     }
     this.updateCheckoutSummary();
+
+    // Auto-update summary when form changes
+    this.shippingForm.valueChanges
+      .pipe(debounceTime(1000), distinctUntilChanged())
+      .subscribe(() => {
+        if (this.shippingForm.valid) {
+          this.updateCheckoutSummary();
+        }
+      });
   }
 
   updateCheckoutSummary() {
     const val = this.shippingForm.value;
-    const address = {
-      street: val.street!,
-      city: val.city!,
-      country: val.country!,
-      phone: val.phone!,
-      postalCode: val.postalCode!,
-    };
+
+    // Only send address if it's partially filled to avoid 400 errors on page load
+    const hasAddress = val.street || val.city || val.phone;
+
+    const address = hasAddress
+      ? {
+          street: val.street || '',
+          city: val.city || '',
+          country: val.country || 'Egypt',
+          phone: val.phone || '',
+          postalCode: val.postalCode || '',
+        }
+      : undefined;
+
     this.orderService
       .checkout({
         couponCode: this.couponCode || undefined,
@@ -146,26 +167,41 @@ export class CheckoutComponent implements OnInit {
     this.apiError.set(null);
 
     const val = this.shippingForm.value;
-    const address = {
+    const address: ShippingAddress = {
       street: val.street!,
       city: val.city!,
       country: val.country!,
       phone: val.phone!,
-      postalCode: val.postalCode!,
+      postalCode: val.postalCode || '',
     };
+
+    const paymentMethod = this.paymentMethod();
 
     this.orderService
       .placeOrder({
-        paymentMethod: this.paymentMethod(),
-        shippingAddress: address as ShippingAddress,
+        paymentMethod: paymentMethod,
+        shippingAddress: address,
         couponCode: this.couponCode || undefined,
       })
       .subscribe({
-        next: (res: PlaceOrderResponse) => {
-          if (res.session?.url) {
-            window.location.href = res.session.url;
-          } else if (res.order?._id) {
-            this.toastService.success('Order placed! Redirecting to payment...');
+        next: (res: OrderResponse) => {
+          if (paymentMethod === 'cod') {
+            this.toastService.success('Order placed successfully!');
+            this.cartService.clearCart().subscribe();
+            this.router.navigate(['/payment/success']);
+          } else if (paymentMethod === 'creditCard') {
+            this.isRedirecting.set(true);
+            this.paymentService.createCheckoutSession(res.order._id).subscribe({
+              next: (paymentRes) => {
+                window.location.href = paymentRes.url;
+              },
+              error: (err) => {
+                this.isRedirecting.set(false);
+                this.isPlacingOrder.set(false);
+                this.apiError.set(err.error?.message || 'Failed to create payment session');
+                this.toastService.error('Error creating payment session');
+              },
+            });
           }
         },
         error: (err) => {
@@ -179,5 +215,9 @@ export class CheckoutComponent implements OnInit {
   fieldInvalid(field: string): boolean {
     const control = this.shippingForm.get(field);
     return !!(control && control.invalid && (control.dirty || control.touched));
+  }
+
+  getCategoryName(id: string): string {
+    return this.categoryService.getCategoryName(id);
   }
 }

@@ -6,6 +6,7 @@ import { CartService } from './cart.service';
 import { API_ENDPOINTS } from '../constants/api-endpoints';
 import { environment } from '../../../environments/environment.prod';
 import { AddToCartPayload, UpdateCartPayload } from '../models/cart.model';
+import { Product } from '../models/product.model';
 
 describe('CartService', () => {
   let service: CartService;
@@ -51,8 +52,7 @@ describe('CartService', () => {
     const payload: AddToCartPayload = { productId: 'p1', quantity: 2 };
     const mockCart = {
       userId: '1',
-      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      products: [{ product: { _id: 'p1' } as any, quantity: 2, price: 50 }],
+      products: [{ product: { _id: 'p1' } as unknown as Product, quantity: 2, price: 50 }],
       totalPrice: 100,
     };
     const mockResponse = { message: 'Added', cart: mockCart };
@@ -73,8 +73,7 @@ describe('CartService', () => {
     const payload: UpdateCartPayload = { operator: '+' };
     const mockCart = {
       userId: '1',
-      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-      products: [{ product: { _id: 'p1' } as any, quantity: 5, price: 50 }],
+      products: [{ product: { _id: 'p1' } as unknown as Product, quantity: 5, price: 50 }],
       totalPrice: 250,
     };
     const mockResponse = { message: 'Updated', cart: mockCart };

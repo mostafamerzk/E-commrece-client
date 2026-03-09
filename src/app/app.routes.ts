@@ -67,6 +67,26 @@ export const routes: Routes = [
         ],
       },
       {
+        path: 'payment',
+        canActivate: [authGuard],
+        children: [
+          {
+            path: 'success',
+            loadComponent: () =>
+              import('./features/orders/pages/payment-success/payment-success.component').then(
+                (m) => m.PaymentSuccessComponent
+              ),
+          },
+          {
+            path: 'cancel',
+            loadComponent: () =>
+              import('./features/orders/pages/payment-cancel/payment-cancel.component').then(
+                (m) => m.PaymentCancelComponent
+              ),
+          },
+        ],
+      },
+      {
         path: 'wishlist',
         loadComponent: () =>
           import('./features/wishlist/pages/wishlist/wishlist.component').then(
