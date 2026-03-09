@@ -132,11 +132,6 @@
   flex-shrink: 0;
   width: 140px;
   height: 140px;
-  background: linear-gradient(
-    135deg,
-    #ffd93d 0%,
-    #ffb100 100%
-  ); /* Placeholder-ish gradient matching the image */
   border-radius: var(--radius-2xl);
   overflow: hidden;
   display: flex;
@@ -209,10 +204,22 @@
     justify-content: space-between;
     align-items: center;
 
-    .item-subtotal {
-      font-size: 1.125rem;
-      font-weight: 800;
-      color: var(--color-gray-900);
+    .price-info-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.25rem;
+
+      .unit-price {
+        font-weight: 600;
+        color: var(--color-gray-400);
+      }
+
+      .item-subtotal {
+        font-size: 1.125rem;
+        font-weight: 800;
+        color: var(--color-gray-900);
+      }
     }
   }
 }

@@ -196,7 +196,9 @@
                       class="item-img"
                     />
                   } @else {
-                    <i class="pi pi-image text-gray-300 text-2xl"></i>
+                    <div class="item-img flex items-center justify-center bg-gray-100">
+                      <i class="pi pi-image text-gray-400 text-2xl"></i>
+                    </div>
                   }
                 </div>
 
@@ -210,7 +212,7 @@
                       @if (item.product.avgRating) {
                         <span class="item-rating">
                           <i class="pi pi-star-fill text-yellow-500"></i>
-                          {{ item.product.avgRating }}
+                          {{ item.product.avgRating | number: '1.1-1' }}
                         </span>
                       }
                     </div>
@@ -362,4 +364,18 @@
       </aside>
     </div>
   </div>
+
+  @if (isRedirecting()) {
+    <div class="stripe-redirect-overlay">
+      <div class="overlay-content">
+        <div class="spinner-box">
+          <i class="pi pi-spin pi-spinner text-4xl text-primary-600"></i>
+        </div>
+        <h2 class="text-2xl font-bold text-gray-900 mt-6">Redirecting to Payment</h2>
+        <p class="text-gray-500 mt-2">
+          Please wait while we set up your secure Stripe checkout session...
+        </p>
+      </div>
+    </div>
+  }
 </main>

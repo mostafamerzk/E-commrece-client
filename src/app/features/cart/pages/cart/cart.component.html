@@ -51,15 +51,15 @@
 
                 <div class="item-visual">
                   <img
-                    [src]="item.product.mainImage.secure_url"
-                    [alt]="item.product.title"
+                    [src]="item.product.mainImage.secure_url || 'assets/placeholder-product.png'"
+                    [alt]="item.product.title || 'Product'"
                     class="item-img"
                   />
                 </div>
 
                 <div class="item-details text-black">
                   <div class="details-top">
-                    <div class="info-group">
+                    <div class="item-info-group">
                       <h3
                         class="item-title text-black"
                         [routerLink]="['/products', item.product._id]"
@@ -71,10 +71,10 @@
                           getCategoryName(item.product.categoryId)
                         }}</span>
                         @if (item.product.avgRating) {
-                          <span class="item-rating text-black">
-                            <i class="pi pi-star-fill text-yellow-500"></i>
-                            {{ item.product.avgRating }}
-                          </span>
+                          <div class="item-rating text-black text-sm">
+                            <i class="pi pi-star-fill text-yellow-500 text-xs"></i>
+                            {{ item.product.avgRating | number: '1.1-1' }}
+                          </div>
                         }
                       </div>
                     </div>
@@ -108,12 +108,19 @@
                         <i class="pi pi-plus"></i>
                       </button>
                     </div>
-                    <p class="item-subtotal text-black">
-                      {{
-                        (item.price || item.product.finalPrice || 0) * (item.quantity || 1)
-                          | currency: 'EGP'
-                      }}
-                    </p>
+
+                    <div class="price-info-stack">
+                      <span class="unit-price text-gray-400 text-sm">
+                        {{ item.price || item.product.finalPrice || 0 | currency: 'EGP' }}
+                      </span>
+                      <p class="item-subtotal text-black">
+                        <span class="text-gray-400 text-xs font-normal">Total Price:</span>
+                        {{
+                          (item.price || item.product.finalPrice || 0) * (item.quantity || 1)
+                            | currency: 'EGP'
+                        }}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
