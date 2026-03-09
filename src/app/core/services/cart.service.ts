@@ -94,6 +94,21 @@ export class CartService {
       } as CartResponse);
     }
     return this.api.get<CartResponse>(this.endpoint).pipe(
+      catchError((err) => {
+        // Handle "Cart Not Found" (400) by initializing an empty cart for the user.
+        // We check err.status (for raw HTTP errors) and err.message (for errors processed by interceptor).
+        const errMsg = err.error?.message || err.message || '';
+        if (err.status === 400 || errMsg.includes('Cart Not Found')) {
+          const emptyCart: Cart = {
+            userId: this.authService.currentUser()?._id || 'unknown',
+            products: [],
+            totalPrice: 0,
+          };
+          this._cart.set(emptyCart);
+          return of({ message: 'Initialized empty cart', cart: emptyCart } as CartResponse);
+        }
+        throw err;
+      }),
       tap((res) => {
         if (res?.cart) {
           this.mergeServerCart(res.cart);

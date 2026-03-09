@@ -17,7 +17,6 @@ describe('AuthService', () => {
     userName: 'testUser',
     email: 'test@example.com',
     role: 'customer',
-    isBlocked: false,
   };
 
   const mockAdmin: User = { ...mockUser, role: 'admin' };

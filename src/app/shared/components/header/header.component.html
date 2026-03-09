@@ -104,9 +104,28 @@
 </aside>
 
 <!-- ═══════════════ HEADER ═══════════════ -->
-<header class="site-header" [class.scrolled]="isScrolled()">
+<header
+  class="site-header"
+  [class.scrolled]="isScrolled()"
+  [class.admin-header]="sidebarExpanded() !== undefined"
+>
   <div class="header-inner">
     <div class="header-left">
+      @if (sidebarExpanded() !== undefined) {
+        <button
+          class="sidebar-toggle"
+          (click)="onSidebarToggle()"
+          [attr.aria-expanded]="sidebarExpanded()"
+          aria-label="Toggle sidebar"
+        >
+          <i
+            class="pi"
+            [class.pi-align-left]="sidebarExpanded()"
+            [class.pi-align-justify]="!sidebarExpanded()"
+          ></i>
+        </button>
+      }
+
       <button
         class="hamburger"
         (click)="toggleMobileMenu()"
@@ -117,81 +136,88 @@
         <span class="hb-line" [class.open]="mobileMenuOpen()"></span>
         <span class="hb-line" [class.open]="mobileMenuOpen()"></span>
       </button>
-      <a routerLink="/" class="site-logo">
-        <div class="logo-icon"><i class="pi pi-shopping-bag"></i></div>
-        <span class="logo-text">ITI<span class="logo-accent">Shop</span></span>
-      </a>
+
+      @if (sidebarExpanded() === undefined) {
+        <a routerLink="/" class="site-logo">
+          <div class="logo-icon"><i class="pi pi-shopping-bag"></i></div>
+          <span class="logo-text">ITI<span class="logo-accent">Shop</span></span>
+        </a>
+      }
     </div>
 
     <div class="header-center">
-      <nav class="desktop-nav" aria-label="Main navigation">
-        <a
-          routerLink="/"
-          routerLinkActive="nav-active"
-          [routerLinkActiveOptions]="{ exact: true }"
-          class="nav-link"
-          >Home</a
-        >
-        <a routerLink="/products" routerLinkActive="nav-active" class="nav-link">Products</a>
-        <!-- <a routerLink="/wishlist" routerLinkActive="nav-active" class="nav-link">Wishlist</a> -->
-      </nav>
+      @if (sidebarExpanded() === undefined) {
+        <nav class="desktop-nav" aria-label="Main navigation">
+          <a
+            routerLink="/"
+            routerLinkActive="nav-active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="nav-link"
+            >Home</a
+          >
+          <a routerLink="/products" routerLinkActive="nav-active" class="nav-link">Products</a>
+          <!-- <a routerLink="/wishlist" routerLinkActive="nav-active" class="nav-link">Wishlist</a> -->
+        </nav>
+      }
 
       <!-- ── Search Bar ── -->
-      <div class="header-search">
-        <i class="pi pi-search search-prefix"></i>
-        <input
-          type="text"
-          placeholder="Search products, brands…"
-          class="search-input"
-          aria-label="Search products"
-          [(ngModel)]="searchQuery"
-          (input)="onSearchInput()"
-          (keydown)="onSearchKeydown($event)"
-          (focus)="onSearchInput()"
-          autocomplete="off"
-        />
-        <!-- Loading Spinner -->
-        @if (searchLoading()) {
-          <i class="pi pi-spin pi-spinner search-spinner"></i>
-        } @else if (searchQuery) {
-          <button class="search-clear" (click)="closeSearch()" aria-label="Clear search">
-            <i class="pi pi-times"></i>
-          </button>
-        } @else {
-          <kbd class="search-kbd">⌘K</kbd>
-        }
-
-        <!-- ── Search Dropdown ── -->
-        @if (searchOpen()) {
-          <div class="search-dropdown">
-            <!-- Results -->
-            @for (product of searchResults(); track product._id) {
-              <button class="search-result-item" (click)="selectProduct(product._id)">
-                <img
-                  [src]="product.mainImage.secure_url"
-                  [alt]="product.title"
-                  class="result-img"
-                />
-                <div class="result-info">
-                  <span class="result-name">{{ product.title }}</span>
-                  <span class="result-price">${{ product.finalPrice }}</span>
-                </div>
-                @if (product.discount) {
-                  <span class="result-badge">-{{ product.discount }}%</span>
-                }
-              </button>
-            }
-
-            <!-- View All Results -->
-            <button class="search-view-all" (click)="goToSearch()">
-              <i class="pi pi-search"></i>
-              View all results for "<strong>{{ searchQuery }}</strong
-              >"
-              <i class="pi pi-arrow-right"></i>
+      @if (sidebarExpanded() === undefined) {
+        <div class="header-search">
+          <i class="pi pi-search search-prefix"></i>
+          <input
+            type="text"
+            placeholder="Search products, brands…"
+            class="search-input"
+            aria-label="Search products"
+            [(ngModel)]="searchQuery"
+            (input)="onSearchInput()"
+            (keydown)="onSearchKeydown($event)"
+            (focus)="onSearchInput()"
+            autocomplete="off"
+          />
+          <!-- Loading Spinner -->
+          @if (searchLoading()) {
+            <i class="pi pi-spin pi-spinner search-spinner"></i>
+          } @else if (searchQuery) {
+            <button class="search-clear" (click)="closeSearch()" aria-label="Clear search">
+              <i class="pi pi-times"></i>
             </button>
-          </div>
-        }
-      </div>
+          } @else {
+            <kbd class="search-kbd">⌘K</kbd>
+          }
+
+          <!-- ── Search Dropdown ── -->
+          @if (searchOpen()) {
+            <div class="search-dropdown">
+              <!-- Results -->
+              @for (product of searchResults(); track product._id) {
+                <button class="search-result-item" (click)="selectProduct(product._id)">
+                  <img
+                    [src]="product.mainImage.secure_url"
+                    [alt]="product.title"
+                    class="result-img"
+                  />
+                  <div class="result-info">
+                    <span class="result-name">{{ product.title }}</span>
+                    <span class="result-price">${{ product.finalPrice }}</span>
+                  </div>
+                  @if (product.discount) {
+                    <span class="result-badge">-{{ product.discount }}%</span>
+                  }
+                </button>
+              }
+
+              <!-- View All Results -->
+              <button class="search-view-all" (click)="goToSearch()">
+                <i class="pi pi-search"></i>
+                View all results for "<strong>{{ searchQuery }}</strong
+                >"
+                <i class="pi pi-arrow-right"></i>
+              </button>
+            </div>
+          }
+        </div>
+      }
     </div>
 
     <div class="header-right">
