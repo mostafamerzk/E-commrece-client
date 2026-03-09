@@ -1,4 +1,4 @@
-import { Component, signal, HostListener, inject, OnDestroy } from '@angular/core';
+import { Component, signal, HostListener, inject, OnDestroy, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -43,6 +43,14 @@ export class HeaderComponent implements OnDestroy {
   readonly currentUser = this.authService.currentUser;
   readonly itemCount = this.cartService.itemCount;
   readonly wishlistCount = this.wishlistService.itemCount;
+
+  // ── Sidebar State (Admin Layout) ─────────────────────────
+  sidebarExpanded = input<boolean | undefined>(undefined);
+  toggleSidebar = output<void>();
+
+  onSidebarToggle() {
+    this.toggleSidebar.emit();
+  }
 
   constructor() {
     // Real-time search — ينتظر 400ms بعد آخر حرف

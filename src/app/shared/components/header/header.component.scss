@@ -14,7 +14,7 @@
   color: #ffffff;
   font-size: 0.8rem;
   font-weight: 500;
-  height: 34px;
+  height: 4rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -181,6 +181,45 @@
   align-items: center;
   gap: 0.625rem;
   flex-shrink: 0;
+}
+
+// ── Sidebar Toggle (Admin) ──────────────────────────────
+.sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  color: #64748b;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-right: 0.25rem;
+
+  &:hover {
+    background: #ffffff;
+    color: #2563eb;
+    border-color: #93c5fd;
+    transform: translateY(-1.5px);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.12);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  .pi {
+    font-size: 1rem;
+  }
+}
+
+.admin-header {
+  .header-inner {
+    max-width: none; // Full width for admin
+    padding: 0 1.5rem;
+  }
 }
 
 .header-center {

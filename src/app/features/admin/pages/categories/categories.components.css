@@ -1,8 +1,13 @@
 /* ─── Page Layout ─── */
 .cat-page {
-  padding: 2rem;
+  padding: 0;
   background: var(--color-slate-50);
-  min-height: 100vh;
+  min-height: 100%;
+  margin-bottom: 0;
+}
+
+.cat-content {
+  padding: 2rem;
 }
 
 /* ─── Page Header ─── */
