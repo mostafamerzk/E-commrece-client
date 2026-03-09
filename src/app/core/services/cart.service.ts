@@ -87,14 +87,16 @@ export class CartService {
       })
     );
   }
-
   addItem(payload: AddToCartPayload, product?: Product): Observable<CartResponse> {
     if (!this.authService.isLoggedIn()) {
       return this.addGuestItem(payload, product);
     }
     return this.api.post<CartResponse, AddToCartPayload>(this.endpoint, payload).pipe(
       tap((res) => {
-        return this._cart.set(res.cart);
+        console.log('ADD ITEM RESPONSE:', JSON.stringify(res, null, 2));
+        if (res?.cart) {
+          this.mergeServerCart(res.cart, product);
+        }
       })
     );
   }
@@ -189,28 +191,23 @@ export class CartService {
    * In all cases, the server's quantities, prices, and totalPrice are adopted so
    * the local state stays in sync with the source of truth.
    */
-  private mergeServerCart(serverCart: Cart): void {
+  private mergeServerCart(serverCart: Cart, newProduct?: Product): void {
     const currentProducts = this._cart()?.products ?? [];
 
     const mergedProducts = serverCart.products.map((serverItem) => {
-      // (a) Server returned a proper populated Product object — use it directly
-      if (
-        serverItem.product &&
-        typeof serverItem.product === 'object' &&
-        (serverItem.product as Product)._id
-      ) {
-        return serverItem;
-      }
-
-      // (b/c) Server returned a string ID or null/undefined — find the matching
-      // populated Product from our current local state and re-attach it
+      // ✅ Backend بيبعت productId مش product
       const productId =
-        typeof serverItem.product === 'string'
-          ? serverItem.product
-          : (serverItem.product as Product)?._id;
+        (serverItem as CartItem & { productId?: string }).productId ||
+        (typeof serverItem.product === 'string' ? serverItem.product : serverItem.product?._id);
 
       const existing = currentProducts.find((p) => p.product?._id === productId);
-      return existing ? { ...serverItem, product: existing.product } : serverItem;
+      if (existing) return { ...serverItem, product: existing.product };
+
+      if (newProduct && newProduct._id === productId) {
+        return { ...serverItem, product: newProduct };
+      }
+
+      return serverItem;
     });
 
     this._cart.set({ ...serverCart, products: mergedProducts });
@@ -222,9 +219,13 @@ export class CartService {
       this.saveGuestCart(currentItems);
       return of(this.getGuestCartResponse(currentItems));
     }
-    return this.api
-      .delete<CartResponse>(`${this.endpoint}/${productId}`)
-      .pipe(tap((res) => this._cart.set(res.cart)));
+    return this.api.delete<CartResponse>(`${this.endpoint}/${productId}`).pipe(
+      tap((res) => {
+        if (res?.cart) {
+          this.mergeServerCart(res.cart);
+        }
+      })
+    );
   }
 
   clearCart(): Observable<MessageResponse> {

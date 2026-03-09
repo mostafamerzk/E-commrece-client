@@ -1,7 +1,9 @@
 <div
-  (click)="navigateToDetail()"
   class="product-card"
   role="article"
+  tabindex="0"
+  (click)="navigateToDetail()"
+  (keydown.enter)="navigateToDetail()"
   [attr.aria-label]="product().title"
 >
   <!-- Wishlist Button -->

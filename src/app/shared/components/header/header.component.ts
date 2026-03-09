@@ -18,10 +18,10 @@ import { Product } from '../../../core/models/product.model';
 })
 export class HeaderComponent implements OnDestroy, OnInit {
   // ── Services ─────────────────────────────────────────────
-  newcurrent = JSON.parse(localStorage.getItem('user') || '');
+  newcurrent = JSON.parse(localStorage.getItem('user') || 'null');
 
   ngOnInit(): void {
-    console.log(this.newcurrent.data.wishlist.length);
+    console.log(this.newcurrent?.data?.wishlist?.length || 0);
   }
   private readonly authService = inject(AuthService);
   private readonly cartService = inject(CartService);
@@ -41,7 +41,7 @@ export class HeaderComponent implements OnDestroy, OnInit {
 
   private readonly searchSubject = new Subject<string>();
   private readonly destroy$ = new Subject<void>();
-  readonly wishlistCount = signal(this.newcurrent.data.wishlist.length);
+  readonly wishlistCount = signal(0);
 
   // ── Derived State ─────────────────────────────────────────
   readonly isLoggedIn = this.authService.isLoggedIn;
@@ -49,6 +49,7 @@ export class HeaderComponent implements OnDestroy, OnInit {
   readonly itemCount = this.cartService.itemCount;
   constructor() {
     // Real-time search — ينتظر 400ms بعد آخر حرف
+
     this.searchSubject
       .pipe(
         debounceTime(400),
