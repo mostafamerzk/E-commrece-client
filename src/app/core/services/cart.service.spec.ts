@@ -57,7 +57,7 @@ describe('CartService', () => {
     };
     const mockResponse = { message: 'Added', cart: mockCart };
 
-    service.addToCart(payload.productId, payload.quantity).subscribe(() => {
+    service.addItem(payload).subscribe(() => {
       expect(service.cart()).toEqual(mockCart);
       expect(service.itemCount()).toBe(2);
       expect(service.totalPrice()).toBe(100);
@@ -78,7 +78,7 @@ describe('CartService', () => {
     };
     const mockResponse = { message: 'Updated', cart: mockCart };
 
-    service.updateQuantity(productId, '+').subscribe(() => {
+    service.updateQuantity(productId, { operator: '+' }).subscribe(() => {
       expect(service.cart()).toEqual(mockCart);
     });
 
@@ -92,7 +92,7 @@ describe('CartService', () => {
     const mockCart = { userId: '1', products: [], totalPrice: 0 };
     const mockResponse = { message: 'Removed', cart: mockCart };
 
-    service.removeFromCart(productId).subscribe(() => {
+    service.removeItem(productId).subscribe(() => {
       expect(service.cart()).toEqual(mockCart);
     });
 

@@ -76,7 +76,7 @@ describe('CheckoutComponent', () => {
     component.shippingForm.patchValue({
       recipientName: 'John',
       phone: '01012345678',
-      address: 'Street',
+      street: 'Street',
       city: 'Cairo',
     });
     expect(component.shippingForm.valid).toBeTrue();
@@ -115,14 +115,14 @@ describe('CheckoutComponent', () => {
     component.shippingForm.patchValue({
       recipientName: 'John',
       phone: '01012345678',
-      address: 'Street',
+      street: 'Street',
       city: 'Cairo',
     });
 
     component.placeOrder();
 
     expect(orderServiceMock.placeOrder).toHaveBeenCalledWith(
-      jasmine.objectContaining({ paymentMethod: 'card' })
+      jasmine.objectContaining({ paymentMethod: 'creditCard' })
     );
   });
 
@@ -130,7 +130,7 @@ describe('CheckoutComponent', () => {
     component.shippingForm.patchValue({
       recipientName: 'John',
       phone: '01012345678',
-      address: 'Street',
+      street: 'Street',
       city: 'Cairo',
     });
     orderServiceMock.placeOrder.and.returnValue(
@@ -145,17 +145,17 @@ describe('CheckoutComponent', () => {
 
   it('should update button text based on payment method', () => {
     // Default is card
-    expect(component.paymentMethod()).toBe('card');
+    expect(component.paymentMethod()).toBe('creditCard');
 
     // Check button label (we can check the signal directly or the rendered text)
     // For simplicity, let's assume the template uses paymentMethod()
-    component.paymentMethod.set('cash');
+    component.paymentMethod.set('cod');
     fixture.detectChanges();
 
     const button = fixture.nativeElement.querySelector('.btn-primary');
     expect(button.textContent).toContain('Place Order');
 
-    component.paymentMethod.set('card');
+    component.paymentMethod.set('creditCard');
     fixture.detectChanges();
     expect(button.textContent).toContain('Complete Payment');
   });
@@ -164,15 +164,15 @@ describe('CheckoutComponent', () => {
     component.shippingForm.patchValue({
       recipientName: 'John',
       phone: '01012345678',
-      address: 'Street',
+      street: 'Street',
       city: 'Cairo',
     });
-    component.paymentMethod.set('cash');
+    component.paymentMethod.set('cod');
 
     component.placeOrder();
 
     expect(orderServiceMock.placeOrder).toHaveBeenCalledWith(
-      jasmine.objectContaining({ paymentMethod: 'cash' })
+      jasmine.objectContaining({ paymentMethod: 'cod' })
     );
   });
 });
