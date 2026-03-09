@@ -1,0 +1,127 @@
+<section class="wishlist-page">
+  <div class="container">
+    <!-- Page Header -->
+    <div class="page-header animate-in">
+      <div class="header-text">
+        <h1 class="page-title">My <span class="accent">Wishlist</span></h1>
+        <p class="page-subtitle">
+          @if (!loading() && !isEmpty()) {
+            {{ itemCount() }} {{ itemCount() === 1 ? 'item' : 'items' }} saved
+          } @else {
+            Items you love, saved for later
+          }
+        </p>
+      </div>
+    </div>
+
+    <!-- Loading Skeleton -->
+    @if (loading()) {
+      <div class="products-grid">
+        @for (item of [1, 2, 3, 4, 5, 6, 7, 8]; track item) {
+          <div class="product-card skeleton-card">
+            <div class="skeleton skeleton-img"></div>
+            <div class="skeleton-body">
+              <div class="skeleton skeleton-text short"></div>
+              <div class="skeleton skeleton-text"></div>
+              <div class="skeleton skeleton-price"></div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Empty State -->
+    @if (!loading() && isEmpty()) {
+      <div class="empty-state animate-in">
+        <div class="empty-icon">
+          <i class="pi pi-heart"></i>
+        </div>
+        <h2 class="empty-title">Your wishlist is empty</h2>
+        <p class="empty-subtitle">Browse our products and save the ones you love.</p>
+        <a routerLink="/products" class="btn-browse">
+          Browse Products <i class="pi pi-arrow-right"></i>
+        </a>
+      </div>
+    }
+
+    <!-- Products Grid -->
+    @if (!loading() && !isEmpty()) {
+      <div class="products-grid">
+        @for (product of items(); track product._id) {
+          <a [routerLink]="['/products', product._id]" class="product-card animate-in">
+            <!-- Remove from Wishlist -->
+            <button
+              class="wishlist-btn active"
+              [class.removing]="isRemoving(product._id)"
+              (click)="
+                $event.preventDefault(); $event.stopPropagation(); removeFromWishlist(product)
+              "
+              aria-label="Remove from wishlist"
+            >
+              @if (isRemoving(product._id)) {
+                <i class="pi pi-spin pi-spinner"></i>
+              } @else {
+                <i class="pi pi-heart-fill"></i>
+              }
+            </button>
+
+            <!-- Discount Badge -->
+            @if (product.discount) {
+              <div class="badge-discount">-{{ product.discount }}%</div>
+            }
+
+            <!-- Image -->
+            <div class="product-img-wrap">
+              <img
+                [src]="product.mainImage.secure_url"
+                [alt]="product.title"
+                class="product-img"
+                loading="lazy"
+              />
+            </div>
+
+            <!-- Info -->
+            <div class="product-info">
+              <h3 class="product-name">{{ product.title }}</h3>
+
+              <!-- Rating -->
+              <div class="product-rating">
+                <div class="stars">
+                  @for (filled of getStars(product.avgRating); track $index) {
+                    <i class="pi pi-star-fill" [class.filled]="filled"></i>
+                  }
+                </div>
+                <span class="rating-value">{{ product.avgRating | number: '1.1-1' }}</span>
+              </div>
+
+              <!-- Price + Add to Cart -->
+              <div class="product-footer">
+                <div class="price-wrap">
+                  <span class="price-current">${{ product.finalPrice }}</span>
+                  @if (product.discount) {
+                    <span class="price-original">${{ product.price }}</span>
+                  }
+                </div>
+
+                <button
+                  class="add-to-cart-btn"
+                  [class.loading]="isAddingToCart(product._id)"
+                  (click)="$event.preventDefault(); $event.stopPropagation(); addToCart(product)"
+                  [disabled]="isAddingToCart(product._id)"
+                  aria-label="Add to cart"
+                >
+                  @if (isAddingToCart(product._id)) {
+                    <i class="pi pi-spin pi-spinner"></i>
+                  } @else {
+                    <i class="pi pi-shopping-cart"></i>
+                    <span>Add to Cart</span>
+                  }
+                </button>
+              </div>
+            </div>
+          </a>
+        }
+      </div>
+    }
+  </div>
+</section>

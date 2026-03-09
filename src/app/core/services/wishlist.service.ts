@@ -1,53 +1,88 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, catchError, of, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 import { ApiService } from './api.service';
-import { API_ENDPOINTS } from '../constants/api-endpoints';
 import { Product } from '../models/product.model';
+import { API_ENDPOINTS } from '../constants/api-endpoints';
 
-// ── Response shapes ──────────────────────────────────────
 interface WishlistResponse {
   message: string;
-  wishlist: {
-    userId: string;
-    products: Product[];
-  };
+  wishlist: Product[] | string[];
+}
+
+interface GetWishlistResponse {
+  message: string;
+  wishlist: Product[];
 }
 
 @Injectable({ providedIn: 'root' })
 export class WishlistService {
   private api = inject(ApiService);
-  private readonly endpoint = API_ENDPOINTS.WISHLIST;
+  private readonly endpoint = API_ENDPOINTS.WISHLIST; // '/wish/user/wishlist'
 
-  // ── State ────────────────────────────────────────────────
   private _items = signal<Product[]>([]);
-
   readonly items = this._items.asReadonly();
-
-  // عدد الـ items — للـ header badge
   readonly itemCount = computed(() => this._items().length);
 
-  // ── API Calls ────────────────────────────────────────────
-
-  // جيب الـ wishlist من السيرفر
-  getWishlist(): Observable<WishlistResponse> {
+  // ── GET /wish/user/wishlist ───────────────────────────────
+  getWishlist(): Observable<GetWishlistResponse> {
     return this.api
-      .get<WishlistResponse>(this.endpoint)
-      .pipe(tap((res) => this._items.set(res.wishlist.products)));
+      .get<GetWishlistResponse>(this.endpoint)
+      .pipe(
+        tap((res) =>
+          this._items.set(Array.isArray(res.wishlist) ? (res.wishlist as Product[]) : [])
+        )
+      );
   }
 
-  // ضيف أو شيل منتج (toggle)
-  toggleWishlist(productId: string): Observable<WishlistResponse> {
-    return this.api
-      .post<WishlistResponse, { productId: string }>(this.endpoint, { productId })
-      .pipe(tap((res) => this._items.set(res.wishlist.products)));
+  // ── POST /wish/user/wishlist/:id ──────────────────────────
+  private addToWishlist(productId: string, product?: Product): Observable<WishlistResponse> {
+    // ✅ Optimistic update أولاً
+    this._items.update((items) => {
+      if (items.some((p) => p._id === productId)) return items;
+      return [...items, product ?? ({ _id: productId } as Product)];
+    });
+
+    return this.api.post<WishlistResponse, object>(`${this.endpoint}/${productId}`, {}).pipe(
+      catchError((err: HttpErrorResponse) => {
+        if (err.status === 409) {
+          return of({ message: 'already in wishlist', wishlist: [] as Product[] });
+        }
+        this._items.update((items) => items.filter((p) => p._id !== productId));
+        return throwError(() => err); // ✅
+      })
+    );
   }
 
-  // هل المنتج ده موجود في الـ wishlist؟
+  // ── DELETE /wish/user/wishlist/:id ────────────────────────
+  private removeFromWishlist(productId: string): Observable<WishlistResponse> {
+    // ✅ Optimistic update أولاً
+    this._items.update((items) => items.filter((p) => p._id !== productId));
+
+    return this.api.delete<WishlistResponse>(`${this.endpoint}/${productId}`).pipe(
+      catchError((err: HttpErrorResponse) => {
+        // فشل — نرجع المنتج للـ _items
+        this.getWishlist().subscribe();
+        throw err;
+      })
+    );
+  }
+
+  // ── TOGGLE ────────────────────────────────────────────────
+  toggleWishlist(
+    productId: string,
+    product?: Product
+  ): Observable<WishlistResponse | GetWishlistResponse> {
+    if (this.isInWishlist(productId)) {
+      return this.removeFromWishlist(productId);
+    }
+    return this.addToWishlist(productId, product);
+  }
+
   isInWishlist(productId: string): boolean {
     return this._items().some((p) => p._id === productId);
   }
 
-  // امسح الـ state بس (بعد logout)
   clearWishlist(): void {
     this._items.set([]);
   }
