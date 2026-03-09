@@ -21,7 +21,7 @@ export interface CartItem {
  */
 export interface RawCartItem {
   product?: Product | string;
-  productId?: string;
+  productId?: Product | string;
   quantity: number;
   price: number;
   _id?: string;

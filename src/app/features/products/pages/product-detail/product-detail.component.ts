@@ -1,4 +1,4 @@
-import { Component, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule, CurrencyPipe, DecimalPipe } from '@angular/common';
 import { ActivatedRoute, RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -61,6 +61,7 @@ export class ProductDetailComponent {
   isLoading = signal(true);
   quantity = signal(1);
   isAddingToCart = signal(false);
+  private lastInitializedProductId = '';
 
   // Computed State
   readonly isWishlisted = computed(() =>
@@ -100,6 +101,22 @@ export class ProductDetailComponent {
         this.loadProduct(id);
       }
     });
+
+    // Effect to sync quantity once both product and cart items are ready
+    effect(() => {
+      const p = this.product();
+      const cart = this.cart.cart(); // Ensures we wait for cart signal to be initialized
+      const items = this.cart.items();
+
+      if (p && cart) {
+        // Only initialize once per product change to avoid overwriting user edits later
+        if (this.lastInitializedProductId !== p._id) {
+          const cartItem = items.find((item) => item.product._id === p._id);
+          this.quantity.set(cartItem?.quantity ?? 1);
+          this.lastInitializedProductId = p._id;
+        }
+      }
+    });
   }
 
   private loadProduct(id: string): void {
@@ -134,18 +151,18 @@ export class ProductDetailComponent {
     const p = this.product();
     if (!p || p.stock === 0) return;
 
+    const currentlyInCart = this.isInCart();
     this.isAddingToCart.set(true);
 
-    const request$ = this.isInCart()
-      ? this.cart.updateQuantity(p._id, { quantity: this.quantity() })
+    const request$ = currentlyInCart
+      ? this.cart.updateQuantity(p._id, { quantity: this.quantity() }, p)
       : this.cart.addItem({ productId: p._id, quantity: this.quantity() }, p);
 
     request$.subscribe({
       next: () => {
         this.isAddingToCart.set(false);
-
         this.toast.success(
-          this.isInCart() ? 'Cart quantity updated!' : 'Successfully added to cart!'
+          currentlyInCart ? 'Cart quantity updated!' : 'Successfully added to cart!'
         );
       },
       error: () => {
@@ -154,24 +171,24 @@ export class ProductDetailComponent {
       },
     });
   }
-  updateQuantity(): void {
-    const p = this.product();
-    if (!p) return;
+  // updateQuantity(): void {
+  //   const p = this.product();
+  //   if (!p) return;
 
-    this.isAddingToCart.set(true);
-    this.cart
-      .updateQuantity(p._id, { quantity: this.quantity() })
-      .pipe(finalize(() => this.isAddingToCart.set(false)))
-      .subscribe({
-        next: () => {
-          this.toast.success('Cart quantity updated!');
-          console.log(this.isInCart(), this.quantity());
-        },
-        error: () => {
-          this.toast.error('Failed to update cart!');
-        },
-      });
-  }
+  //   this.isAddingToCart.set(true);
+  //   this.cart
+  //     .updateQuantity(p._id, { quantity: this.quantity() })
+  //     .pipe(finalize(() => this.isAddingToCart.set(false)))
+  //     .subscribe({
+  //       next: () => {
+  //         this.toast.success('Cart quantity updated!');
+  //         console.log(this.isInCart(), this.quantity());
+  //       },
+  //       error: () => {
+  //         this.toast.error('Failed to update cart!');
+  //       },
+  //     });
+  // }
   toggleWishlist(): void {
     const p = this.product();
     if (!p) return;
