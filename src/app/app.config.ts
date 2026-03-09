@@ -12,6 +12,7 @@ import { definePreset } from '@primeng/themes';
 import { routes } from './app.routes';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { cacheInterceptor } from './core/interceptors/cache.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { loadingInterceptor } from './core/interceptors/loading.interceptor';
 import { AUTH_FACADE, TOAST_FACADE } from './core/tokens/app.tokens';
@@ -52,7 +53,9 @@ export const appConfig: ApplicationConfig = {
         },
       },
     }),
-    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor, loadingInterceptor])),
+    provideHttpClient(
+      withInterceptors([authInterceptor, cacheInterceptor, errorInterceptor, loadingInterceptor])
+    ),
     MessageService,
     { provide: AUTH_FACADE, useExisting: AuthService },
     { provide: TOAST_FACADE, useExisting: ToastService },
