@@ -51,7 +51,7 @@
 
                 <div class="item-visual">
                   <img
-                    [src]="item.product.mainImage?.secure_url || 'assets/placeholder-product.png'"
+                    [src]="item.product.mainImage.secure_url || 'assets/placeholder-product.png'"
                     [alt]="item.product.title || 'Product'"
                     class="item-img"
                   />
@@ -73,7 +73,7 @@
                         @if (item.product.avgRating) {
                           <div class="item-rating text-black text-sm">
                             <i class="pi pi-star-fill text-yellow-500 text-xs"></i>
-                            {{ item.product.avgRating }}
+                            {{ item.product.avgRating | number: '1.1-1' }}
                           </div>
                         }
                       </div>
