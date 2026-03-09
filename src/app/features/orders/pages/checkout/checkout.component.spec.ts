@@ -76,7 +76,7 @@ describe('CheckoutComponent', () => {
     component.shippingForm.patchValue({
       recipientName: 'John',
       phone: '01012345678',
-      address: 'Street',
+      street: 'Street',
       city: 'Cairo',
     });
     expect(component.shippingForm.valid).toBeTrue();
@@ -115,7 +115,7 @@ describe('CheckoutComponent', () => {
     component.shippingForm.patchValue({
       recipientName: 'John',
       phone: '01012345678',
-      address: 'Street',
+      street: 'Street',
       city: 'Cairo',
     });
 
@@ -130,7 +130,7 @@ describe('CheckoutComponent', () => {
     component.shippingForm.patchValue({
       recipientName: 'John',
       phone: '01012345678',
-      address: 'Street',
+      street: 'Street',
       city: 'Cairo',
     });
     orderServiceMock.placeOrder.and.returnValue(
@@ -149,7 +149,7 @@ describe('CheckoutComponent', () => {
 
     // Check button label (we can check the signal directly or the rendered text)
     // For simplicity, let's assume the template uses paymentMethod()
-    component.paymentMethod.set('cash');
+    component.paymentMethod.set('cod');
     fixture.detectChanges();
 
     const button = fixture.nativeElement.querySelector('.btn-primary');
@@ -164,10 +164,10 @@ describe('CheckoutComponent', () => {
     component.shippingForm.patchValue({
       recipientName: 'John',
       phone: '01012345678',
-      address: 'Street',
+      street: 'Street',
       city: 'Cairo',
     });
-    component.paymentMethod.set('cash');
+    component.paymentMethod.set('cod');
 
     component.placeOrder();
 

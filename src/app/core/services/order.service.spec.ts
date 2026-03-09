@@ -45,7 +45,7 @@ describe('OrderService', () => {
   describe('placeOrder()', () => {
     it('should call POST /order with payload', () => {
       const payload: PlaceOrderPayload = {
-        paymentMethod: 'card',
+        paymentMethod: 'creditCard',
         shippingAddress: { street: '123 St', city: 'NY', country: 'USA', phone: '123' },
       };
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
