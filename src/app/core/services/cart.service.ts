@@ -46,32 +46,43 @@ export class CartService {
   });
 
   constructor() {
-    this.loadCart();
+    // Initial load from storage (guest) or fetch from API
+    this.initializeCart();
 
-    effect(
-      () => {
-        if (this.authService.isLoggedIn()) {
+    // Re-sync or re-load whenever logged-in status changes
+    effect(() => {
+      const loggedIn = this.authService.isLoggedIn();
+      // We don't want to run this synchronously in the effect
+      // to avoid 'signal writes' warnings and recursive loops.
+      // setTimeout or a microtask ensures it runs after current detection cycle.
+      Promise.resolve().then(() => {
+        if (loggedIn) {
           this.syncCartWithBackend().subscribe();
         } else {
-          this.loadCart();
+          this.loadGuestCart();
         }
-      },
-      { allowSignalWrites: true }
-    );
+      });
+    });
   }
 
-  private loadCart() {
+  private initializeCart() {
     if (this.authService.isLoggedIn()) {
       this.getCart().subscribe();
     } else {
-      const guestCart = this.storage.getItem<CartItem[]>(this.GUEST_CART_KEY);
-      if (guestCart) {
-        this._cart.set({
-          userId: 'guest',
-          products: guestCart,
-          totalPrice: guestCart.reduce((total, item) => total + item.price * item.quantity, 0),
-        });
-      }
+      this.loadGuestCart();
+    }
+  }
+
+  private loadGuestCart() {
+    const guestCart = this.storage.getItem<CartItem[]>(this.GUEST_CART_KEY);
+    if (guestCart) {
+      this._cart.set({
+        userId: 'guest',
+        products: guestCart,
+        totalPrice: guestCart.reduce((total, item) => total + item.price * item.quantity, 0),
+      });
+    } else {
+      this._cart.set(null);
     }
   }
 
@@ -86,8 +97,6 @@ export class CartService {
       tap((res) => {
         if (res?.cart) {
           this.mergeServerCart(res.cart);
-        } else {
-          console.warn('Backend returned no cart for user');
         }
       })
     );
@@ -125,7 +134,11 @@ export class CartService {
     return of(this.getGuestCartResponse(currentItems));
   }
 
-  updateQuantity(productId: string, payload: UpdateCartPayload): Observable<CartResponse> {
+  updateQuantity(
+    productId: string,
+    payload: UpdateCartPayload,
+    product?: Product
+  ): Observable<CartResponse> {
     if (!this.authService.isLoggedIn()) {
       const currentItems = this.items().map((i) => ({ ...i }));
       const itemIndex = currentItems.findIndex((i) => i.product._id === productId);
@@ -153,7 +166,7 @@ export class CartService {
       .pipe(
         tap((res) => {
           if (res?.cart) {
-            this.mergeServerCart(res.cart);
+            this.mergeServerCart(res.cart, product);
           } else {
             console.warn('Backend returned empty cart in PATCH response');
           }
@@ -192,24 +205,36 @@ export class CartService {
   private mergeServerCart(serverCart: Cart, hintProduct?: Product): void {
     const currentProducts = this._cart()?.products ?? [];
 
-    const mergedProducts = (serverCart.products as unknown as RawCartItem[]).map((serverItem) => {
-      // 1. Extract the ID. Backend might send it as 'productId' OR 'product' (string or object)
-      const productId =
-        serverItem.productId ||
-        (this.isProductObject(serverItem.product) ? serverItem.product._id : serverItem.product);
+    const mergedProducts = (serverCart.products as RawCartItem[]).map((serverItem) => {
+      let productId: string | undefined;
+
+      const productField = serverItem.product;
+      const productIdField = serverItem.productId;
+
+      if (typeof productField === 'string') {
+        productId = productField;
+      } else if (this.isProductObject(productField)) {
+        productId = productField._id;
+      } else if (typeof productIdField === 'string') {
+        productId = productIdField;
+      } else if (this.isProductObject(productIdField)) {
+        productId = productIdField._id;
+      }
 
       if (!productId) {
         return serverItem;
       }
 
       // 2. Try to find populated product object from:
-      //    (a) The server item itself (if it's already an object)
-      //    (b) Our hintProduct (if we just added something)
+      //    (a) The server item itself (if it was a populated object)
+      //    (b) Our hintProduct (if we just added/updated something)
       //    (c) Our current local state
       let populatedProduct: Product;
 
-      if (this.isProductObject(serverItem.product)) {
-        populatedProduct = serverItem.product;
+      if (this.isProductObject(productField)) {
+        populatedProduct = productField;
+      } else if (this.isProductObject(productIdField)) {
+        populatedProduct = productIdField;
       } else if (hintProduct?._id === productId) {
         populatedProduct = hintProduct;
       } else {
@@ -300,7 +325,7 @@ export class CartService {
   }
 
   loadInitialCart() {
-    this.loadCart();
+    this.initializeCart();
   }
 
   private isProductObject(p: Product | string | undefined): p is Product {
