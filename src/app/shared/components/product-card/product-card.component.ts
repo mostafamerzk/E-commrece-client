@@ -37,7 +37,7 @@ export class ProductCardComponent {
 
   // Local state
   readonly isAddingToCart = signal(false);
-
+  readonly isAddingToWishlist = signal(false);
   // Injected services
   private cart = inject(CartService);
   private wishlist = inject(WishlistService);
@@ -48,8 +48,9 @@ export class ProductCardComponent {
     this.wishlist.items().some((p) => p._id === this.product()._id)
   );
 
-  readonly isInCart = computed(() => this.cart.isInCart(this.product()._id));
-
+  readonly isInCart = computed(() =>
+    this.cart.items().some((item) => item.product._id === this.product()._id)
+  );
   addToCart(event: Event): void {
     event.stopPropagation();
     if (this.product().stock === 0 || this.isInCart()) return;
@@ -77,9 +78,8 @@ export class ProductCardComponent {
 
   toggleWishlist(event: Event): void {
     event.stopPropagation();
-    this.wishlist.toggleWishlist(this.product()._id);
+    this.wishlist.toggleWishlist(this.product()._id, this.product()).subscribe();
   }
-
   navigateToDetail(): void {
     this.router.navigate(['/products', this.product()._id]);
   }
