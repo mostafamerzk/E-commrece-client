@@ -8,6 +8,7 @@ import {
   AddToCartPayload,
   UpdateCartPayload,
   CartItem,
+  RawCartItem,
 } from '../models/cart.model';
 import { MessageResponse } from '../models/shared.model';
 import { StorageService } from './storage.service';
@@ -41,32 +42,43 @@ export class CartService {
   });
 
   constructor() {
-    this.loadCart();
+    // Initial load from storage (guest) or fetch from API
+    this.initializeCart();
 
-    effect(
-      () => {
-        if (this.authService.isLoggedIn()) {
+    // Re-sync or re-load whenever logged-in status changes
+    effect(() => {
+      const loggedIn = this.authService.isLoggedIn();
+      // We don't want to run this synchronously in the effect
+      // to avoid 'signal writes' warnings and recursive loops.
+      // setTimeout or a microtask ensures it runs after current detection cycle.
+      Promise.resolve().then(() => {
+        if (loggedIn) {
           this.syncCartWithBackend().subscribe();
         } else {
-          this.loadCart();
+          this.loadGuestCart();
         }
-      },
-      { allowSignalWrites: true }
-    );
+      });
+    });
   }
 
-  private loadCart() {
+  private initializeCart() {
     if (this.authService.isLoggedIn()) {
       this.getCart().subscribe();
     } else {
-      const guestCart = this.storage.getItem<CartItem[]>(this.GUEST_CART_KEY);
-      if (guestCart) {
-        this._cart.set({
-          userId: 'guest',
-          products: guestCart,
-          totalPrice: guestCart.reduce((total, item) => total + item.price * item.quantity, 0),
-        });
-      }
+      this.loadGuestCart();
+    }
+  }
+
+  private loadGuestCart() {
+    const guestCart = this.storage.getItem<CartItem[]>(this.GUEST_CART_KEY);
+    if (guestCart) {
+      this._cart.set({
+        userId: 'guest',
+        products: guestCart,
+        totalPrice: guestCart.reduce((total, item) => total + item.price * item.quantity, 0),
+      });
+    } else {
+      this._cart.set(null);
     }
   }
 
@@ -78,11 +90,24 @@ export class CartService {
       } as CartResponse);
     }
     return this.api.get<CartResponse>(this.endpoint).pipe(
+      catchError((err) => {
+        // Handle "Cart Not Found" (400) by initializing an empty cart for the user.
+        // We check err.status (for raw HTTP errors) and err.message (for errors processed by interceptor).
+        const errMsg = err.error?.message || err.message || '';
+        if (err.status === 400 || errMsg.includes('Cart Not Found')) {
+          const emptyCart: Cart = {
+            userId: this.authService.currentUser()?._id || 'unknown',
+            products: [],
+            totalPrice: 0,
+          };
+          this._cart.set(emptyCart);
+          return of({ message: 'Initialized empty cart', cart: emptyCart } as CartResponse);
+        }
+        throw err;
+      }),
       tap((res) => {
         if (res?.cart) {
           this.mergeServerCart(res.cart);
-        } else {
-          console.warn('Backend returned no cart for user');
         }
       })
     );
@@ -198,11 +223,23 @@ export class CartService {
   private mergeServerCart(serverCart: Cart, newProduct?: Product): void {
     const currentProducts = this._cart()?.products ?? [];
 
-    const mergedProducts = serverCart.products.map((serverItem) => {
-      // ✅ Backend بيبعت productId مش product
-      const productId =
-        (serverItem as CartItem & { productId?: string }).productId ||
-        (typeof serverItem.product === 'string' ? serverItem.product : serverItem.product?._id);
+    const mergedProducts = (serverCart.products as RawCartItem[]).map((serverItem) => {
+      let productId: string | undefined;
+
+      const productField = serverItem.product;
+      const productIdField = serverItem.productId;
+
+      if (typeof productField === 'string') {
+        productId = productField;
+      } else if (this.isProductObject(productField)) {
+        productId = productField._id;
+      } else if (typeof productIdField === 'string') {
+        productId = productIdField;
+      }
+
+      if (this.isProductObject(productField)) {
+        return { ...serverItem, product: productField };
+      }
 
       const existing = currentProducts.find((p) => p.product?._id === productId);
       if (existing) return { ...serverItem, product: existing.product };
@@ -211,12 +248,14 @@ export class CartService {
         return { ...serverItem, product: newProduct };
       }
 
-      return serverItem;
+      return { ...serverItem, product: { _id: productId } as Product };
     });
 
     this._cart.set({ ...serverCart, products: mergedProducts });
   }
-
+  private isProductObject(value: unknown): value is Product {
+    return typeof value === 'object' && value !== null && '_id' in value;
+  }
   removeItem(productId: string): Observable<CartResponse> {
     if (!this.authService.isLoggedIn()) {
       const currentItems = this.items().filter((i) => i.product._id !== productId);
@@ -291,7 +330,7 @@ export class CartService {
   }
 
   loadInitialCart() {
-    this.loadCart();
+    this.initializeCart();
   }
 
   /** Immediately patches the quantity in the local signal without a network call. */

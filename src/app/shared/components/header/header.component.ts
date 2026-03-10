@@ -4,9 +4,9 @@ import {
   HostListener,
   inject,
   OnDestroy,
-  OnInit,
   input,
   output,
+  OnInit,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
@@ -68,8 +68,6 @@ export class HeaderComponent implements OnDestroy, OnInit {
   }
 
   constructor() {
-    // Real-time search — ينتظر 400ms بعد آخر حرف
-
     this.searchSubject
       .pipe(
         debounceTime(400),
@@ -157,7 +155,6 @@ export class HeaderComponent implements OnDestroy, OnInit {
     this.isScrolled.set(window.scrollY > 10);
   }
 
-  // ── Click Outside — يقفل الـ dropdown ────────────────────
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
     const target = event.target as HTMLElement;

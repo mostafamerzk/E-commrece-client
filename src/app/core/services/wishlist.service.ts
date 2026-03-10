@@ -30,18 +30,15 @@ export class WishlistService {
       tap((res) => {
         if (!Array.isArray(res.wishlist)) return;
 
-        // ✅ لو populated objects استخدمهم، لو strings امسح بس اللي مش موجود
         const first = res.wishlist[0];
         if (first && typeof first === 'object') {
           this._items.set(res.wishlist as Product[]);
         }
-        // لو strings — الـ optimistic update كافي، مش بنعمل حاجة
       })
     );
   }
 
   private addToWishlist(productId: string, product?: Product): Observable<WishlistResponse> {
-    // ✅ Optimistic update بالـ product object كامل
     this._items.update((items) => {
       if (items.some((p) => p._id === productId)) return items;
       return [...items, product ?? ({ _id: productId } as Product)];
@@ -49,15 +46,13 @@ export class WishlistService {
 
     return this.api.post<WishlistResponse, object>(`${this.endpoint}/${productId}`, {}).pipe(
       tap((res) => {
-        // ✅ الـ backend بيرجع strings — نحافظ على الـ items اللي عندنا
-        // ونضيف أي ID جديد مش عنده object بعد
         const ids = res.wishlist as string[];
         this._items.update((items) => {
           const existingIds = new Set(items.map((p) => p._id));
           const missingIds = ids.filter((id) => !existingIds.has(id));
           return [
-            ...items.filter((p) => ids.includes(p._id)), // شيل اللي اتحذف
-            ...missingIds.map((id) => ({ _id: id }) as Product), // ضيف الجديد
+            ...items.filter((p) => ids.includes(p._id)),
+            ...missingIds.map((id) => ({ _id: id }) as Product),
           ];
         });
       }),
@@ -73,12 +68,10 @@ export class WishlistService {
 
   // ── DELETE /wish/user/wishlist/:id ────────────────────────
   private removeFromWishlist(productId: string): Observable<WishlistResponse> {
-    // ✅ Optimistic update أولاً
     this._items.update((items) => items.filter((p) => p._id !== productId));
 
     return this.api.delete<WishlistResponse>(`${this.endpoint}/${productId}`).pipe(
       catchError((err: HttpErrorResponse) => {
-        // فشل — نرجع المنتج للـ _items
         this.getWishlist().subscribe();
         throw err;
       })
@@ -100,7 +93,6 @@ export class WishlistService {
   ): Observable<WishlistResponse | GetWishlistResponse> {
     if (this.isToggling().has(productId)) return of({ message: 'pending', wishlist: [] });
 
-    // ✅ قفل
     this.isToggling.update((set) => new Set(set).add(productId));
 
     const action$ = this.isInWishlist(productId)

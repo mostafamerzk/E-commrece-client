@@ -33,7 +33,7 @@ export class AuthService {
   private baseUrl = environment.apiUrl;
 
   // Core signals for UI reactivity
-  currentUser = signal<User | null>(this.storage.getItem<User>('user'));
+  currentUser = signal<User | null>(this.getUserFromStorage());
   private _token = signal<string | null>(localStorage.getItem('access_token'));
 
   // Computed signals
@@ -78,8 +78,10 @@ export class AuthService {
   }
 
   async getProfile(): Promise<User> {
-    const response = await firstValueFrom(this.http.get<User>(`${this.baseUrl}/user/profile`));
-    return response;
+    const response = await firstValueFrom(
+      this.http.get<ProfileResponse | User>(`${this.baseUrl}/user/profile`)
+    );
+    return 'data' in response ? response.data : response;
   }
 
   async register(payload: RegisterPayload): Promise<AuthResponse> {
