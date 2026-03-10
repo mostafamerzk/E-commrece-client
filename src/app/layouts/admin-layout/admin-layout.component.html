@@ -1,0 +1,37 @@
+<div class="admin-layout">
+  <!-- Top Header -->
+  <header class="admin-header">
+    <app-admin-header
+      [sidebarExpanded]="sidebarExpanded()"
+      (toggleSidebar)="toggleSidebar()"
+    ></app-admin-header>
+  </header>
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" [class.expanded]="sidebarExpanded()">
+    <!-- Close button for mobile -->
+    <button class="sidebar-close-btn" (click)="toggleSidebar()" aria-label="Close sidebar">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M6 18L18 6M6 6l12 12"
+        />
+      </svg>
+    </button>
+    <app-admin-sidebar
+      [expanded]="sidebarExpanded()"
+      (toggleSidebar)="toggleSidebar()"
+    ></app-admin-sidebar>
+  </aside>
+
+  <!-- Mobile Backdrop - Click to close sidebar -->
+
+  <!-- Main Content Area -->
+  <main class="admin-main" [class.collapsed]="!sidebarExpanded()">
+    <div class="admin-content">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>

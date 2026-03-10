@@ -24,6 +24,7 @@ import { Order, OrderStatus } from './order.model';
  * Query params for GET /admin/users
  */
 export interface AdminUserQueryParams {
+  [key: string]: string | undefined;
   search?: string;
   page?: string;
   limit?: string;
@@ -34,6 +35,7 @@ export interface AdminUserQueryParams {
  * More filter options than the public endpoint — admin can see by stock, rating, etc.
  */
 export interface AdminProductQueryParams {
+  [key: string]: string | undefined;
   page?: string;
   limit?: string;
   sort?: string;
@@ -41,7 +43,6 @@ export interface AdminProductQueryParams {
   minPrice?: string;
   maxPrice?: string;
   rating?: string;
-  // "true" or "false" as string — HTTP params are always strings
   inStock?: string;
   search?: string;
 }
@@ -51,6 +52,7 @@ export interface AdminProductQueryParams {
  * Extensive filter set because admins need to find specific orders quickly.
  */
 export interface AdminOrderQueryParams {
+  [key: string]: string | OrderStatus | undefined;
   page?: string;
   limit?: string;
   sort?: string;
@@ -59,7 +61,6 @@ export interface AdminOrderQueryParams {
   shippingStatus?: string;
   minTotal?: string;
   maxTotal?: string;
-  // ISO date strings e.g. "2024-01-01"
   startDate?: string;
   endDate?: string;
 }
@@ -68,6 +69,7 @@ export interface AdminOrderQueryParams {
  * Query params for GET /admin/banners
  */
 export interface AdminBannerQueryParams {
+  [key: string]: string | undefined;
   page?: string;
   limit?: string;
   sort?: string;
@@ -133,4 +135,25 @@ export interface AdminOrdersResponse {
 export interface AdminOrderResponse {
   message: string;
   data: Order;
+}
+
+/**
+ * KPI shape for the Admin Dashboard
+ */
+export interface AdminStat {
+  label: string;
+  value: number;
+  icon: string;
+  iconBg: string;
+  iconColor: string;
+  route: string;
+  change?: number; // percentage change this month
+}
+
+/**
+ * Response from GET /admin/stats
+ */
+export interface AdminStatsResponse {
+  message: string;
+  stats: AdminStat[];
 }

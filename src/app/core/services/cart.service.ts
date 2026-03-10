@@ -222,7 +222,7 @@ export class CartService {
     return this.api.delete<CartResponse>(`${this.endpoint}/${productId}`).pipe(
       tap((res) => {
         if (res?.cart) {
-          this.mergeServerCart(res.cart);
+          this.mergeServerCart(res.cart); // ✅ بدل _cart.set
         }
       })
     );

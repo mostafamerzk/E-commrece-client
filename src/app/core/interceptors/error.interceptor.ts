@@ -39,8 +39,14 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       }
 
       console.error('[API ERROR]:', message);
-      toastService?.show(message);
 
+      // Skip toast for expected scenarios like "Cart Not Found" for a new user
+      if (message !== 'Cart Not Found') {
+        toastService?.show(message);
+      }
+
+      // Re-throw the original error instead of new Error(message)
+      // This allows services to read status codes and specialized messages.
       return throwError(() => error);
     })
   );
