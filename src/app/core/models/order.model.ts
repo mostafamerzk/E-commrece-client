@@ -6,7 +6,7 @@
 //          OrderListComponent, OrderDetailComponent, AdminOrdersComponent.
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { Pagination } from './shared.model';
+import { CloudinaryImage, Pagination } from './shared.model';
 
 /**
  * The valid values for an order's current status.
@@ -68,9 +68,16 @@ export interface ShippingAddress {
  */
 export interface OrderItem {
   productId: string;
+  title: string;
+  description?: string;
   quantity: number;
-  // The unit price at time of purchase — locked in, not affected by later price changes
+  // The price after discount at time of purchase
+  unitPrice: number;
+  // The original price before discount at time of purchase
   price: number;
+  // The discount percentage at time of purchase
+  discount?: number;
+  mainImage: CloudinaryImage;
 }
 
 /**
@@ -79,30 +86,16 @@ export interface OrderItem {
  */
 export interface Order {
   _id: string;
-
-  // Human-readable order reference, e.g. "ORD-12345"
-  // More user-friendly than the MongoDB ObjectId for customer service
   orderNumber: string;
-
   orderStatus: OrderStatus;
-
   paymentStatus: PaymentStatus;
-
   paymentMethod: PaymentMethod;
-
-  items: OrderItem[];
-
+  products: OrderItem[];
   shippingAddress: ShippingAddress;
-
   // The final amount the user paid or owes, after discounts and shipping
-  totalAmount: number;
-
-  // Optional: present if the user applied a coupon code
+  totalPrice: number;
   couponCode?: string;
-
-  // The MongoDB ObjectId of the user who placed the order
   userId: string;
-
   createdAt: string;
   updatedAt?: string;
 }
