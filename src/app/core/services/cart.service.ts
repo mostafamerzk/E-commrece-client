@@ -232,9 +232,13 @@ export class CartService {
       if (typeof productField === 'string') {
         productId = productField;
       } else if (this.isProductObject(productField)) {
-        productId = productField._id;
+        productId = productField._id || productField.id;
       } else if (typeof productIdField === 'string') {
         productId = productIdField;
+      } else if (this.isProductObject(productIdField)) {
+        productId = productIdField._id || productIdField.id;
+      } else if (serverItem._id) {
+        productId = serverItem._id;
       }
 
       if (this.isProductObject(productField)) {
@@ -251,10 +255,11 @@ export class CartService {
       return { ...serverItem, product: { _id: productId } as Product };
     });
 
-    this._cart.set({ ...serverCart, products: mergedProducts });
+    this._cart.set({ ...serverCart, products: [...mergedProducts] });
   }
-  private isProductObject(value: unknown): value is Product {
-    return typeof value === 'object' && value !== null && '_id' in value;
+  private isProductObject(p: (Product & { id?: string }) | string | undefined): p is Product {
+    if (!p || typeof p !== 'object') return false;
+    return '_id' in p || 'id' in p;
   }
   removeItem(productId: string): Observable<CartResponse> {
     if (!this.authService.isLoggedIn()) {
@@ -344,7 +349,7 @@ export class CartService {
 
       return {
         ...current,
-        products: updatedProducts,
+        products: [...updatedProducts],
         totalPrice: updatedProducts.reduce((sum, item) => {
           if (!item.product) return sum;
           const qty = item.product._id === productId ? newQty : item.quantity;

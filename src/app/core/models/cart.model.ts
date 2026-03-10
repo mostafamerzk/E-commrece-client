@@ -20,8 +20,8 @@ export interface CartItem {
  * Used only during the normalization phase in CartService.
  */
 export interface RawCartItem {
-  product?: Product | string;
-  productId?: Product | string;
+  product?: (Product & { id?: string }) | string;
+  productId?: (Product & { id?: string }) | string;
   quantity: number;
   price: number;
   _id?: string;

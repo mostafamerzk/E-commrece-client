@@ -192,7 +192,7 @@ export class ProductDetailComponent {
   toggleWishlist(): void {
     const p = this.product();
     if (!p) return;
-    this.wishlist.toggleWishlist(p._id);
+    this.wishlist.toggleWishlist(p._id, p).subscribe();
   }
 
   removeFromCart(): void {
