@@ -9,7 +9,7 @@ import {
   PaymentStatus,
 } from '../../../../core/models/order.model';
 import { SkeletonModule } from 'primeng/skeleton';
-import { PaginatorModule } from 'primeng/paginator';
+import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 
 @Component({
   selector: 'app-order-list',
@@ -104,10 +104,9 @@ export class OrderListComponent implements OnInit {
       });
   }
 
-  onPageChange(event: Record<string, unknown>) {
-    const page = event['page'] as number | undefined;
-    if (page !== undefined) {
-      this.currentPage.set(page + 1);
+  onPageChange(event: PaginatorState) {
+    if (event.page !== undefined) {
+      this.currentPage.set(event.page + 1);
       this.fetchOrders();
     }
   }
