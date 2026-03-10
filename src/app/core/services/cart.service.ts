@@ -120,7 +120,11 @@ export class CartService {
     return of(this.getGuestCartResponse(currentItems));
   }
 
-  updateQuantity(productId: string, payload: UpdateCartPayload): Observable<CartResponse> {
+  updateQuantity(
+    productId: string,
+    payload: UpdateCartPayload,
+    product?: Product
+  ): Observable<CartResponse> {
     if (!this.authService.isLoggedIn()) {
       const currentItems = this.items().map((i) => ({ ...i }));
       const itemIndex = currentItems.findIndex((i) => i.product._id === productId);
@@ -148,7 +152,7 @@ export class CartService {
       .pipe(
         tap((res) => {
           if (res?.cart) {
-            this.mergeServerCart(res.cart);
+            this.mergeServerCart(res.cart, product);
           } else {
             console.warn('Backend returned empty cart in PATCH response');
           }

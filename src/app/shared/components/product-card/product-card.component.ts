@@ -37,7 +37,7 @@ export class ProductCardComponent {
 
   // Local state
   readonly isAddingToCart = signal(false);
-
+  readonly isAddingToWishlist = signal(false);
   // Injected services
   private cart = inject(CartService);
   private wishlist = inject(WishlistService);

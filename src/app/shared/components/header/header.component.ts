@@ -30,7 +30,9 @@ export class HeaderComponent implements OnDestroy, OnInit {
   newcurrent = JSON.parse(localStorage.getItem('user') || 'null');
 
   ngOnInit(): void {
-    console.log(this.newcurrent?.data?.wishlist?.length || 0);
+    if (this.authService.isLoggedIn()) {
+      this.wishlistService.getWishlist().subscribe();
+    }
   }
   private readonly authService = inject(AuthService);
   private readonly cartService = inject(CartService);
@@ -50,7 +52,7 @@ export class HeaderComponent implements OnDestroy, OnInit {
 
   private readonly searchSubject = new Subject<string>();
   private readonly destroy$ = new Subject<void>();
-  readonly wishlistCount = signal(0);
+  readonly wishlistCount = this.wishlistService.itemCount;
 
   // ── Derived State ─────────────────────────────────────────
   readonly isLoggedIn = this.authService.isLoggedIn;
