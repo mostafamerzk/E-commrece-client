@@ -1,0 +1,127 @@
+<main class="orders-page">
+  <div class="orders-container">
+    <!-- Header — mirrors .cart-header -->
+    <header class="orders-header">
+      <div class="header-titles">
+        <h1>My Orders</h1>
+        <p class="item-count">Track, manage and view details of all your past purchases.</p>
+      </div>
+    </header>
+
+    @if (isLoading()) {
+      <div class="orders-skeleton-list">
+        @for (i of [1, 2, 3]; track i) {
+          <div class="order-skeleton-card">
+            <div class="skeleton-main">
+              <p-skeleton width="150px" height="24px"></p-skeleton>
+              <div class="skeleton-meta">
+                <p-skeleton width="100px" height="18px"></p-skeleton>
+                <p-skeleton width="100px" height="18px"></p-skeleton>
+              </div>
+            </div>
+            <div class="skeleton-side">
+              <p-skeleton width="80px" height="32px"></p-skeleton>
+              <p-skeleton width="48px" height="48px" borderRadius="12px"></p-skeleton>
+            </div>
+          </div>
+        }
+      </div>
+    } @else if (error()) {
+      <!-- Error State -->
+      <div class="orders-error">
+        <div class="error-icon-box">
+          <i class="pi pi-exclamation-circle text-rose-500"></i>
+        </div>
+        <h3>Oops! Something went wrong</h3>
+        <p>{{ error() }}</p>
+        <button (click)="fetchOrders()" class="btn-retry">Try Again</button>
+      </div>
+    } @else if (orders().length > 0) {
+      <!-- Order Cards -->
+      <div class="orders-list">
+        @for (order of orders(); track order._id) {
+          <div [routerLink]="['/orders', order._id]" class="order-card">
+            <!-- Status Side Accent -->
+            <div
+              class="status-accent"
+              [ngClass]="getStatusColor(order.orderStatus).split(' ')[0]"
+            ></div>
+
+            <div class="order-content">
+              <!-- Order Info -->
+              <div class="order-info">
+                <div class="order-header-row">
+                  <span class="order-number">#{{ order.orderNumber }}</span>
+                  <span class="status-badge" [ngClass]="getStatusColor(order.orderStatus)">
+                    {{ order.orderStatus }}
+                  </span>
+                </div>
+
+                <div class="order-meta">
+                  <div class="meta-item">
+                    <i class="pi pi-calendar"></i>
+                    <span>{{ order.createdAt | date: 'MMMM d, y' }}</span>
+                  </div>
+                  <div class="meta-item">
+                    <i class="pi pi-shopping-bag"></i>
+                    <span>{{ order.products.length }} Items</span>
+                  </div>
+                  <div class="meta-item payment-method">
+                    <i [class]="getPaymentMethodIcon(order.paymentMethod)"></i>
+                    <span>{{ formatPaymentMethod(order.paymentMethod) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Price & Action -->
+              <div class="order-actions">
+                <div class="order-price">
+                  <p class="price-label">Total Amount</p>
+                  <p class="price-value">{{ order.totalPrice | currency }}</p>
+                  <span
+                    class="payment-status-badge"
+                    [ngClass]="getPaymentStatusColor(order.paymentStatus)"
+                  >
+                    {{ order.paymentStatus }}
+                  </span>
+                </div>
+
+                <div class="btn-view-detail">
+                  <i class="pi pi-chevron-right"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+
+      <!-- Pagination -->
+      @if (totalOrders() > pageSize()) {
+        <div class="pagination-wrapper">
+          <p-paginator
+            [rows]="pageSize()"
+            [totalRecords]="totalOrders()"
+            [first]="(currentPage() - 1) * pageSize()"
+            (onPageChange)="onPageChange($event)"
+            [showCurrentPageReport]="true"
+            currentPageReportTemplate="Showing {first} to {last} of {totalRecords}"
+            [rowsPerPageOptions]="[10, 20, 30]"
+          ></p-paginator>
+        </div>
+      }
+    } @else {
+      <!-- Empty State — mirrors .cart-empty -->
+      <div class="orders-empty">
+        <div class="empty-icon-box">
+          <i class="pi pi-shopping-bag"></i>
+        </div>
+        <h2>No orders yet</h2>
+        <p>
+          It looks like you haven't placed any orders yet. Start shopping and discover our amazing
+          products!
+        </p>
+        <a routerLink="/products" class="btn-start-shopping"> Start Shopping </a>
+      </div>
+    }
+  </div>
+</main>
