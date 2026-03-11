@@ -131,6 +131,7 @@ export interface ProductQueryParams {
 export interface ProductsResponse {
   message: string;
   products: Product[];
+  docs?: Product[];
   pagination: Pagination;
 }
 

@@ -1,35 +1,48 @@
 import { inject } from '@angular/core';
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { catchError, throwError, EMPTY } from 'rxjs';
+import { Router } from '@angular/router';
 import { AUTH_FACADE, TOAST_FACADE } from '../tokens/app.tokens';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AUTH_FACADE, { optional: true });
   const toastService = inject(TOAST_FACADE, { optional: true });
+  const router = inject(Router);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      // ✅ 409 — بنتجاهله، الـ wishlist service بتتعامل معاه
+      // ✅ 409 — re-throw silently so the calling service/component can handle it
+      // No toast shown — the component displays its own error message
       if (error.status === 409) {
-        return EMPTY;
+        return throwError(() => error);
       }
 
-      let message = 'Something went wrong';
+      const serverMessage: string = error.error?.message ?? '';
 
-      if (error.error?.message) {
-        message = error.error.message;
-      } else if (error.status === 0) {
+      // ── Detect expired / invalid JWT regardless of status code ──────────
+      // Some backends return 500 instead of 401 for jwt errors
+      const isJwtError =
+        error.status === 401 ||
+        (error.status === 500 && /jwt (expired|invalid|malformed)/i.test(serverMessage));
+
+      if (isJwtError) {
+        authService?.logout();
+        router.navigate(['/auth/login']);
+        toastService?.show('Session expired — please login again');
+        return EMPTY; // stop propagation, no need to re-throw
+      }
+
+      // ── Build user-facing message ────────────────────────────────────────
+      let message = serverMessage || 'Something went wrong';
+
+      if (error.status === 0) {
         message = 'Cannot reach server — check your connection';
       } else if (error.status === 400) {
-        message = 'Invalid request — please check your data';
-      } else if (error.status === 401) {
-        message = 'Unauthorized — please login again';
-        localStorage.removeItem('access_token');
-        authService?.logout();
+        message = serverMessage || 'Invalid request — please check your data';
       } else if (error.status === 403) {
         message = 'Forbidden — you do not have permission for this action';
       } else if (error.status === 404) {
-        message = 'Resource not found';
+        message = serverMessage || 'Resource not found';
       } else if (error.status === 422) {
         message = 'Validation error — please check the input fields';
       } else if (error.status === 429) {
@@ -40,13 +53,12 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
       console.error('[API ERROR]:', message);
 
-      // Skip toast for expected scenarios like "Cart Not Found" for a new user
-      if (message !== 'Cart Not Found') {
+      // Skip toast for expected scenarios
+      const silentMessages = ['Cart Not Found'];
+      if (!silentMessages.includes(serverMessage)) {
         toastService?.show(message);
       }
 
-      // Re-throw the original error instead of new Error(message)
-      // This allows services to read status codes and specialized messages.
       return throwError(() => error);
     })
   );

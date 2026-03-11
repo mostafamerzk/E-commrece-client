@@ -17,7 +17,19 @@ import { CloudinaryImage } from './shared.model';
  * 'seller'   → can create and manage their own product listings
  * 'admin'    → full platform control: users, all products, orders, banners
  */
-export type UserRole = 'customer' | 'seller' | 'admin';
+export type UserRole = 'user' | 'seller' | 'admin';
+
+/**
+ * Address structure for user profile and orders.
+ */
+export interface Address {
+  _id?: string;
+  street: string;
+  city: string;
+  country: string;
+  postalCode: string;
+  phone: string;
+}
 
 /**
  * The core User object.
@@ -57,12 +69,21 @@ export interface User {
 
   isLogged?: boolean;
   provider?: string;
-
+  address?: {
+    street: string;
+    city: string;
+    country: string;
+    zipCode: string;
+  };
   // Seller-specific fields — only populated when role === 'seller'.
   // Optional because customer and admin users do not have a store.
   storeName?: string;
   storeDescription?: string;
   phone?: string;
+
+  // Array of user addresses (plural 'addresses' for frontend consistency, singular 'address' for backend compatibility)
+  addresses?: Address[];
+  address?: Address[];
 
   // Timestamps
   createdAt?: string;

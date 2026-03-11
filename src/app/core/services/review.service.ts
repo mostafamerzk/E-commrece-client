@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { ApiService } from './api.service';
 import { API_ENDPOINTS } from '../constants/api-endpoints';
 import {
@@ -20,10 +20,10 @@ export class ReviewService {
    * POST /review/:productId
    */
   addReview(productId: string, payload: AddReviewPayload): Observable<ReviewResponse> {
-    return this.apiService.post<ReviewResponse, AddReviewPayload>(
-      `${API_ENDPOINTS.REVIEWS}/${productId}`,
-      payload
-    );
+    const endpoint = `${API_ENDPOINTS.REVIEWS}/${productId}`;
+    console.log('[ReviewService] 📤 POST endpoint:', endpoint);
+    console.log('[ReviewService] 📤 Payload:', payload);
+    return this.apiService.post<ReviewResponse, AddReviewPayload>(endpoint, payload);
   }
 
   /**
@@ -34,7 +34,14 @@ export class ReviewService {
     productId: string,
     params?: Record<string, unknown>
   ): Observable<ReviewsResponse> {
-    return this.apiService.get<ReviewsResponse>(`${API_ENDPOINTS.REVIEWS}/${productId}`, params);
+    return this.apiService
+      .get<ReviewsResponse>(`${API_ENDPOINTS.REVIEWS}/${productId}`, params)
+      .pipe(
+        map((res) => ({
+          ...res,
+          reviews: res.docs || res.reviews || [],
+        }))
+      );
   }
 
   /**

@@ -1,0 +1,76 @@
+.grid-container {
+  min-height: 400px;
+}
+
+.filtering-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(1px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  border-radius: var(--radius-xl);
+}
+
+.spinner-sm {
+  width: 24px;
+  height: 24px;
+  border-width: 2px;
+}
+
+/* ─── Skeleton Styles ─── */
+.skeleton-card {
+  pointer-events: none;
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #f8fafc 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-md);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-banner-image {
+  height: 180px;
+  border-radius: var(--radius-2xl) var(--radius-2xl) 0 0;
+}
+
+.skeleton-title {
+  height: 1.25rem;
+  width: 50%;
+  margin-bottom: 0.75rem;
+}
+
+.skeleton-text {
+  height: 0.875rem;
+  width: 80%;
+  margin-bottom: 1rem;
+}
+
+.skeleton-button {
+  height: 2rem;
+  width: 70px;
+}
+
+.banner-card {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.3s ease;
+}
+
+.banner-card.deleting {
+  opacity: 0.5;
+  transform: scale(0.98);
+}

@@ -22,27 +22,38 @@
           </div>
 
           <div class="card-body">
-            <form [formGroup]="shippingForm" novalidate>
-              <div class="form-grid-2">
-                <!-- Full Name -->
-                <div class="form-group">
-                  <label for="recipientName">Full Name</label>
-                  <input
-                    type="text"
-                    id="recipientName"
-                    formControlName="recipientName"
-                    placeholder="e.g. John Doe"
-                    class="form-input"
-                    [class.error]="fieldInvalid('recipientName')"
-                  />
-                  @if (fieldInvalid('recipientName')) {
-                    <span class="field-error">
-                      <i class="pi pi-exclamation-circle"></i>
-                      Name is required
-                    </span>
-                  }
-                </div>
+            <div class="checkout-form-intro">
+              <p class="text-sm text-gray-600 mb-6">
+                Please provide your shipping information below. You can save this address to your
+                profile for faster checkout next time.
+              </p>
+            </div>
 
+            <!-- Saved Addresses Select -->
+            @if (user()?.addresses?.length) {
+              <div class="saved-addresses-select-wrapper">
+                <label
+                  class="form-label text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2 block"
+                >
+                  Use a saved address
+                </label>
+                <div class="select-wrapper">
+                  <select
+                    class="form-select mb-6"
+                    (change)="onSelectSavedAddressByIndex($any($event.target).value)"
+                  >
+                    <option value="" disabled selected>Select from your saved addresses</option>
+                    @for (addr of user()?.addresses; track addr._id; let i = $index) {
+                      <option [value]="i">{{ addr.street }}, {{ addr.city }}</option>
+                    }
+                  </select>
+                  <i class="pi pi-chevron-down select-icon"></i>
+                </div>
+              </div>
+            }
+
+            <form [formGroup]="shippingForm" novalidate>
+              <div class="form-grid-1">
                 <!-- Phone -->
                 <div class="form-group">
                   <label for="phone">Phone Number</label>
@@ -127,6 +138,17 @@
                 <!-- Hidden Country (Defaulted to Egypt in Component) -->
                 <input type="hidden" formControlName="country" />
               </div>
+
+              <!-- Save Address Checkbox -->
+              @if (authService.isLoggedIn()) {
+                <div class="save-address-check">
+                  <label class="checkbox-container">
+                    <input type="checkbox" formControlName="saveAddress" />
+                    <span class="checkmark-box"></span>
+                    <span class="checkbox-text">Save this address to my profile for later</span>
+                  </label>
+                </div>
+              }
             </form>
           </div>
         </section>
@@ -300,19 +322,30 @@
                 [(ngModel)]="couponCode"
                 placeholder="Enter code"
                 class="form-input coupon-input"
+                [disabled]="!!couponSuccess() || isApplyingCoupon()"
               />
-              <button
-                type="button"
-                class="btn-coupon"
-                (click)="applyCoupon()"
-                [disabled]="!couponCode || isApplyingCoupon()"
-              >
-                @if (isApplyingCoupon()) {
-                  <i class="pi pi-spin pi-spinner"></i>
-                } @else {
-                  Apply
-                }
-              </button>
+              @if (couponSuccess()) {
+                <button
+                  type="button"
+                  class="btn-coupon btn-coupon--remove"
+                  (click)="removeCoupon()"
+                >
+                  Remove
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  class="btn-coupon"
+                  (click)="applyCoupon()"
+                  [disabled]="!couponCode || isApplyingCoupon()"
+                >
+                  @if (isApplyingCoupon()) {
+                    <i class="pi pi-spin pi-spinner"></i>
+                  } @else {
+                    Apply
+                  }
+                </button>
+              }
             </div>
             @if (couponError()) {
               <div class="coupon-feedback coupon-feedback--error">

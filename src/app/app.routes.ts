@@ -40,6 +40,11 @@ export const routes: Routes = [
           import('./features/cart/pages/cart/cart.component').then((m) => m.CartComponent),
       },
       {
+        path: 'profile',
+        loadComponent: () =>
+          import('./shared/components/profile/profile.component').then((m) => m.ProfileComponent),
+      },
+      {
         path: 'orders',
         canActivate: [authGuard],
         children: [
@@ -152,10 +157,81 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'users',
+        loadComponent: () =>
+          import('./features/admin/pages/users/users.component').then((m) => m.AdminUsersComponent),
+      },
+      {
+        path: 'sellers',
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/admin/pages/sellers/sellers.component').then(
+                (m) => m.AdminSellersComponent
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./features/admin/pages/sellers/seller-detail/seller-detail.component').then(
+                (m) => m.SellerDetailComponent
+              ),
+          },
+        ],
+      },
+      {
+        path: 'products',
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/admin/pages/products/products.component').then(
+                (m) => m.AdminProductsComponent
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./features/admin/pages/products/product-detail/product-detail.component').then(
+                (m) => m.ProductDetailComponent
+              ),
+          },
+        ],
+      },
+      {
         path: 'categories',
         loadComponent: () =>
           import('./features/admin/pages/categories/categories.component').then(
             (m) => m.CategoriesComponent
+          ),
+      },
+      {
+        path: 'orders',
+        loadComponent: () =>
+          import('./features/admin/pages/orders/orders.component').then(
+            (m) => m.AdminOrdersComponent
+          ),
+      },
+      {
+        path: 'coupons',
+        loadComponent: () =>
+          import('./features/admin/pages/coupons/coupons.component').then(
+            (m) => m.AdminCouponsComponent
+          ),
+      },
+      {
+        path: 'reviews',
+        loadComponent: () =>
+          import('./features/admin/pages/reviews/reviews.component').then(
+            (m) => m.AdminReviewsComponent
+          ),
+      },
+      {
+        path: 'banners',
+        loadComponent: () =>
+          import('./features/admin/pages/banners/banners.component').then(
+            (m) => m.AdminBannersComponent
           ),
       },
     ],

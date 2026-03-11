@@ -1,225 +1,240 @@
-import { Component, OnInit, inject, signal, computed, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { TableModule } from 'primeng/table';
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { FileUploadModule } from 'primeng/fileupload';
-import { ToastModule } from 'primeng/toast';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { MessageService, ConfirmationService } from 'primeng/api';
-import { CategoryService } from '../../../../core/services/category.service';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import {
+  FormBuilder,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
+import { listAnimation, fadeInOut } from '../../../../core/animations/admin.animations';
 import { Category } from '../../../../core/models/category.model';
+import { Pagination } from '../../../../core/models/shared.model';
+import { AdminService } from '../../../../core/services/admin.service';
 
 @Component({
   selector: 'app-categories',
   standalone: true,
-  imports: [
-    CommonModule,
-    FormsModule,
-    TableModule,
-    ButtonModule,
-    DialogModule,
-    InputTextModule,
-    FileUploadModule,
-    ToastModule,
-    ConfirmDialogModule,
-  ],
-  providers: [MessageService, ConfirmationService],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule],
   templateUrl: './categories.component.html',
-  styleUrl: './categories.components.css',
-  encapsulation: ViewEncapsulation.None,
+  styleUrl: './categories.component.css',
+  animations: [listAnimation, fadeInOut],
 })
 export class CategoriesComponent implements OnInit {
-  private categoryService = inject(CategoryService);
-  private messageService = inject(MessageService);
-  private confirmationService = inject(ConfirmationService);
+  private adminService = inject(AdminService);
+  private fb = inject(FormBuilder);
 
   categories = signal<Category[]>([]);
+  pagination = signal<Pagination | null>(null);
   isLoading = signal(false);
-  isSaving = signal(false); // Added missing signal
+  isInitialLoad = signal(true);
+  isFiltering = signal(false);
+  isSaving = signal(false);
+  error = signal<string | null>(null);
+  actionLoading = signal<string | null>(null);
+  confirmDeleteId = signal<string | null>(null);
   searchQuery = signal('');
+  currentPage = signal(1);
 
-  parentCategories = computed(() => this.categories().filter((c) => !c.parentCategoryId)); // Added computed for parent categories
+  private searchSubject = new Subject<string>();
 
-  filteredCategories = computed(() => {
-    const query = this.searchQuery().toLowerCase().trim();
-    if (!query) return this.categories();
-    return this.categories().filter(
-      (c) => c.name.toLowerCase().includes(query) || c.slug.toLowerCase().includes(query)
-    );
-  });
-
-  displayDialog = false;
-  isEditing = false;
-  categoryForm: {
-    name: string;
-    slug?: string;
-    description?: string;
-    parentCategoryId?: string;
-    id?: string;
-    existingImageUrl?: string;
-  } = {
-    name: '',
-    slug: '',
-    description: '',
-    parentCategoryId: undefined,
-  };
+  showModal = signal(false);
+  editingCategory = signal<Category | null>(null);
+  imagePreview = signal<string | null>(null);
   selectedFile: File | null = null;
 
-  ngOnInit() {
+  categoryForm!: FormGroup;
+
+  filteredCategories = computed(() => {
+    const q = this.searchQuery().toLowerCase().trim();
+    if (!q) return this.categories();
+    return this.categories().filter((c) => c.name.toLowerCase().includes(q));
+  });
+
+  parentCategories = computed(() => this.categories().filter((c) => !c.parentCategoryId));
+
+  constructor() {
+    this.searchSubject
+      .pipe(debounceTime(400), distinctUntilChanged(), takeUntilDestroyed())
+      .subscribe((q) => {
+        this.searchQuery.set(q);
+        this.currentPage.set(1);
+        this.loadCategories();
+      });
+  }
+
+  ngOnInit(): void {
+    this.initForm();
     this.loadCategories();
   }
 
-  onSearchInput(event: Event) {
-    const value = (event.target as HTMLInputElement).value;
-    this.searchQuery.set(value);
+  initForm(category?: Category): void {
+    this.categoryForm = this.fb.group({
+      name: [category?.name ?? '', Validators.required],
+      description: [category?.description ?? ''],
+      parentCategoryId: [category?.parentCategoryId ?? ''],
+    });
+    this.imagePreview.set(category?.image?.secure_url ?? null);
+    this.selectedFile = null;
   }
 
-  loadCategories() {
-    this.isLoading.set(true);
-    this.categoryService.getAll().subscribe({
+  loadCategories(): void {
+    if (this.isInitialLoad()) {
+      this.isLoading.set(true);
+    } else {
+      this.isFiltering.set(true);
+    }
+    this.error.set(null);
+    const params: Record<string, string> = { page: String(this.currentPage()), limit: '10' };
+    if (this.searchQuery()) params['search'] = this.searchQuery();
+
+    this.adminService.getCategories(params).subscribe({
       next: (res) => {
-        this.categories.set(res.categories);
+        const rawCategories = res.categories || [];
+        this.categories.set(rawCategories.filter((c) => !!c && !!c._id));
+        this.pagination.set(res.pagination ?? null);
         this.isLoading.set(false);
+        this.isInitialLoad.set(false);
+        this.isFiltering.set(false);
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Could not load categories',
-        });
+        this.error.set('Failed to load categories.');
         this.isLoading.set(false);
+        this.isInitialLoad.set(false);
+        this.isFiltering.set(false);
       },
     });
   }
 
-  showDialog() {
-    this.isEditing = false;
-    this.categoryForm = { name: '', slug: '', description: '' };
+  openCreateModal(): void {
+    this.editingCategory.set(null);
+    this.initForm();
+    this.showModal.set(true);
+  }
+
+  openEditModal(category: Category): void {
+    this.editingCategory.set(category);
+    this.initForm(category);
+    this.showModal.set(true);
+  }
+
+  closeModal(): void {
+    this.showModal.set(false);
+    this.editingCategory.set(null);
+    this.imagePreview.set(null);
     this.selectedFile = null;
-    this.displayDialog = true;
   }
 
-  hideDialog() {
-    this.displayDialog = false;
-  }
-
-  onFileSelect(event: { files: File[] }) {
-    this.selectedFile = event.files[0];
-  }
-
-  editCategory(category: Category) {
-    this.isEditing = true;
-    this.categoryForm = {
-      name: category.name,
-      slug: category.slug,
-      description: category.description,
-      parentCategoryId: category.parentCategoryId,
-      existingImageUrl: category.image?.secure_url,
-      id: category._id,
-    };
-    this.selectedFile = null;
-    this.displayDialog = true;
-  }
-
-  saveCategory() {
-    this.isSaving.set(true); // Using isSaving instead of isLoading for the button state
-    if (this.isEditing && this.categoryForm.id) {
-      this.categoryService
-        .update(
-          this.categoryForm.id,
-          {
-            name: this.categoryForm.name,
-            ...(this.categoryForm.description
-              ? { description: this.categoryForm.description }
-              : {}),
-          },
-          this.selectedFile || undefined
-        )
-        .subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: 'Category updated',
-            });
-            this.loadCategories();
-            this.hideDialog();
-            this.isSaving.set(false);
-          },
-          error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Could not update category',
-            });
-            this.isSaving.set(false);
-          },
-        });
-    } else if (this.selectedFile) {
-      this.categoryService
-        .create(
-          {
-            name: this.categoryForm.name,
-            ...(this.categoryForm.description
-              ? { description: this.categoryForm.description }
-              : {}),
-          },
-          this.selectedFile
-        )
-        .subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: 'Category created',
-            });
-            this.loadCategories();
-            this.hideDialog();
-            this.isSaving.set(false); // Added this line
-          },
-          error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Could not create category',
-            });
-            this.isSaving.set(false); // Changed from isLoading to isSaving
-          },
-        });
+  onFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (file) {
+      this.selectedFile = file;
+      const reader = new FileReader();
+      reader.onload = (e: ProgressEvent<FileReader>) =>
+        this.imagePreview.set(e.target?.result as string);
+      reader.readAsDataURL(file);
     }
   }
 
-  deleteCategory(category: Category) {
-    this.confirmationService.confirm({
-      message: `Are you sure you want to delete "${category.name}"? This cannot be undone.`,
-      header: 'Confirm Deletion',
-      icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger p-button-sm',
-      rejectButtonStyleClass: 'p-button-text p-button-sm',
-      accept: () => {
-        this.isLoading.set(true);
-        this.categoryService.delete(category._id).subscribe({
-          next: () => {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: 'Category deleted',
-            });
-            this.loadCategories();
-          },
-          error: () => {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Could not delete category',
-            });
-            this.isLoading.set(false);
-          },
-        });
+  saveCategory(): void {
+    if (this.categoryForm.invalid) {
+      this.categoryForm.markAllAsTouched();
+      return;
+    }
+
+    this.isSaving.set(true);
+    const editing = this.editingCategory();
+    const formData = new FormData();
+    formData.append('name', this.categoryForm.value.name);
+    if (this.categoryForm.value.description) {
+      formData.append('description', this.categoryForm.value.description);
+    }
+    if (this.categoryForm.value.parentCategoryId) {
+      formData.append('parentCategoryId', this.categoryForm.value.parentCategoryId);
+    }
+    if (this.selectedFile) {
+      formData.append('file', this.selectedFile);
+    }
+
+    const req = editing
+      ? this.adminService.updateCategory(editing._id, formData)
+      : this.adminService.createCategory(formData);
+
+    req.subscribe({
+      next: (res) => {
+        const updatedCategory = res.category;
+        if (!updatedCategory || !updatedCategory._id) {
+          this.isSaving.set(false);
+          this.loadCategories();
+          return;
+        }
+        if (editing) {
+          this.categories.update((list) =>
+            list.map((c) => (c && c._id === updatedCategory._id ? updatedCategory : c))
+          );
+        } else {
+          this.categories.update((list) => [updatedCategory, ...list]);
+        }
+        this.isSaving.set(false);
+        this.closeModal();
+      },
+      error: () => {
+        this.isSaving.set(false);
       },
     });
+  }
+
+  requestDelete(category: Category): void {
+    this.confirmDeleteId.set(category._id);
+  }
+
+  cancelDelete(): void {
+    this.confirmDeleteId.set(null);
+  }
+
+  confirmDelete(): void {
+    const id = this.confirmDeleteId();
+    if (!id) return;
+    this.actionLoading.set(id);
+    this.confirmDeleteId.set(null);
+    this.adminService.deleteCategory(id).subscribe({
+      next: () => {
+        this.categories.update((list) => list.filter((c) => c._id !== id));
+        this.actionLoading.set(null);
+      },
+      error: () => this.actionLoading.set(null),
+    });
+  }
+
+  getParentName(parentId?: string): string {
+    if (!parentId) return '';
+    return this.categories().find((c) => c._id === parentId)?.name ?? '';
+  }
+
+  isFieldInvalid(field: string): boolean {
+    const c = this.categoryForm.get(field);
+    return !!(c && c.invalid && c.touched);
+  }
+
+  goToPage(page: number): void {
+    this.currentPage.set(page);
+    this.loadCategories();
+  }
+
+  get totalPages(): number {
+    const p = this.pagination();
+    if (!p) return 1;
+    return p.totalPages ?? 1;
+  }
+
+  get pages(): number[] {
+    return Array.from({ length: this.totalPages }, (_, i) => i + 1);
+  }
+
+  onSearchInput(event: Event): void {
+    this.searchSubject.next((event.target as HTMLInputElement).value);
   }
 }

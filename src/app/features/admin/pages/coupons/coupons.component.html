@@ -1,0 +1,314 @@
+<section class="admin-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Coupons</h1>
+      <p class="page-subtitle">Manage discount coupons</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreateModal()">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+      </svg>
+      Create Coupon
+    </button>
+  </div>
+
+  @if (isLoading() && isInitialLoad()) {
+    <div class="table-card">
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Type</th>
+              <th>Value</th>
+              <th>Min Order</th>
+              <th>Uses</th>
+              <th>Expires</th>
+              <th>Active</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (i of [1, 2, 3, 4, 5]; track i) {
+              <tr>
+                <td><div class="skeleton skeleton-text" style="width: 80px"></div></td>
+                <td><div class="skeleton skeleton-badge"></div></td>
+                <td><div class="skeleton skeleton-text" style="width: 60px"></div></td>
+                <td><div class="skeleton skeleton-text" style="width: 70px"></div></td>
+                <td><div class="skeleton skeleton-text" style="width: 50px"></div></td>
+                <td><div class="skeleton skeleton-text" style="width: 90px"></div></td>
+                <td><div class="skeleton skeleton-badge"></div></td>
+                <td>
+                  <div class="action-buttons">
+                    <div class="skeleton skeleton-button"></div>
+                    <div class="skeleton skeleton-button"></div>
+                  </div>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+  @if (error()) {
+    <div class="error-state">
+      <p>{{ error() }}</p>
+      <button class="btn btn-secondary" (click)="loadCoupons()">Retry</button>
+    </div>
+  }
+
+  @if (!isLoading() && !error()) {
+    <div class="table-card">
+      @if (coupons().length === 0) {
+        <div class="empty-state">
+          <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z"
+            />
+          </svg>
+          <p>No coupons yet</p>
+          <button class="btn btn-primary" (click)="openCreateModal()">
+            Create your first coupon
+          </button>
+        </div>
+      } @else {
+        <div class="table-wrapper" style="position: relative">
+          @if (isFiltering()) {
+            <div class="filtering-overlay" @fadeInOut>
+              <div class="spinner spinner-sm"></div>
+            </div>
+          }
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Type</th>
+                <th>Value</th>
+                <th>Min Order</th>
+                <th>Uses</th>
+                <th>Expires</th>
+                <th>Active</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody [@listAnimation]="coupons().length">
+              @for (coupon of coupons(); track coupon?._id ?? $index) {
+                <tr>
+                  <td>
+                    <span class="coupon-code">{{ coupon.code }}</span>
+                  </td>
+                  <td>
+                    <span
+                      class="status-badge"
+                      [class]="
+                        coupon.discountType === 'percentage' ? 'status-info' : 'status-warning'
+                      "
+                    >
+                      {{ coupon.discountType | titlecase }}
+                    </span>
+                  </td>
+                  <td>
+                    @if (coupon.discountType === 'percentage') {
+                      {{ coupon.discountValue }}%
+                    } @else {
+                      {{ formatCurrency(coupon.discountValue) }}
+                    }
+                  </td>
+                  <td>{{ coupon.minOrderAmount ? formatCurrency(coupon.minOrderAmount) : '—' }}</td>
+                  <td>{{ coupon.usedCount }} / {{ coupon.maxUses ?? '∞' }}</td>
+                  <td class="text-muted">{{ formatDate(coupon.expiresAt) }}</td>
+                  <td>
+                    <span
+                      class="status-badge"
+                      [class]="coupon.isActive ? 'status-success' : 'status-neutral'"
+                    >
+                      {{ coupon.isActive ? 'Active' : 'Inactive' }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="btn btn-sm btn-secondary" (click)="openEditModal(coupon)">
+                        Edit
+                      </button>
+                      @if (coupon.isActive) {
+                        <button
+                          class="btn btn-sm btn-danger"
+                          (click)="requestDeactivate(coupon)"
+                          [disabled]="actionLoading() === coupon._id"
+                        >
+                          @if (actionLoading() === coupon._id) {
+                            <span class="btn-spinner"></span>
+                          } @else {
+                            Deactivate
+                          }
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Pagination -->
+        @if (totalPages > 1) {
+          <div
+            class="pagination"
+            style="padding: 1rem 1.5rem; border-top: 1px solid var(--color-slate-200)"
+          >
+            <button
+              class="page-btn"
+              [disabled]="currentPage() === 1"
+              (click)="goToPage(currentPage() - 1)"
+            >
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+            @for (page of pages; track page) {
+              <button
+                class="page-btn"
+                [class.active]="page === currentPage()"
+                (click)="goToPage(page)"
+              >
+                {{ page }}
+              </button>
+            }
+            <button
+              class="page-btn"
+              [disabled]="currentPage() === totalPages"
+              (click)="goToPage(currentPage() + 1)"
+            >
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </div>
+        }
+      }
+    </div>
+  }
+
+  <!-- Create/Edit Modal -->
+  @if (showModal()) {
+    <div class="modal-overlay" (click)="closeModal()">
+      <div class="modal-dialog" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2 class="modal-title">{{ editingCoupon() ? 'Edit Coupon' : 'Create Coupon' }}</h2>
+          <button class="modal-close" (click)="closeModal()">
+            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M6 18L18 6M6 6l12 12"
+              />
+            </svg>
+          </button>
+        </div>
+        <form [formGroup]="couponForm" (ngSubmit)="saveCoupon()" class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Code *</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="code"
+              placeholder="SAVE20"
+              [class.is-invalid]="isFieldInvalid('code')"
+            />
+            @if (isFieldInvalid('code')) {
+              <p class="field-error">Code is required (min 3 characters)</p>
+            }
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Discount Type *</label>
+              <select class="form-control" formControlName="discountType">
+                <option value="percentage">Percentage (%)</option>
+                <option value="fixed">Fixed Amount ($)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Discount Value *</label>
+              <input
+                type="number"
+                class="form-control"
+                formControlName="discountValue"
+                [class.is-invalid]="isFieldInvalid('discountValue')"
+              />
+              @if (isFieldInvalid('discountValue')) {
+                <p class="field-error">Value is required</p>
+              }
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Min Order Amount</label>
+              <input
+                type="number"
+                class="form-control"
+                formControlName="minOrderAmount"
+                placeholder="Optional"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Max Uses</label>
+              <input
+                type="number"
+                class="form-control"
+                formControlName="maxUses"
+                placeholder="Unlimited"
+              />
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Expiry Date</label>
+            <input type="date" class="form-control" formControlName="expiresAt" />
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+            <button type="submit" class="btn btn-primary" [disabled]="isSaving()">
+              @if (isSaving()) {
+                <span class="btn-spinner"></span>
+              } @else {
+                {{ editingCoupon() ? 'Save Changes' : 'Create Coupon' }}
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <!-- Deactivate Confirmation -->
+  @if (confirmDeactivateId()) {
+    <div class="modal-overlay" (click)="cancelDeactivate()">
+      <div class="confirm-dialog" (click)="$event.stopPropagation()">
+        <h3>Deactivate Coupon?</h3>
+        <p>
+          This coupon will no longer be usable. This action can be reversed by re-creating the
+          coupon.
+        </p>
+        <div class="dialog-actions">
+          <button class="btn btn-secondary" (click)="cancelDeactivate()">Cancel</button>
+          <button class="btn btn-danger" (click)="confirmDeactivate()">Deactivate</button>
+        </div>
+      </div>
+    </div>
+  }
+</section>

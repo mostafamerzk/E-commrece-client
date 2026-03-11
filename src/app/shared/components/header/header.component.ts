@@ -27,8 +27,6 @@ import { Product } from '../../../core/models/product.model';
 })
 export class HeaderComponent implements OnDestroy, OnInit {
   // ── Services ─────────────────────────────────────────────
-  newcurrent = JSON.parse(localStorage.getItem('user') || 'null');
-
   ngOnInit(): void {
     if (this.authService.isLoggedIn()) {
       this.wishlistService.getWishlist().subscribe();
@@ -143,7 +141,9 @@ export class HeaderComponent implements OnDestroy, OnInit {
   hideAnnouncement(): void {
     this.showAnnouncement.set(false);
   }
-
+  goToProfile() {
+    this.router.navigate(['/profile']);
+  }
   // ── Auth ──────────────────────────────────────────────────
   logout(): void {
     this.authService.logout();

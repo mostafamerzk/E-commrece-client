@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import {
   FormControl,
@@ -10,6 +11,7 @@ import {
 import { OrderService } from '../../../../core/services/order.service';
 import { CartService } from '../../../../core/services/cart.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import {
   CheckoutSummary,
   OrderResponse,
@@ -20,6 +22,7 @@ import { PaymentService } from '../../../../core/services/payment.service';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { CategoryService } from '../../../../core/services/category.service';
+import { Address } from '../../../../core/models/auth.model';
 
 @Component({
   selector: 'app-checkout',
@@ -34,6 +37,7 @@ export class CheckoutComponent implements OnInit {
   private toastService = inject(ToastService);
   private categoryService = inject(CategoryService);
   private paymentService = inject(PaymentService);
+  public authService = inject(AuthService);
   private router = inject(Router);
 
   readonly isPlacingOrder = signal(false);
@@ -43,6 +47,8 @@ export class CheckoutComponent implements OnInit {
   readonly couponSuccess = signal<string | null>(null);
   readonly checkoutSummary = signal<CheckoutSummary | null>(null);
   readonly apiError = signal<string | null>(null);
+
+  readonly user = this.authService.currentUser;
 
   couponCode = '';
   readonly paymentMethod = signal<PaymentMethod>('creditCard');
@@ -59,12 +65,12 @@ export class CheckoutComponent implements OnInit {
   );
 
   shippingForm = new FormGroup({
-    recipientName: new FormControl('', Validators.required),
     phone: new FormControl('', [Validators.required, Validators.pattern(/^01[0125]\d{8}$/)]),
     street: new FormControl('', Validators.required),
     city: new FormControl('', Validators.required),
     country: new FormControl('Egypt', Validators.required),
     postalCode: new FormControl('', Validators.required),
+    saveAddress: new FormControl(false),
   });
 
   readonly egyptianCities = [
@@ -95,6 +101,38 @@ export class CheckoutComponent implements OnInit {
           this.updateCheckoutSummary();
         }
       });
+
+    // Listen for user profile updates and pre-fill if form is empty
+    toObservable(this.user).subscribe((u) => {
+      if (u && u.addresses && u.addresses.length > 0) {
+        // Only auto-fill if the user hasn't started typing yet
+        if (!this.shippingForm.get('street')?.value) {
+          this.onSelectSavedAddress(u.addresses[0]);
+        }
+      } else if (u) {
+        this.shippingForm.patchValue({
+          phone: u.phone || '',
+        });
+      }
+    });
+  }
+
+  onSelectSavedAddress(address: Address) {
+    this.shippingForm.patchValue({
+      street: address.street,
+      city: address.city,
+      country: address.country || 'Egypt',
+      postalCode: address.postalCode || '',
+      phone: address.phone || this.user()?.phone || '',
+    });
+    this.updateCheckoutSummary();
+  }
+
+  onSelectSavedAddressByIndex(index: string) {
+    const addresses = this.user()?.addresses;
+    if (addresses && addresses[+index]) {
+      this.onSelectSavedAddress(addresses[+index]);
+    }
   }
 
   updateCheckoutSummary() {
@@ -131,13 +169,17 @@ export class CheckoutComponent implements OnInit {
     this.couponSuccess.set(null);
 
     const val = this.shippingForm.value;
-    const address = {
-      street: val.street!,
-      city: val.city!,
-      country: val.country!,
-      phone: val.phone!,
-      postalCode: val.postalCode!,
-    };
+    const hasPartialAddress = val.street || val.city || val.phone;
+
+    const address = hasPartialAddress
+      ? {
+          street: val.street || '',
+          city: val.city || '',
+          country: val.country || 'Egypt',
+          phone: val.phone || '',
+          postalCode: val.postalCode || '',
+        }
+      : undefined;
 
     this.orderService
       .checkout({
@@ -153,8 +195,16 @@ export class CheckoutComponent implements OnInit {
         error: (err) => {
           this.couponError.set(err.error?.message || 'Invalid coupon code');
           this.isApplyingCoupon.set(false);
+          this.couponCode = ''; // Reset code on error
         },
       });
+  }
+
+  removeCoupon() {
+    this.couponCode = '';
+    this.couponSuccess.set(null);
+    this.couponError.set(null);
+    this.updateCheckoutSummary();
   }
 
   placeOrder() {
@@ -184,7 +234,25 @@ export class CheckoutComponent implements OnInit {
         couponCode: this.couponCode || undefined,
       })
       .subscribe({
-        next: (res: OrderResponse) => {
+        next: async (res: OrderResponse) => {
+          // If user checked "Save Address", update their profile
+          if (val.saveAddress && this.authService.isLoggedIn()) {
+            try {
+              await this.authService.updateProfile({
+                address: {
+                  street: address.street,
+                  city: address.city,
+                  country: address.country,
+                  postalCode: address.postalCode,
+                  phone: address.phone,
+                },
+              });
+              this.toastService.success('Address saved to profile');
+            } catch (error) {
+              console.error('Failed to save address:', error);
+            }
+          }
+
           if (paymentMethod === 'cod') {
             this.toastService.success('Order placed successfully!');
             this.cartService.clearCart().subscribe();

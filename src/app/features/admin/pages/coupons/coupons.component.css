@@ -1,0 +1,58 @@
+.filtering-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(1px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.spinner-sm {
+  width: 24px;
+  height: 24px;
+  border-width: 2px;
+}
+
+/* ─── Skeleton Styles ─── */
+.skeleton {
+  background: linear-gradient(90deg, #f1f5f9 25%, #f8fafc 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-sm);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-text {
+  height: 1rem;
+}
+
+.skeleton-badge {
+  height: 1.5rem;
+  width: 60px;
+  border-radius: 999px;
+}
+
+.skeleton-button {
+  height: 2rem;
+  width: 60px;
+}
+
+.coupon-code {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--color-slate-900);
+  background: var(--color-slate-100);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-md);
+  letter-spacing: 0.05em;
+}

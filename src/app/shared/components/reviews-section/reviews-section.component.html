@@ -102,6 +102,21 @@
         </div>
       </div>
 
+      @if (status()) {
+        <div class="status-alert" role="alert">
+          <svg viewBox="0 0 24 24" fill="none" class="alert-icon">
+            <path
+              d="M12 8V12M12 16H12.01M22 12C22 17.5228 17.5228 22 12 22C6.47715 22 2 17.5228 2 12C2 6.47715 6.47715 2 12 2C17.5228 2 22 6.47715 22 12Z"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          <span class="alert-message">{{ status() }}</span>
+        </div>
+      }
+
       <form [formGroup]="reviewForm" (ngSubmit)="submitReview()" class="review-form">
         <!-- Star Rating Input -->
         <div class="form-field rating-field">
@@ -261,11 +276,11 @@
             <div class="review-header">
               <div class="reviewer-info">
                 <div class="reviewer-avatar">
-                  <span>{{ review.user.userName | slice: 0 : 1 | uppercase }}</span>
+                  <span>{{ review.user?.userName || 'A' | slice: 0 : 1 | uppercase }}</span>
                 </div>
                 <div class="reviewer-details">
                   <div class="reviewer-name-row">
-                    <h4 class="reviewer-name">{{ review.user.userName }}</h4>
+                    <h4 class="reviewer-name">{{ review.user?.userName || 'Anonymous User' }}</h4>
                     @if (true) {
                       <span class="verified-badge">
                         <svg viewBox="0 0 24 24" fill="none">
@@ -285,57 +300,141 @@
                 </div>
               </div>
 
-              <!-- Star Rating Display -->
-              <div class="review-stars">
-                @for (star of [1, 2, 3, 4, 5]; track star) {
-                  <svg
-                    class="star-icon"
-                    [class.star-filled]="review.rating >= star"
-                    viewBox="0 0 24 24"
-                    fill="none"
+              <!-- Options Menu (Three Dots) -->
+              @if (canEdit(review) || canDelete(review)) {
+                <div class="review-options">
+                  <button
+                    class="options-btn"
+                    (click)="toggleMenu(review._id, $event)"
+                    aria-label="Review options"
                   >
-                    <path
-                      d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
-                      [attr.fill]="getStarFill(star, review.rating)"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                }
-              </div>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="5" r="1" fill="currentColor" />
+                      <circle cx="12" cy="12" r="1" fill="currentColor" />
+                      <circle cx="12" cy="19" r="1" fill="currentColor" />
+                    </svg>
+                  </button>
+
+                  @if (openMenuId() === review._id) {
+                    <div
+                      class="options-menu"
+                      (click)="$event.stopPropagation()"
+                      (keydown.stop)="$event.stopPropagation()"
+                      tabindex="0"
+                    >
+                      @if (canEdit(review)) {
+                        <button class="menu-item" (click)="startEdit(review)">
+                          <i class="pi pi-pencil"></i>
+                          <span>Edit</span>
+                        </button>
+                      }
+                      <button class="menu-item delete" (click)="confirmDelete(review._id)">
+                        <i class="pi pi-trash"></i>
+                        <span>Delete</span>
+                      </button>
+                    </div>
+                  }
+                </div>
+              }
+
+              <!-- Star Rating Display -->
+              @if (editingReviewId() !== review._id) {
+                <div class="review-stars">
+                  @for (star of [1, 2, 3, 4, 5]; track $index) {
+                    <svg
+                      class="star-icon"
+                      [class.star-filled]="review.rating >= star"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                    >
+                      <path
+                        d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                        [attr.fill]="getStarFill(star, review.rating)"
+                        stroke="currentColor"
+                        stroke-width="1.5"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      />
+                    </svg>
+                  }
+                </div>
+              }
             </div>
 
             <!-- Review Content -->
             <div class="review-content">
-              <p class="review-text">{{ review.comment }}</p>
+              @if (editingReviewId() === review._id) {
+                <!-- Inline Edit Mode -->
+                <div
+                  class="edit-mode-container"
+                  (click)="$event.stopPropagation()"
+                  (keydown.stop)="$event.stopPropagation()"
+                  tabindex="0"
+                >
+                  <form [formGroup]="editForm" (ngSubmit)="saveEdit(review._id)">
+                    <!-- Inline Star Picker -->
+                    <div class="edit-rating-row">
+                      <span class="edit-label">Update Rating:</span>
+                      <div class="star-input-group small">
+                        @for (star of [1, 2, 3, 4, 5]; track star) {
+                          <button
+                            type="button"
+                            (click)="editForm.patchValue({ rating: star })"
+                            class="star-input-btn"
+                            [class.is-active]="(editForm.value.rating || 0) >= star"
+                          >
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <path
+                                d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+                                [attr.fill]="
+                                  (editForm.value.rating || 0) >= star ? 'currentColor' : 'none'
+                                "
+                                stroke="currentColor"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                              />
+                            </svg>
+                          </button>
+                        }
+                      </div>
+                    </div>
+
+                    <textarea
+                      formControlName="comment"
+                      class="edit-textarea"
+                      placeholder="Update your review..."
+                      rows="3"
+                    ></textarea>
+
+                    <div class="edit-actions">
+                      <button
+                        type="button"
+                        class="edit-btn secondary"
+                        (click)="cancelEdit()"
+                        [disabled]="isUpdating()"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        class="edit-btn primary"
+                        [disabled]="editForm.invalid || isUpdating()"
+                      >
+                        @if (isUpdating()) {
+                          <i class="pi pi-spin pi-spinner mr-1"></i>
+                        }
+                        Save
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              } @else {
+                <p class="review-text">{{ review.comment }}</p>
+              }
             </div>
 
-            <!-- Review Actions -->
-            @if (canDelete(review)) {
-              <div class="review-actions">
-                <button (click)="confirmDelete(review._id)" class="delete-btn" type="button">
-                  <svg viewBox="0 0 24 24" fill="none">
-                    <path
-                      d="M3 6H5H21"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                    <path
-                      d="M8 6V4C8 3.46957 8.21071 2.96086 8.58579 2.58579C8.96086 2.21071 9.46957 2 10 2H14C14.5304 2 15.0391 2.21071 15.4142 2.58579C15.7893 2.96086 16 3.46957 16 4V6M19 6V20C19 20.5304 18.7893 21.0391 18.4142 21.4142C18.0391 21.7893 17.5304 22 17 22H7C6.46957 22 5.96086 21.7893 5.58579 21.4142C5.21071 21.0391 5 20.5304 5 20V6H19Z"
-                      stroke="currentColor"
-                      stroke-width="2"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                    />
-                  </svg>
-                  <span>Delete</span>
-                </button>
-              </div>
-            }
+            <!-- Legacy Delete Button (Removed in favor of options menu) -->
           </article>
         }
       </div>

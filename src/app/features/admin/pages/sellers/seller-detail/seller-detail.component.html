@@ -1,0 +1,151 @@
+<section class="admin-page">
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading seller details...</p>
+    </div>
+  }
+  @if (error()) {
+    <div class="error-state">
+      <p>{{ error() }}</p>
+    </div>
+  }
+
+  @if (seller(); as s) {
+    <!-- Back Button + Header -->
+    <div class="page-header">
+      <div>
+        <a routerLink="/admin/sellers" class="back-link">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          Back to Sellers
+        </a>
+        <h1 class="page-title">{{ s.storename || s.userName || 'Seller Profile' }}</h1>
+      </div>
+      <div class="header-actions">
+        @if (!s.isBlocked) {
+          <button class="btn btn-danger" (click)="restrictSeller()" [disabled]="actionLoading()">
+            @if (actionLoading()) {
+              <span class="btn-spinner"></span>
+            } @else {
+              Restrict Seller
+            }
+          </button>
+        } @else {
+          <button class="btn btn-success" (click)="approveSeller()" [disabled]="actionLoading()">
+            @if (actionLoading()) {
+              <span class="btn-spinner"></span>
+            } @else {
+              Approve Seller
+            }
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Main Content Layout -->
+    <div class="details-layout-wrapper">
+      <!-- Seller Professional Details -->
+      <div class="detail-card profile-main-card">
+        <h2 class="card-title">Seller Information</h2>
+        <div class="info-list">
+          <div class="info-row">
+            <span class="info-label">Email</span>
+            <span class="info-value">{{ s.email }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Phone</span>
+            <span class="info-value">{{ s.phone || '—' }}</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Status</span>
+            <span class="status-badge" [class]="s.isBlocked ? 'status-danger' : 'status-success'">
+              {{ s.isBlocked ? 'Blocked' : 'Active' }}
+            </span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Member Since</span>
+            <span class="info-value">{{ formatDate(s.createdAt) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products Section -->
+      <div class="table-card products-section">
+        <div class="card-header-flex">
+          <h2 class="card-title">Products</h2>
+          @if (s.products && s.products.length > 0) {
+            <span class="count-badge">{{ s.products.length }}</span>
+          }
+        </div>
+
+        <div class="table-wrapper">
+          @if (s.products && s.products.length > 0) {
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (product of s.products; track product._id) {
+                  <tr>
+                    <td>
+                      <div class="product-cell">
+                        @if (product.mainImage && product.mainImage.secure_url) {
+                          <img
+                            [src]="product.mainImage.secure_url"
+                            [alt]="product.title"
+                            class="product-thumb"
+                          />
+                        }
+                        <span>{{ product.title }}</span>
+                      </div>
+                    </td>
+                    <td>{{ formatCurrency(product.price) }}</td>
+                    <td>{{ product.stock }}</td>
+                    <td>
+                      <span
+                        class="status-badge"
+                        [class]="product.isDeleted ? 'status-danger' : 'status-success'"
+                      >
+                        {{ product.isDeleted ? 'Deleted' : 'Active' }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          } @else {
+            <div class="empty-state-small">
+              <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                />
+              </svg>
+              <p>No products listed by this seller yet.</p>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  }
+  @if (!isLoading() && !error() && !seller()) {
+    <div class="empty-state">
+      <p>Seller not found or no data available.</p>
+      <button class="btn btn-secondary" routerLink="/admin/sellers">Back to Sellers</button>
+    </div>
+  }
+</section>
