@@ -40,6 +40,11 @@ export const routes: Routes = [
           import('./features/cart/pages/cart/cart.component').then((m) => m.CartComponent),
       },
       {
+        path: 'profile',
+        loadComponent: () =>
+          import('./shared/components/profile/profile.component').then((m) => m.ProfileComponent),
+      },
+      {
         path: 'orders',
         canActivate: [authGuard],
         children: [

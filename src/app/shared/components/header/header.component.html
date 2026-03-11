@@ -10,19 +10,6 @@
     </button>
   </div>
 
-  <!-- Mobile Search -->
-  <!-- <div class="drawer-search">
-    <i class="pi pi-search search-icon"></i>
-    <input
-      type="text"
-      placeholder="Search products…"
-      class="drawer-search-input"
-      [(ngModel)]="searchQuery"
-      (input)="onSearchInput()"
-      (keydown)="onSearchKeydown($event)"
-    />
-  </div> -->
-
   <nav class="drawer-nav" aria-label="Mobile navigation">
     <a
       routerLink="/"
@@ -66,8 +53,8 @@
     <div class="drawer-user">
       <div class="drawer-avatar"><i class="pi pi-user"></i></div>
       <div class="drawer-user-info">
-        <span class="drawer-user-name">{{ newcurrent.data.userName }}</span>
-        <span class="drawer-user-role">{{ newcurrent.data.role }}</span>
+        <span class="drawer-user-name">{{ currentUser()?.userName }}</span>
+        <span class="drawer-user-role">{{ currentUser()?.role }}</span>
       </div>
     </div>
     <nav class="drawer-nav">
@@ -79,7 +66,7 @@
       >
         <i class="pi pi-list"></i> My Orders
       </a>
-      @if (newcurrent.data.role === 'seller') {
+      @if (currentUser()?.role === 'seller') {
         <a
           routerLink="/seller"
           routerLinkActive="active"
@@ -156,7 +143,6 @@
             >Home</a
           >
           <a routerLink="/products" routerLinkActive="nav-active" class="nav-link">Products</a>
-          <!-- <a routerLink="/wishlist" routerLinkActive="nav-active" class="nav-link">Wishlist</a> -->
         </nav>
       }
 
@@ -175,7 +161,6 @@
             (focus)="onSearchInput()"
             autocomplete="off"
           />
-          <!-- Loading Spinner -->
           @if (searchLoading()) {
             <i class="pi pi-spin pi-spinner search-spinner"></i>
           } @else if (searchQuery) {
@@ -189,7 +174,6 @@
           <!-- ── Search Dropdown ── -->
           @if (searchOpen()) {
             <div class="search-dropdown">
-              <!-- Results -->
               @for (product of searchResults(); track product._id) {
                 <button class="search-result-item" (click)="selectProduct(product._id)">
                   <img
@@ -207,7 +191,6 @@
                 </button>
               }
 
-              <!-- View All Results -->
               <button class="search-view-all" (click)="goToSearch()">
                 <i class="pi pi-search"></i>
                 View all results for "<strong>{{ searchQuery }}</strong
@@ -238,22 +221,24 @@
         @if (isLoggedIn()) {
           <button class="user-trigger" aria-haspopup="true" aria-label="User menu">
             <div class="user-avatar"><i class="pi pi-user"></i></div>
-            <span class="user-name">{{ newcurrent.data.userName }}</span>
+            <span class="user-name">{{ currentUser()?.userName }}</span>
             <i class="pi pi-chevron-down chevron"></i>
           </button>
           <div class="user-dropdown" role="menu">
-            <div class="dropdown-header">
-              <div class="dropdown-avatar"><i class="pi pi-user"></i></div>
-              <div>
-                <p class="dropdown-name">{{ newcurrent.data.userName }}</p>
-                <p class="dropdown-meta">{{ newcurrent.data.role }}</p>
+            <button (click)="goToProfile()">
+              <div class="dropdown-header">
+                <div class="dropdown-avatar"><i class="pi pi-user"></i></div>
+                <div>
+                  <p class="dropdown-name">{{ currentUser()?.userName }}</p>
+                  <p class="dropdown-meta">{{ currentUser()?.role }}</p>
+                </div>
               </div>
-            </div>
+            </button>
             <div class="dropdown-divider"></div>
             <a routerLink="/orders" class="dropdown-item" role="menuitem">
               <i class="pi pi-list"></i> My Orders
             </a>
-            @if (newcurrent.data.role === 'seller') {
+            @if (currentUser()?.role === 'seller') {
               <a routerLink="/seller" class="dropdown-item" role="menuitem">
                 <i class="pi pi-chart-bar"></i> Seller Dashboard
               </a>
