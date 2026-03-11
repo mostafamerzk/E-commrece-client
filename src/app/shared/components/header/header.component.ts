@@ -115,9 +115,10 @@ export class HeaderComponent implements OnDestroy, OnInit {
 
   goToSearch(): void {
     if (!this.searchQuery.trim()) return;
+    const query = this.searchQuery.trim();
     this.closeSearch();
     this.router.navigate(['/products'], {
-      queryParams: { search: this.searchQuery.trim() },
+      queryParams: { search: query },
     });
   }
 

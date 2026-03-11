@@ -125,7 +125,7 @@ describe('ProductListComponent', () => {
     fixture.detectChanges();
 
     expect(component.searchQuery()).toBe('phone');
-    expect(component.selectedCategories()).toEqual(['cat1']);
+    expect(component.selectedCategory()).toBe('cat1');
     expect(component.priceRange()).toEqual([100, 10000]);
     expect(productServiceMock.getAll).toHaveBeenCalled();
   });
@@ -151,7 +151,7 @@ describe('ProductListComponent', () => {
     component.searchQuery.set('test');
     expect(component.activeFilterCount()).toBe(1);
 
-    component.selectedCategories.set(['cat1']);
+    component.selectedCategory.set('cat1');
     expect(component.activeFilterCount()).toBe(2);
 
     component.inStockOnly.set(true);
