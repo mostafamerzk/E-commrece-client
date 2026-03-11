@@ -51,7 +51,13 @@
 
   @if (isLoggedIn()) {
     <div class="drawer-user">
-      <div class="drawer-avatar"><i class="pi pi-user"></i></div>
+      <div class="drawer-avatar">
+        @if (currentUser()?.profilePicture?.secure_url) {
+          <img [src]="currentUser()!.profilePicture!.secure_url" [alt]="currentUser()!.userName" />
+        } @else {
+          <i class="pi pi-user"></i>
+        }
+      </div>
       <div class="drawer-user-info">
         <span class="drawer-user-name">{{ currentUser()?.userName }}</span>
         <span class="drawer-user-role">{{ currentUser()?.role }}</span>
@@ -219,15 +225,34 @@
 
       <div class="user-menu-wrap">
         @if (isLoggedIn()) {
-          <button class="user-trigger" aria-haspopup="true" aria-label="User menu">
-            <div class="user-avatar"><i class="pi pi-user"></i></div>
+          <button class="user-trigger">
+            <div class="user-avatar">
+              @if (currentUser()?.profilePicture?.secure_url) {
+                <img
+                  [src]="currentUser()!.profilePicture!.secure_url"
+                  [alt]="currentUser()!.userName"
+                />
+              } @else {
+                <i class="pi pi-user"></i>
+              }
+            </div>
             <span class="user-name">{{ currentUser()?.userName }}</span>
             <i class="pi pi-chevron-down chevron"></i>
           </button>
+
           <div class="user-dropdown" role="menu">
             <button (click)="goToProfile()">
               <div class="dropdown-header">
-                <div class="dropdown-avatar"><i class="pi pi-user"></i></div>
+                <div class="dropdown-avatar">
+                  @if (currentUser()?.profilePicture?.secure_url) {
+                    <img
+                      [src]="currentUser()!.profilePicture!.secure_url"
+                      [alt]="currentUser()!.userName"
+                    />
+                  } @else {
+                    <i class="pi pi-user"></i>
+                  }
+                </div>
                 <div>
                   <p class="dropdown-name">{{ currentUser()?.userName }}</p>
                   <p class="dropdown-meta">{{ currentUser()?.role }}</p>

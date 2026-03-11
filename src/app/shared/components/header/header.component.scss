@@ -228,10 +228,6 @@
   align-items: center;
   gap: 1.5rem;
   min-width: 0;
-
-  // @media (max-width: 767px) {
-  //   display: none;
-  // }
 }
 
 .header-right {
@@ -414,6 +410,14 @@
     justify-content: center;
     font-size: 0.65rem;
     flex-shrink: 0;
+    overflow: hidden; // ← مهم عشان الصورة تتقطع صح مع border-radius
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 9999px;
+    }
   }
 
   .user-name {
@@ -478,6 +482,14 @@
     justify-content: center;
     font-size: 0.875rem;
     flex-shrink: 0;
+    overflow: hidden; // ← مهم عشان الصورة تتقطع صح مع border-radius
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 9999px;
+    }
   }
 
   .dropdown-name {
@@ -802,6 +814,14 @@
     justify-content: center;
     font-size: 1rem;
     flex-shrink: 0;
+    overflow: hidden; // ← مهم عشان الصورة تتقطع صح مع border-radius
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 9999px;
+    }
   }
 
   .drawer-user-name {
@@ -866,8 +886,9 @@
     }
   }
 }
+
 // ══════════════════════════════════════════════════════════
-// SEARCH DROPDOWN — أضف ده في آخر header.component.scss
+// SEARCH DROPDOWN
 // ══════════════════════════════════════════════════════════
 
 .search-spinner {
@@ -1018,6 +1039,10 @@
     color: #2563eb;
   }
 }
+
+// ══════════════════════════════════════════════════════════
+// RESPONSIVE
+// ══════════════════════════════════════════════════════════
 @media (max-width: 767px) {
   .header-inner {
     gap: 0.5rem;
@@ -1037,16 +1062,16 @@
     width: 100%;
   }
 
-  // إخفاء الـ login/register بس، وتخلي الـ icons تظهر
   .auth-actions {
     display: none;
   }
+
   .pi-heart {
     display: block;
   }
+
   .user-menu-wrap {
     margin-left: 0;
-
     padding-left: 0;
     border-left: none;
   }
