@@ -8,7 +8,7 @@
     </div>
 
     <!-- Loading Skeleton -->
-    @if (loading) {
+    @if (loading()) {
       <div class="categories-grid">
         @for (item of [1, 2, 3, 4, 5, 6]; track item) {
           <div class="category-card skeleton-card">
@@ -21,7 +21,7 @@
     }
 
     <!-- Error -->
-    @if (error) {
+    @if (error()) {
       <div class="error-state">
         <i class="pi pi-exclamation-circle"></i>
         <p>Could not load categories.</p>
@@ -29,9 +29,9 @@
     }
 
     <!-- Categories Grid -->
-    @if (!loading && !error) {
+    @if (!loading() && !error()) {
       <div class="categories-grid">
-        @for (cat of visibleCategories; track cat._id) {
+        @for (cat of visibleCategories(); track cat._id) {
           <a
             [routerLink]="['/products']"
             [queryParams]="{ categoryId: cat._id }"
@@ -57,15 +57,15 @@
 
       <!-- Pagination Info -->
       <div class="pagination-info">
-        Showing <strong>{{ visibleCategories.length }}</strong> of
+        Showing <strong>{{ visibleCategories().length }}</strong> of
         <strong>{{ totalCount }}</strong> categories
       </div>
 
       <!-- Load More — centered -->
       @if (hasMore) {
         <div class="section-cta">
-          <button class="btn-load-more" (click)="loadMore()" [disabled]="loadingMore">
-            @if (loadingMore) {
+          <button class="btn-load-more" (click)="loadMore()" [disabled]="loadingMore()">
+            @if (loadingMore()) {
               <i class="pi pi-spin pi-spinner"></i>
               Loading...
             } @else {

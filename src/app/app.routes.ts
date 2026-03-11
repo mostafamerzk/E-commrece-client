@@ -182,10 +182,22 @@ export const routes: Routes = [
       },
       {
         path: 'products',
-        loadComponent: () =>
-          import('./features/admin/pages/products/products.component').then(
-            (m) => m.AdminProductsComponent
-          ),
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/admin/pages/products/products.component').then(
+                (m) => m.AdminProductsComponent
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./features/admin/pages/products/product-detail/product-detail.component').then(
+                (m) => m.ProductDetailComponent
+              ),
+          },
+        ],
       },
       {
         path: 'categories',

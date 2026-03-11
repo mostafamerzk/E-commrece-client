@@ -10,7 +10,16 @@ interface ProfileResponse {
   data: User;
 }
 export interface UpdateProfilePayload {
-  userName: string;
+  userName?: string;
+  phone?: string;
+  addressId?: string;
+  address?: {
+    phone: string;
+    street: string;
+    city: string;
+    country: string;
+    postalCode: string;
+  };
 }
 
 export interface ChangePasswordPayload {
@@ -43,7 +52,7 @@ export class UserService {
           // then override only with what the backend returned
           const updated: User = res?.user
             ? { ...current, ...res.user }
-            : { ...current, userName: payload.userName };
+            : { ...current, userName: payload.userName ?? current.userName };
 
           this.auth.currentUser.set(updated);
           this.storage.setItem('user', updated);

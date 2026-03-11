@@ -136,7 +136,7 @@
                       </button>
                       @if (coupon.isActive) {
                         <button
-                          class="btn btn-sm btn-warning"
+                          class="btn btn-sm btn-danger"
                           (click)="requestDeactivate(coupon)"
                           [disabled]="actionLoading() === coupon._id"
                         >

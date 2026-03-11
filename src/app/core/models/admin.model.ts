@@ -21,6 +21,8 @@ export interface AdminUser {
   profileImage?: { secure_url: string; public_id: string };
   phone?: string;
   addresses?: ShippingAddress[];
+  storename?: string;
+  storeDescription?: string;
   createdAt?: string;
 }
 
@@ -99,7 +101,8 @@ export interface AdminBannerQueryParams {
 export interface AdminSellerInfo {
   _id: string;
   userId: string;
-  storeName: string;
+  userName: string;
+  storename: string;
   email: string;
   phone?: string;
   isBlocked: boolean;

@@ -28,8 +28,11 @@ export class SellerDetailComponent implements OnInit {
   loadSeller(id: string): void {
     this.isLoading.set(true);
     this.adminService.getSellerById(id).subscribe({
-      next: (seller) => {
+      next: (seller: SellerDetail) => {
+        // Log to identify property names in detail response if possible (internal hint)
         this.seller.set(seller);
+        this.isLoading.set(false);
+
         this.isLoading.set(false);
       },
       error: () => {

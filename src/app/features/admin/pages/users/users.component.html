@@ -320,6 +320,31 @@
             </div>
           </div>
 
+          @if (user.role === 'seller') {
+            <div class="form-grid seller-fields" @fadeInOut>
+              <div class="form-group">
+                <label>Store Name <span class="required">*</span></label>
+                <input
+                  type="text"
+                  class="form-input"
+                  [value]="user.storename || ''"
+                  (input)="updateEditableField('storename', $any($event.target).value)"
+                  placeholder="Enter store name"
+                />
+              </div>
+              <div class="form-group">
+                <label>Store Description <span class="required">*</span></label>
+                <textarea
+                  class="form-input"
+                  rows="3"
+                  [value]="user.storeDescription || ''"
+                  (input)="updateEditableField('storeDescription', $any($event.target).value)"
+                  placeholder="Enter store description"
+                ></textarea>
+              </div>
+            </div>
+          }
+
           <div class="form-grid">
             <div class="form-group">
               <label>Phone Number</label>

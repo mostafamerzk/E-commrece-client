@@ -26,7 +26,7 @@
           </svg>
           Back to Sellers
         </a>
-        <h1 class="page-title">{{ s.storeName }}</h1>
+        <h1 class="page-title">{{ s.storename || s.userName || 'Seller Profile' }}</h1>
       </div>
       <div class="header-actions">
         @if (!s.isBlocked) {
@@ -49,9 +49,10 @@
       </div>
     </div>
 
-    <!-- Profile Card -->
-    <div class="detail-grid">
-      <div class="detail-card">
+    <!-- Main Content Layout -->
+    <div class="details-layout-wrapper">
+      <!-- Seller Professional Details -->
+      <div class="detail-card profile-main-card">
         <h2 class="card-title">Seller Information</h2>
         <div class="info-list">
           <div class="info-row">
@@ -74,58 +75,77 @@
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Products Table -->
-    @if (s.products && s.products.length > 0) {
-      <div class="table-card" style="margin-top: 1.5rem">
-        <h2
-          class="card-title"
-          style="padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--color-slate-200)"
-        >
-          Products ({{ s.products.length }})
-        </h2>
+      <!-- Products Section -->
+      <div class="table-card products-section">
+        <div class="card-header-flex">
+          <h2 class="card-title">Products</h2>
+          @if (s.products && s.products.length > 0) {
+            <span class="count-badge">{{ s.products.length }}</span>
+          }
+        </div>
+
         <div class="table-wrapper">
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>Price</th>
-                <th>Stock</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (product of s.products; track product._id) {
+          @if (s.products && s.products.length > 0) {
+            <table class="data-table">
+              <thead>
                 <tr>
-                  <td>
-                    <div class="product-cell">
-                      @if (product.mainImage && product.mainImage.secure_url) {
-                        <img
-                          [src]="product.mainImage.secure_url"
-                          [alt]="product.title"
-                          class="product-thumb"
-                        />
-                      }
-                      <span>{{ product.title }}</span>
-                    </div>
-                  </td>
-                  <td>{{ formatCurrency(product.price) }}</td>
-                  <td>{{ product.stock }}</td>
-                  <td>
-                    <span
-                      class="status-badge"
-                      [class]="product.isDeleted ? 'status-danger' : 'status-success'"
-                    >
-                      {{ product.isDeleted ? 'Deleted' : 'Active' }}
-                    </span>
-                  </td>
+                  <th>Product</th>
+                  <th>Price</th>
+                  <th>Stock</th>
+                  <th>Status</th>
                 </tr>
-              }
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                @for (product of s.products; track product._id) {
+                  <tr>
+                    <td>
+                      <div class="product-cell">
+                        @if (product.mainImage && product.mainImage.secure_url) {
+                          <img
+                            [src]="product.mainImage.secure_url"
+                            [alt]="product.title"
+                            class="product-thumb"
+                          />
+                        }
+                        <span>{{ product.title }}</span>
+                      </div>
+                    </td>
+                    <td>{{ formatCurrency(product.price) }}</td>
+                    <td>{{ product.stock }}</td>
+                    <td>
+                      <span
+                        class="status-badge"
+                        [class]="product.isDeleted ? 'status-danger' : 'status-success'"
+                      >
+                        {{ product.isDeleted ? 'Deleted' : 'Active' }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          } @else {
+            <div class="empty-state-small">
+              <svg width="32" height="32" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="1.5"
+                  d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+                />
+              </svg>
+              <p>No products listed by this seller yet.</p>
+            </div>
+          }
         </div>
       </div>
-    }
+    </div>
+  }
+  @if (!isLoading() && !error() && !seller()) {
+    <div class="empty-state">
+      <p>Seller not found or no data available.</p>
+      <button class="btn btn-secondary" routerLink="/admin/sellers">Back to Sellers</button>
+    </div>
   }
 </section>
