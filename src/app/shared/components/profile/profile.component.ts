@@ -10,7 +10,8 @@ import {
 } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { UserService } from '../../../core/services/user.service';
+import { UserService, UpdateProfilePayload } from '../../../core/services/user.service';
+import { Address } from '../../../core/models/auth.model';
 import { OrderListComponent } from '../../../features/orders/pages/order-list/order-list.component';
 
 // ── Custom Validators ─────────────────────────────────────────────────────────
@@ -77,6 +78,7 @@ export class ProfileComponent implements OnInit {
       '',
       [Validators.required, Validators.minLength(5), Validators.maxLength(15), userNameValidator],
     ],
+    phone: ['', [Validators.pattern(/^01[0125]\d{8}$/)]],
   });
 
   readonly isUploadingAvatar = signal(false);
@@ -98,7 +100,14 @@ export class ProfileComponent implements OnInit {
     this.infoError.set('');
     this.infoSuccess.set(false);
 
-    this.userService.updateProfile({ userName: this.f['userName'].value! }).subscribe({
+    const payload: UpdateProfilePayload = {
+      userName: this.f['userName'].value!,
+    };
+    if (this.f['phone'].value) {
+      payload.phone = this.f['phone'].value;
+    }
+
+    this.userService.updateProfile(payload).subscribe({
       next: () => {
         this.isSavingInfo.set(false);
         this.infoSuccess.set(true);
@@ -174,6 +183,7 @@ export class ProfileComponent implements OnInit {
 
   // ── Address Form ──────────────────────────────────────────────────────────
   addressForm = this.fb.group({
+    phone: ['', [Validators.required, Validators.pattern(/^01[0125]\d{8}$/)]],
     street: ['', Validators.required],
     city: ['', Validators.required],
     country: ['Egypt', Validators.required],
@@ -188,24 +198,86 @@ export class ProfileComponent implements OnInit {
     return this.addressForm.controls;
   }
 
-  saveAddress(): void {
-    this.addressForm.markAllAsTouched();
-    if (this.addressForm.invalid) return;
-    this.isSavingAddress.set(true);
-    this.addressError.set('');
-    setTimeout(() => {
-      this.isSavingAddress.set(false);
-      this.addressSuccess.set(true);
-      setTimeout(() => this.addressSuccess.set(false), 3000);
-    }, 800);
-  }
-
   // ── Init ─────────────────────────────────────────────────────────────────
   ngOnInit(): void {
     const u = this.user();
     if (u) {
-      this.infoForm.patchValue({ userName: u.userName ?? '' });
+      this.infoForm.patchValue({
+        userName: u.userName ?? '',
+        phone: u.phone ?? '',
+      });
     }
+  }
+
+  // ── Address Operations ──────────────────────────────────────────────────
+  readonly editingAddressId = signal<string | null>(null);
+
+  editAddress(address: Address): void {
+    this.editingAddressId.set(address._id ?? null);
+    this.addressForm.patchValue({
+      phone: address.phone,
+      street: address.street,
+      city: address.city,
+      country: address.country,
+      postalCode: address.postalCode,
+    });
+    // Scroll to form if needed
+  }
+
+  cancelEditAddress(): void {
+    this.editingAddressId.set(null);
+    this.addressForm.reset({ country: 'Egypt' });
+  }
+
+  saveAddress(): void {
+    this.addressForm.markAllAsTouched();
+    if (this.addressForm.invalid) return;
+
+    this.isSavingAddress.set(true);
+    this.addressError.set('');
+    this.addressSuccess.set(false);
+
+    const payload: UpdateProfilePayload = {
+      address: {
+        phone: this.a['phone'].value!,
+        street: this.a['street'].value!,
+        city: this.a['city'].value!,
+        country: this.a['country'].value!,
+        postalCode: this.a['postalCode'].value!,
+      },
+    };
+
+    if (this.editingAddressId()) {
+      payload.addressId = this.editingAddressId()!;
+    }
+
+    this.userService.updateProfile(payload).subscribe({
+      next: () => {
+        this.isSavingAddress.set(false);
+        this.addressSuccess.set(true);
+        this.editingAddressId.set(null);
+        this.addressForm.reset({ country: 'Egypt' });
+        setTimeout(() => this.addressSuccess.set(false), 3000);
+      },
+      error: (err) => {
+        this.isSavingAddress.set(false);
+        this.addressError.set(err?.error?.message ?? 'Failed to save address.');
+      },
+    });
+  }
+
+  deleteAddress(addressId: string): void {
+    if (!confirm('Are you sure you want to delete this address?')) return;
+
+    this.addressError.set('');
+    this.userService.updateProfile({ addressId }).subscribe({
+      next: () => {
+        // Success
+      },
+      error: (err) => {
+        this.addressError.set(err?.error?.message ?? 'Failed to delete address.');
+      },
+    });
   }
 
   // ── Password Strength ─────────────────────────────────────────────────────

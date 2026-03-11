@@ -20,6 +20,18 @@ import { CloudinaryImage } from './shared.model';
 export type UserRole = 'user' | 'seller' | 'admin';
 
 /**
+ * Address structure for user profile and orders.
+ */
+export interface Address {
+  _id?: string;
+  street: string;
+  city: string;
+  country: string;
+  postalCode: string;
+  phone: string;
+}
+
+/**
  * The core User object.
  * This is what the backend stores and what we cache in localStorage after login.
  * Every guard, every role-based UI element, and AuthService itself reads from
@@ -63,6 +75,10 @@ export interface User {
   storeName?: string;
   storeDescription?: string;
   phone?: string;
+
+  // Array of user addresses (plural 'addresses' for frontend consistency, singular 'address' for backend compatibility)
+  addresses?: Address[];
+  address?: Address[];
 
   // Timestamps
   createdAt?: string;

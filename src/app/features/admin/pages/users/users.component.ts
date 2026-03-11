@@ -5,8 +5,13 @@ import { RouterModule } from '@angular/router';
 import { debounceTime, distinctUntilChanged, Subject } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { AdminService } from '../../../../core/services/admin.service';
-import { AdminUser, AdminUsersResponse } from '../../../../core/models/admin.model';
+import {
+  AdminUser,
+  AdminUsersResponse,
+  ShippingAddress,
+} from '../../../../core/models/admin.model';
 import { Pagination } from '../../../../core/models/shared.model';
+import { TOAST_FACADE } from '../../../../core/tokens/app.tokens';
 import { listAnimation, fadeInOut } from '../../../../core/animations/admin.animations';
 
 @Component({
@@ -20,6 +25,7 @@ import { listAnimation, fadeInOut } from '../../../../core/animations/admin.anim
 export class AdminUsersComponent implements OnInit {
   private adminService = inject(AdminService);
   private fb = inject(FormBuilder);
+  private toast = inject(TOAST_FACADE);
 
   users = signal<AdminUser[]>([]);
   pagination = signal<Pagination | null>(null);
@@ -163,21 +169,45 @@ export class AdminUsersComponent implements OnInit {
     if (!original || !updated) return;
 
     this.isSaving.set(true);
-    this.adminService.updateUser(original._id, updated).subscribe({
+
+    // Filter payload to include only allowed fields
+    const payload: Partial<AdminUser> & Record<string, unknown> = {
+      userName: updated.userName,
+      phone: updated.phone,
+      role: updated.role,
+      storename: updated.role === 'seller' ? updated.storename : undefined,
+      storeDescription: updated.role === 'seller' ? updated.storeDescription : undefined,
+    };
+
+    if (updated.addresses) {
+      payload['addresses'] = updated.addresses.map((addr: ShippingAddress) => {
+        return {
+          street: addr.street,
+          city: addr.city,
+          country: addr.country,
+          postalCode: addr.postalCode,
+          phone: addr.phone,
+        };
+      });
+    }
+
+    this.adminService.updateUser(original._id, payload).subscribe({
       next: (updatedUser: AdminUser) => {
-        if (!updatedUser || !updatedUser._id) {
-          this.isSaving.set(false);
-          this.loadUsers();
-          return;
-        }
+        // Merge with existing data so addresses don't disappear if backend response is partial
+        const mergedUser: AdminUser =
+          updatedUser && updatedUser._id ? { ...updated, ...updatedUser } : { ...updated };
+
         this.users.update((list: AdminUser[]) =>
-          list.map((u) => (u && u._id === updatedUser._id ? updatedUser : u))
+          list.map((u) => (u && u._id === original._id ? mergedUser : u))
         );
+
         this.isSaving.set(false);
+        this.toast.success('User updated successfully');
         this.closeUserModal();
       },
-      error: () => {
+      error: (err) => {
         this.isSaving.set(false);
+        this.toast.error(err?.error?.message || 'Failed to update user');
       },
     });
   }
@@ -188,6 +218,7 @@ export class AdminUsersComponent implements OnInit {
       next: (updatedUser: AdminUser) => {
         if (!updatedUser || !updatedUser._id) {
           this.actionLoading.set(null);
+          this.toast.success('Action completed successfully');
           this.loadUsers();
           return;
         }
@@ -195,8 +226,12 @@ export class AdminUsersComponent implements OnInit {
           list.map((u) => (u && u._id === updatedUser._id ? updatedUser : u))
         );
         this.actionLoading.set(null);
+        this.toast.success('Action completed successfully');
       },
-      error: () => this.actionLoading.set(null),
+      error: (err) => {
+        this.actionLoading.set(null);
+        this.toast.error(err?.error?.message || 'Action failed');
+      },
     });
   }
 
@@ -206,6 +241,7 @@ export class AdminUsersComponent implements OnInit {
       next: (updatedUser: AdminUser) => {
         if (!updatedUser || !updatedUser._id) {
           this.actionLoading.set(null);
+          this.toast.success('Action completed successfully');
           this.loadUsers();
           return;
         }
@@ -213,8 +249,12 @@ export class AdminUsersComponent implements OnInit {
           list.map((u) => (u && u._id === updatedUser._id ? updatedUser : u))
         );
         this.actionLoading.set(null);
+        this.toast.success('Action completed successfully');
       },
-      error: () => this.actionLoading.set(null),
+      error: (err) => {
+        this.actionLoading.set(null);
+        this.toast.error(err?.error?.message || 'Action failed');
+      },
     });
   }
 
@@ -225,6 +265,7 @@ export class AdminUsersComponent implements OnInit {
       next: (updatedUser: AdminUser) => {
         if (!updatedUser || !updatedUser._id) {
           this.actionLoading.set(null);
+          this.toast.success('Action completed successfully');
           this.loadUsers();
           return;
         }
@@ -232,8 +273,12 @@ export class AdminUsersComponent implements OnInit {
           list.map((u) => (u && u._id === updatedUser._id ? updatedUser : u))
         );
         this.actionLoading.set(null);
+        this.toast.success('Action completed successfully');
       },
-      error: () => this.actionLoading.set(null),
+      error: (err) => {
+        this.actionLoading.set(null);
+        this.toast.error(err?.error?.message || 'Action failed');
+      },
     });
   }
 

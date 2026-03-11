@@ -141,6 +141,27 @@
               >
             </div>
 
+            <div class="form-group">
+              <label for="phone">Phone Number</label>
+              <div
+                class="input-wrap"
+                [class.input-error]="f['phone'].invalid && f['phone'].touched"
+              >
+                <i class="pi pi-phone"></i>
+                <input
+                  id="phone"
+                  type="text"
+                  formControlName="phone"
+                  placeholder="e.g. 0123456789"
+                />
+              </div>
+              @if (f['phone'].touched && f['phone'].errors?.['pattern']) {
+                <span class="field-error"
+                  ><i class="pi pi-exclamation-circle"></i> Invalid Egyptian phone number.</span
+                >
+              }
+            </div>
+
             <div class="form-actions">
               <button
                 type="submit"
@@ -353,7 +374,77 @@
             </div>
           }
 
-          <form class="profile-form" [formGroup]="addressForm" (ngSubmit)="saveAddress()">
+          <!-- Address List -->
+          <div class="address-list">
+            @for (address of user()?.addresses; track address._id) {
+              <div class="address-card" [class.editing]="editingAddressId() === address._id">
+                <div class="address-details">
+                  <p class="address-street">{{ address.street }}</p>
+                  <p class="address-city">{{ address.city }}, {{ address.country }}</p>
+                  <p class="address-zip">
+                    Zip: {{ address.postalCode }} | <i class="pi pi-phone"></i> {{ address.phone }}
+                  </p>
+                </div>
+                <div class="address-actions">
+                  <button class="action-btn edit" (click)="editAddress(address)" title="Edit">
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <button
+                    class="action-btn delete"
+                    (click)="deleteAddress(address._id!)"
+                    title="Delete"
+                  >
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+              </div>
+            } @empty {
+              <div class="empty-state">
+                <i class="pi pi-map-marker"></i>
+                <p>No addresses saved yet.</p>
+              </div>
+            }
+          </div>
+
+          <form
+            class="profile-form address-form"
+            [formGroup]="addressForm"
+            (ngSubmit)="saveAddress()"
+          >
+            <div class="section-divider">
+              <span>{{ editingAddressId() ? 'Edit Address' : 'Add New Address' }}</span>
+            </div>
+
+            <div class="form-group mb-4">
+              <label for="addressPhone">Address Phone Number</label>
+              <div
+                class="input-wrap"
+                [class.input-error]="a['phone'].invalid && a['phone'].touched"
+              >
+                <i class="pi pi-phone"></i>
+                <input
+                  id="addressPhone"
+                  type="text"
+                  formControlName="phone"
+                  placeholder="e.g. 0123456789"
+                />
+              </div>
+              @if (a['phone'].touched && a['phone'].errors) {
+                <div class="field-errors">
+                  @if (a['phone'].errors['required']) {
+                    <span class="field-error"
+                      ><i class="pi pi-exclamation-circle"></i> Phone is required.</span
+                    >
+                  }
+                  @if (a['phone'].errors['pattern']) {
+                    <span class="field-error"
+                      ><i class="pi pi-exclamation-circle"></i> Invalid Egyptian phone.</span
+                    >
+                  }
+                </div>
+              }
+            </div>
+
             <div class="form-row">
               <div class="form-group">
                 <label for="street">Street</label>
@@ -443,6 +534,11 @@
             </div>
 
             <div class="form-actions">
+              @if (editingAddressId()) {
+                <button type="button" class="cancel-btn" (click)="cancelEditAddress()">
+                  Cancel
+                </button>
+              }
               <button
                 type="submit"
                 class="save-btn"
@@ -452,7 +548,12 @@
                 @if (isSavingAddress()) {
                   <i class="pi pi-spin pi-spinner"></i> Saving...
                 } @else {
-                  <i class="pi pi-map"></i> Save Address
+                  <i
+                    class="pi"
+                    [class.pi-map-marker]="!editingAddressId()"
+                    [class.pi-check]="editingAddressId()"
+                  ></i>
+                  {{ editingAddressId() ? 'Update Address' : 'Save Address' }}
                 }
               </button>
             </div>

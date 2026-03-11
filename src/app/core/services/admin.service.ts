@@ -30,6 +30,7 @@ import {
 } from '../models/admin.model';
 import { Banner } from '../models/banner.model';
 import { Pagination } from '../models/shared.model';
+import { Product } from '../models/product.model';
 import { API_ENDPOINTS } from '../constants/api-endpoints';
 import { environment } from '../../../environments/environment';
 
@@ -167,8 +168,22 @@ export class AdminService {
 
   getSellerById(id: string): Observable<SellerDetail> {
     return this.api
-      .get<{ message: string; seller: SellerDetail }>(`${API_ENDPOINTS.ADMIN.SELLERS}/${id}`)
-      .pipe(map((res) => res.seller));
+      .get<{
+        message: string;
+        data?: { seller: AdminSellerInfo; products: Product[] };
+      }>(`${API_ENDPOINTS.ADMIN.SELLERS}/${id}`)
+      .pipe(
+        map((res) => {
+          const data = res.data;
+          if (data && data.seller) {
+            return {
+              ...data.seller,
+              products: data.products || [],
+            } as SellerDetail;
+          }
+          return res as unknown as SellerDetail;
+        })
+      );
   }
 
   approveSeller(id: string): Observable<AdminSellerInfo> {
@@ -212,22 +227,32 @@ export class AdminService {
     return this.api
       .get<{
         message: string;
-        product: import('../models/product.model').Product;
+        data: import('../models/product.model').Product;
       }>(`${API_ENDPOINTS.ADMIN.PRODUCTS}/${id}`)
-      .pipe(map((res) => res.product));
+      .pipe(map((res) => res.data));
   }
 
   recoverProduct(id: string): Observable<import('../models/product.model').Product> {
     return this.api
       .patch<
-        { message: string; product: import('../models/product.model').Product },
+        { message: string; data: import('../models/product.model').Product },
         object
       >(`${API_ENDPOINTS.ADMIN.PRODUCTS}/${id}/recover`, {})
-      .pipe(map((res) => res.product));
+      .pipe(map((res) => res.data));
   }
 
   deleteProduct(id: string): Observable<unknown> {
     return this.api.delete(`${API_ENDPOINTS.ADMIN.PRODUCTS}/${id}`);
+  }
+
+  updateProduct(id: string, data: Partial<Product>): Observable<Product> {
+    // Admins use the public /product/:id endpoint for partial updates
+    return this.api
+      .patch<
+        { message: string; product: Product },
+        Partial<Product>
+      >(`${API_ENDPOINTS.PRODUCTS}/${id}`, data)
+      .pipe(map((res) => res.product));
   }
 
   // ─── Categories ───────────────────────────────────────────────────────────────

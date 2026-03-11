@@ -9,6 +9,7 @@ import {
 } from '@angular/forms';
 import { AdminService } from '../../../../core/services/admin.service';
 import { Coupon } from '../../../../core/models/admin.model';
+import { ToastService } from '../../../../core/services/toast.service';
 import { Pagination } from '../../../../core/models/shared.model';
 import { listAnimation, fadeInOut } from '../../../../core/animations/admin.animations';
 import { AdminCouponsResponse } from '../../../../core/models/admin.model';
@@ -24,6 +25,7 @@ import { AdminCouponsResponse } from '../../../../core/models/admin.model';
 export class AdminCouponsComponent implements OnInit {
   private adminService = inject(AdminService);
   private fb = inject(FormBuilder);
+  private toastService = inject(ToastService);
 
   coupons = signal<Coupon[]>([]);
   pagination = signal<Pagination | null>(null);
@@ -129,13 +131,18 @@ export class AdminCouponsComponent implements OnInit {
           this.coupons.update((list: Coupon[]) =>
             list.map((c) => (c && c._id === updatedCoupon._id ? updatedCoupon : c))
           );
+          this.toastService.success('Coupon updated successfully');
         } else {
           this.coupons.update((list: Coupon[]) => [updatedCoupon, ...list]);
+          this.toastService.success('Coupon created successfully');
         }
         this.isSaving.set(false);
         this.closeModal();
       },
-      error: () => this.isSaving.set(false),
+      error: () => {
+        this.isSaving.set(false);
+        this.toastService.error('Failed to save coupon');
+      },
     });
   }
 
@@ -156,8 +163,12 @@ export class AdminCouponsComponent implements OnInit {
       next: () => {
         this.coupons.update((list: Coupon[]) => list.filter((c) => c._id !== id));
         this.actionLoading.set(null);
+        this.toastService.success('Coupon deactivated successfully');
       },
-      error: () => this.actionLoading.set(null),
+      error: () => {
+        this.actionLoading.set(null);
+        this.toastService.error('Failed to deactivate coupon');
+      },
     });
   }
 

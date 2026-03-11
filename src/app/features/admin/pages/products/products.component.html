@@ -179,6 +179,12 @@
                   </td>
                   <td>
                     <div class="action-buttons">
+                      <button
+                        class="btn btn-sm btn-secondary"
+                        [routerLink]="['/admin/products', product._id]"
+                      >
+                        View
+                      </button>
                       @if (product.isDeleted) {
                         <button
                           class="btn btn-sm btn-success"

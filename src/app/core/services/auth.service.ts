@@ -43,8 +43,14 @@ export class AuthService {
 
   private getUserFromStorage(): User | null {
     const stored = this.storage.getItem<User | ProfileResponse>('user');
-    // Handle both { data: User } and direct User structures
-    return stored && 'data' in stored ? stored.data : stored;
+    const user = stored && 'data' in stored ? stored.data : (stored as User);
+
+    // Normalize backend 'address' (singular) to frontend 'addresses' (plural)
+    if (user && user.address && !user.addresses) {
+      user.addresses = user.address;
+    }
+
+    return user;
   }
 
   async login(email: string, password: string): Promise<LoginResponse> {
@@ -81,7 +87,14 @@ export class AuthService {
     const response = await firstValueFrom(
       this.http.get<ProfileResponse | User>(`${this.baseUrl}/user/profile`)
     );
-    return 'data' in response ? response.data : response;
+    const user = 'data' in response ? response.data : response;
+
+    // Normalize backend 'address' (singular) to frontend 'addresses' (plural)
+    if (user && user.address && !user.addresses) {
+      user.addresses = user.address;
+    }
+
+    return user;
   }
 
   async register(payload: RegisterPayload): Promise<AuthResponse> {
@@ -107,6 +120,22 @@ export class AuthService {
       this.http.post<{ message: string }>(`${this.baseUrl}/auth/resetPass?email=${email}`, payload)
     );
     return response;
+  }
+
+  async updateProfile(payload: Record<string, unknown>): Promise<void> {
+    const response = await firstValueFrom(
+      this.http.patch<{ success: boolean; message: string }>(
+        `${this.baseUrl}/user/profile/update`,
+        payload
+      )
+    );
+
+    if (response?.success) {
+      // Refresh user profile after update to keep signals in sync
+      const updatedUser = await this.getProfile();
+      this.storage.setItem('user', updatedUser);
+      this.currentUser.set(updatedUser);
+    }
   }
 
   logout(): void {
