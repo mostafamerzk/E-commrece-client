@@ -23,13 +23,26 @@ export interface UserApiResponse {
   message: string;
   user?: User;
 }
+export interface UpdateAddressPayload {
+  street: string;
+  city: string;
+  country: string;
+  zipCode: string;
+}
 
 @Injectable({ providedIn: 'root' })
 export class UserService {
   private api = inject(ApiService);
   private auth = inject(AuthService);
   private storage = inject(StorageService);
-
+  updateAddress(payload: UpdateAddressPayload): Observable<UserApiResponse> {
+    return this.api
+      .patch<
+        UserApiResponse,
+        UpdateAddressPayload
+      >(`${API_ENDPOINTS.USER}/profile/updateAddress`, payload)
+      .pipe(catchError((err) => throwError(() => err)));
+  }
   // PATCH /user/profile/update
   updateProfile(payload: UpdateProfilePayload): Observable<UserApiResponse> {
     return this.api

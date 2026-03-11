@@ -200,13 +200,30 @@ export class ProfileComponent implements OnInit {
   saveAddress(): void {
     this.addressForm.markAllAsTouched();
     if (this.addressForm.invalid) return;
+
     this.isSavingAddress.set(true);
     this.addressError.set('');
-    setTimeout(() => {
-      this.isSavingAddress.set(false);
-      this.addressSuccess.set(true);
-      setTimeout(() => this.addressSuccess.set(false), 3000);
-    }, 800);
+
+    const { street, city, country, postalCode } = this.addressForm.value;
+
+    this.userService
+      .updateAddress({
+        street: street!,
+        city: city!,
+        country: country!,
+        zipCode: postalCode!,
+      })
+      .subscribe({
+        next: () => {
+          this.isSavingAddress.set(false);
+          this.addressSuccess.set(true);
+          setTimeout(() => this.addressSuccess.set(false), 3000);
+        },
+        error: (err) => {
+          this.isSavingAddress.set(false);
+          this.addressError.set(err?.error?.message ?? 'Failed to save address.');
+        },
+      });
   }
 
   // ── Init ─────────────────────────────────────────────────────────────────
