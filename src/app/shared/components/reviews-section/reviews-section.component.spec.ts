@@ -42,7 +42,7 @@ describe('ReviewsSectionComponent', () => {
       'addReview',
       'deleteReview',
     ]);
-    authServiceSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn', 'currentUser', 'isAdmin'], {
+    authServiceSpy = jasmine.createSpyObj('AuthService', [], {
       isLoggedIn: signal(false),
       currentUser: signal<User | null>(null),
       isAdmin: signal(false),
