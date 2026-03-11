@@ -142,7 +142,9 @@ export class HeaderComponent implements OnDestroy, OnInit {
   hideAnnouncement(): void {
     this.showAnnouncement.set(false);
   }
-
+  goToProfile() {
+    this.router.navigate(['/profile']);
+  }
   // ── Auth ──────────────────────────────────────────────────
   logout(): void {
     this.authService.logout();
