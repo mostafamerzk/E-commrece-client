@@ -10,7 +10,7 @@ export const adminGuard: CanActivateFn = async () => {
   const router = inject(Router);
   const storageService = inject(StorageService);
 
-  const user = authService.currentUser();
+  const user = JSON.parse(localStorage.getItem('user') || '{}') as User;
   const isAdmin = user?.role === 'admin';
 
   console.log('[AdminGuard] Checking access...', {

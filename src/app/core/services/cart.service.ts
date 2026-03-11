@@ -255,7 +255,7 @@ export class CartService {
       return { ...serverItem, product: { _id: productId } as Product };
     });
 
-    this._cart.set({ ...serverCart, products: [...mergedProducts] });
+    this._cart.set({ ...serverCart, products: [...mergedProducts] as CartItem[] });
   }
   private isProductObject(p: (Product & { id?: string }) | string | undefined): p is Product {
     if (!p || typeof p !== 'object') return false;

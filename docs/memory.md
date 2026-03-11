@@ -72,6 +72,8 @@
 | TASK-M03 | Category Service & Management (Admin) | Mostafa | [x] Done | feature/category-managment |
 | TASK-I03 | Review Service | Issac | [x] Done | task/i03-review-service |
 | TASK-K07 | Login & Register Pages | Isaac | [x] Done | — |
+| TASK-I05 | Admin Layout + Dashboard | Issac | [x] Done | — |
+| TASK-I06 | Admin Users Management | Issac | [x] Done | — |
 
 ---
 
@@ -92,6 +94,8 @@
 | TASK-I03 | Review Service | Issac | 2026-03-03 |
 | TASK-K07 | Login & Register Pages | Isaac | 2026-03-05 |
 | TASK-I04 | Reviews Section Component | Isaac | 2026-03-07 |
+| TASK-I05 | Admin Layout + Dashboard | Issac | 2026-03-07 |
+| TASK-I06 | Admin Users Management | Issac | 2026-03-11 |
 
 ---
 
@@ -115,10 +119,10 @@ _None yet._
 
 ## Last Session Summary
 
-- **Date:** 2026-03-07
-- **Who:** Antigravity (Agent)
-- **What was done:** Completed **[TASK-I05] Admin Layout + Dashboard**. Implemented a shared `SidebarNavComponent` with mobile drawer, a responsive `AdminLayout`, and the `DashboardComponent` featuring KPI cards and recent orders. Refined `AdminService` and API constants. Verified with a successful production build.
-- **What is next:** Proceed with Phase 2 Admin management pages (Users, Orders, Banners).
+- **Date:** 2026-03-11
+- **Who:** Issac (with Agent)
+- **What was done:** Completed **[TASK-I06] Admin Users Management**. Refactored `AdminUsersComponent` with URL query param state management (search, page, limit), lazy loading PrimeNG table, separate load methods for paginated vs. search results, user actions (approve, restrict, restore) with admin protection, and matching product-list styling. Updated `AdminService` with `restoreUser()` method. Fixed test file with proper imports and restore tests.
+- **What is next:** Proceed with remaining Phase 2 Admin management pages (Orders, Banners).
 
 ---
 
@@ -140,3 +144,4 @@ _None yet._
 | 2026-03-05 | Task K07 | Login & Register pages completed (TASK-K07) |
 | 2026-03-07 | Task I04 | Reviews Section Component completed; PrimeNG removed, Tailwind design tokens applied, PrimaryButton refactored for variants, 10/10 tests passed |
 | 2026-03-07 | Task I05 | Admin Layout & Dashboard completed; SidebarNav created, AdminService implemented, Responsive layout verified, Build passed |
+| 2026-03-11 | Task I06 | Admin Users Management completed; Query param state sync, lazy loading table, approve/restrict/restore actions, admin protection, test updates |

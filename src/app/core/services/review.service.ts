@@ -20,10 +20,10 @@ export class ReviewService {
    * POST /review/:productId
    */
   addReview(productId: string, payload: AddReviewPayload): Observable<ReviewResponse> {
-    return this.apiService.post<ReviewResponse, AddReviewPayload>(
-      `${API_ENDPOINTS.REVIEWS}/${productId}`,
-      payload
-    );
+    const endpoint = `${API_ENDPOINTS.REVIEWS}/${productId}`;
+    console.log('[ReviewService] 📤 POST endpoint:', endpoint);
+    console.log('[ReviewService] 📤 Payload:', payload);
+    return this.apiService.post<ReviewResponse, AddReviewPayload>(endpoint, payload);
   }
 
   /**

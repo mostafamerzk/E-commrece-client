@@ -68,6 +68,113 @@ $white: #ffffff;
   }
 }
 
+// ── Options Menu ──────────────────────────────────────────
+.product-options {
+  position: absolute;
+  top: 0.75rem;
+  right: 3.25rem;
+  z-index: 10;
+  outline: none;
+}
+
+.options-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $slate-500;
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  &:hover {
+    color: $blue;
+    background: $white;
+    transform: scale(1.05);
+  }
+}
+
+.options-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background: $white;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  border: 1px solid $slate-100;
+  padding: 0.5rem;
+  min-width: 120px;
+  z-index: 11;
+  animation: menuFadeIn 0.2s ease-out;
+}
+
+.menu-item {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.625rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: $slate-900;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s;
+  text-align: left;
+
+  i {
+    font-size: 0.875rem;
+    color: $slate-500;
+  }
+
+  &:hover {
+    background: $slate-50;
+    color: $blue;
+    i {
+      color: $blue;
+    }
+  }
+
+  &.delete {
+    &:hover {
+      background: #fef2f2;
+      color: #ef4444;
+      i {
+        color: #ef4444;
+      }
+    }
+  }
+
+  &.recover {
+    &:hover {
+      background: #f0fdf4;
+      color: #16a34a;
+      i {
+        color: #16a34a;
+      }
+    }
+  }
+}
+
+@keyframes menuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 // ── Discount Badge ────────────────────────────────────────
 .badge-discount {
   position: absolute;
@@ -99,6 +206,31 @@ $white: #ffffff;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.1em;
+  }
+}
+
+// ── Deleted Overlay ───────────────────────────────────────
+.deleted-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: rgba(239, 68, 68, 0.4); // Red/danger tint
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 20px;
+  backdrop-filter: blur(2px);
+
+  span {
+    color: $white;
+    background: #ef4444;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
   }
 }
 

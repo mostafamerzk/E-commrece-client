@@ -1,12 +1,14 @@
-import { Component, input, signal, inject, computed } from '@angular/core';
+import { Component, input, signal, inject, computed, HostListener } from '@angular/core';
 import { CommonModule, CurrencyPipe } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { finalize } from 'rxjs';
 import { Product } from '../../../core/models/product.model';
-// Assume these exist as per instructions
 import { CartService } from '../../../core/services/cart.service';
 import { WishlistService } from '../../../core/services/wishlist.service';
+import { AuthService } from '../../../core/services/auth.service';
+import { ProductService } from '../../../core/services/product.service';
+import { ToastService } from '../../../core/services/toast.service';
 /* 
 import { DiscountPricePipe } from '../../../pipes/discount-price.pipe';
  */
@@ -42,6 +44,25 @@ export class ProductCardComponent {
   private cart = inject(CartService);
   private wishlist = inject(WishlistService);
   private router = inject(Router);
+  private authService = inject(AuthService);
+  private productService = inject(ProductService);
+  private toast = inject(ToastService);
+
+  // Core signals for roles
+  readonly isAdmin = this.authService.isAdmin;
+  readonly isSeller = this.authService.isSeller;
+  readonly currentUser = this.authService.currentUser;
+
+  // Local state for menu
+  readonly isMenuOpen = signal(false);
+
+  // Computed permissions
+  readonly isOwner = computed(() => {
+    const user = this.currentUser();
+    return !!user && user._id === this.product().sellerId;
+  });
+
+  readonly canManage = computed(() => this.isOwner());
 
   // Computed state
   readonly isWishlisted = computed(() =>
@@ -82,5 +103,56 @@ export class ProductCardComponent {
   }
   navigateToDetail(): void {
     this.router.navigate(['/products', this.product()._id]);
+  }
+
+  toggleMenu(event: Event): void {
+    event.stopPropagation();
+    this.isMenuOpen.update((prev) => !prev);
+  }
+
+  @HostListener('document:click')
+  closeMenu(): void {
+    if (this.isMenuOpen()) {
+      this.isMenuOpen.set(false);
+    }
+  }
+
+  onEdit(event: Event): void {
+    event.stopPropagation();
+    this.isMenuOpen.set(false);
+    // Placeholder for now as per instructions
+    this.toast.info('Edit Product feature coming soon!', 'Info');
+  }
+
+  onDelete(event: Event): void {
+    event.stopPropagation();
+    this.isMenuOpen.set(false);
+
+    if (confirm('Are you sure you want to delete this product?')) {
+      this.productService.delete(this.product()._id, false).subscribe({
+        next: () => {
+          this.toast.success('Product deleted successfully', 'Success');
+          this.product().isDeleted = true;
+        },
+        error: (err) => {
+          this.toast.error(err.message || 'Failed to delete product', 'Error');
+        },
+      });
+    }
+  }
+
+  onRecover(event: Event): void {
+    event.stopPropagation();
+    this.isMenuOpen.set(false);
+
+    this.productService.restore(this.product()._id, false).subscribe({
+      next: () => {
+        this.toast.success('Product restored successfully', 'Success');
+        this.product().isDeleted = false;
+      },
+      error: (err) => {
+        this.toast.error(err.message || 'Failed to restore product', 'Error');
+      },
+    });
   }
 }

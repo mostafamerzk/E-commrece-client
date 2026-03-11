@@ -69,7 +69,12 @@ export interface User {
 
   isLogged?: boolean;
   provider?: string;
-
+  address?: {
+    street: string;
+    city: string;
+    country: string;
+    zipCode: string;
+  };
   // Seller-specific fields — only populated when role === 'seller'.
   // Optional because customer and admin users do not have a store.
   storeName?: string;
