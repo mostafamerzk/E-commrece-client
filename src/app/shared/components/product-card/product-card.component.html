@@ -16,63 +16,15 @@
     <i class="pi" [class.pi-heart]="!isWishlisted()" [class.pi-heart-fill]="isWishlisted()"></i>
   </button>
 
-  <!-- Product Options Menu -->
-  @if (canManage()) {
-    <div
-      class="product-options"
-      (click)="$event.stopPropagation()"
-      (keydown.stop)="$event.stopPropagation()"
-      tabindex="0"
-    >
-      <button
-        class="options-btn"
-        (click)="toggleMenu($event)"
-        [attr.aria-expanded]="isMenuOpen()"
-        aria-label="Product options"
-      >
-        <i class="pi pi-ellipsis-v"></i>
-      </button>
-
-      @if (isMenuOpen()) {
-        <div class="options-menu">
-          @if (isOwner()) {
-            <button class="menu-item" (click)="onEdit($event)">
-              <i class="pi pi-pencil"></i>
-              <span>Edit</span>
-            </button>
-          }
-
-          @if (!product().isDeleted) {
-            <button class="menu-item delete" (click)="onDelete($event)">
-              <i class="pi pi-trash"></i>
-              <span>Delete</span>
-            </button>
-          } @else {
-            <button class="menu-item recover" (click)="onRecover($event)">
-              <i class="pi pi-refresh"></i>
-              <span>Recover</span>
-            </button>
-          }
-        </div>
-      }
-    </div>
-  }
-
   <!-- Discount Badge -->
   @if (product().discount) {
     <div class="badge-discount">-{{ product().discount }}%</div>
   }
 
+  <!-- Out of Stock Overlay -->
   @if (product().stock === 0) {
     <div class="out-of-stock-overlay">
       <span>Out of Stock</span>
-    </div>
-  }
-
-  <!-- Deleted Overlay (Admin only) -->
-  @if (product().isDeleted && isAdmin()) {
-    <div class="deleted-overlay">
-      <span>Deleted Product</span>
     </div>
   }
 

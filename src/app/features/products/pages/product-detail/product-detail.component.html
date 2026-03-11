@@ -60,10 +60,10 @@
           <!-- Rating -->
           <div class="rating-row">
             <p-rating [ngModel]="product()?.avgRating" [readonly]="true" />
-            <button class="rating-link-btn" (click)="scrollToReviews()">
+            <span class="rating-text">
               {{ product()?.avgRating | number: '1.1-1' }}
-              <span class="rating-count"> ({{ product()?.reviews?.length || 0 }} reviews) </span>
-            </button>
+              <span class="rating-count">(0 reviews)</span>
+            </span>
           </div>
 
           <!-- Price -->
@@ -98,7 +98,7 @@
           <!-- Actions -->
           <div class="actions-section">
             <div class="quantity-row">
-              <label class="quantity-label" for="quantity">Quantity</label>
+              <label class="quantity-label">Quantity</label>
               <p-inputnumber
                 [ngModel]="quantity()"
                 (ngModelChange)="quantity.set($event)"
@@ -114,7 +114,6 @@
                 [min]="1"
                 [max]="product()!.stock"
                 [disabled]="product()!.stock === 0"
-                id="quantity"
               />
             </div>
 
@@ -173,11 +172,7 @@
 
       <!-- Reviews Section -->
       <div class="reviews-wrapper">
-        <app-reviews-section
-          [initialAvgRating]="product()?.avgRating || 0"
-          [initialReviews]="product()?.reviews || []"
-          [productId]="product()?._id || ''"
-        />
+        <app-reviews-section [productId]="product()?._id || ''" />
       </div>
     }
   </div>

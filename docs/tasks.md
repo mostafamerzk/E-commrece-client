@@ -356,7 +356,7 @@
 ---
 
 ### [TASK-I05] Admin Layout + Dashboard
-**Status:** [~]
+**Status:** [ ]
 **Phase:** 2 — Feature Pages
 **Files to create:**
 - src/app/layouts/admin-layout/admin-layout.component.ts

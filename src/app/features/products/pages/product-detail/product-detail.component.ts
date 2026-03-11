@@ -208,11 +208,4 @@ export class ProductDetailComponent {
       },
     });
   }
-
-  scrollToReviews(): void {
-    const element = document.getElementById('reviews-section');
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  }
 }

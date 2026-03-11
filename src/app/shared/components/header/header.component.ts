@@ -27,6 +27,8 @@ import { Product } from '../../../core/models/product.model';
 })
 export class HeaderComponent implements OnDestroy, OnInit {
   // ── Services ─────────────────────────────────────────────
+  newcurrent = JSON.parse(localStorage.getItem('user') || 'null');
+
   ngOnInit(): void {
     if (this.authService.isLoggedIn()) {
       this.wishlistService.getWishlist().subscribe();
