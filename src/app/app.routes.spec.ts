@@ -79,7 +79,6 @@ interface AuthFacadeMock {
 describe('App Routing', () => {
   let authFacadeMock: AuthFacadeMock;
   let harness: RouterTestingHarness;
-
   beforeEach(async () => {
     authFacadeMock = {
       isLoggedIn: signal(false),

@@ -1,0 +1,208 @@
+<main class="order-detail-page">
+  <div class="order-detail-container">
+    <!-- Header Actions -->
+    <div class="header-actions">
+      <button routerLink="/orders" class="btn-back">
+        <i class="pi pi-arrow-left"></i>
+        Back to Orders
+      </button>
+
+      @if (order() && canCancel(order()!.orderStatus)) {
+        <button (click)="confirmCancelOrder()" [disabled]="isCancelling()" class="btn-cancel">
+          <i class="pi pi-times-circle"></i>
+          {{ isCancelling() ? 'Cancelling...' : 'Cancel Order' }}
+        </button>
+      }
+    </div>
+
+    @if (isLoading()) {
+      <div class="receipt-card skeleton-receipt">
+        <div class="skeleton-content">
+          <p-skeleton width="200px" height="40px"></p-skeleton>
+          <p-skeleton width="300px" height="20px"></p-skeleton>
+          <div class="skeleton-divider"></div>
+          <p-skeleton width="100%" height="300px"></p-skeleton>
+        </div>
+      </div>
+    } @else if (order()) {
+      <!-- Receipt Layout -->
+      <div class="receipt-card">
+        <!-- Decorative Receipt Edge (Top) -->
+        <div class="receipt-edge top"></div>
+
+        <div class="receipt-body">
+          <!-- Order Header -->
+          <header class="receipt-header">
+            <span class="receipt-badge">Official Receipt</span>
+            <h1 class="receipt-id">#{{ order()!.orderNumber }}</h1>
+            <p class="receipt-date">
+              <i class="pi pi-clock"></i>
+              Placed on {{ order()!.createdAt | date: 'MMMM d, y, h:mm a' }}
+            </p>
+          </header>
+
+          <!-- Status Stepper -->
+          <div class="status-stepper-wrapper">
+            @if (isCancelledOrReturned(order()!.orderStatus)) {
+              <div class="status-alert">
+                <div class="alert-content">
+                  <span
+                    [class]="getStatusDotClass(order()!.orderStatus)"
+                    class="status-dot-pulse"
+                  ></span>
+                  <span class="status-text" [class]="getStatusTextClass(order()!.orderStatus)">
+                    Order {{ order()!.orderStatus }}
+                  </span>
+                </div>
+              </div>
+            } @else {
+              <div class="stepper">
+                <!-- Progress Line -->
+                <div class="stepper-line">
+                  <div class="stepper-progress" [style.width]="getStepperProgress()"></div>
+                </div>
+
+                <div class="stepper-steps">
+                  @for (s of steps; track s.status) {
+                    <div class="step-item">
+                      <div class="step-circle" [ngClass]="getStepCircleClass(s.status)">
+                        <i [class]="s.icon"></i>
+                      </div>
+                      <span class="step-label" [ngClass]="getStepTextClass(s.status)">
+                        {{ s.label }}
+                      </span>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="receipt-grid">
+            <!-- Items Section -->
+            <section class="receipt-items">
+              <h3 class="section-title">
+                <i class="pi pi-list"></i>
+                Ordered Items
+              </h3>
+              <div class="items-table-wrapper">
+                <table class="items-table">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th class="text-center">Qty</th>
+                      <th class="text-right">Price</th>
+                      <th class="text-right">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (item of order()!.products; track item.productId) {
+                      <tr>
+                        <td class="product-cell">
+                          <div class="product-info-mini">
+                            <img
+                              [src]="item.mainImage.secure_url"
+                              [alt]="item.title"
+                              class="item-img-mini"
+                            />
+                            <div class="item-text">
+                              <p class="item-name">{{ item.title }}</p>
+                              <p class="item-ref">Ref: {{ item.productId }}</p>
+                            </div>
+                          </div>
+                        </td>
+                        <td class="text-center">{{ item.quantity }}</td>
+                        <td class="text-right">{{ item.unitPrice | currency }}</td>
+                        <td class="text-right font-bold">
+                          {{ item.unitPrice * item.quantity | currency }}
+                        </td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+            </section>
+
+            <!-- Summary Section -->
+            <aside class="receipt-sidebar">
+              <!-- Totals -->
+              <section class="summary-box">
+                <h3 class="sidebar-title">Payment Summary</h3>
+                <div class="summary-lines">
+                  <div class="summary-line">
+                    <span class="label">Subtotal</span>
+                    <span class="value">{{ calculateSubtotal() | currency }}</span>
+                  </div>
+                  <div class="summary-line">
+                    <span class="label">Shipping</span>
+                    <span class="value-free">Free</span>
+                  </div>
+                  @if (order()!.couponCode) {
+                    <div class="summary-line">
+                      <span class="label">Discount ({{ order()!.couponCode }})</span>
+                      <span class="value-discount">-$0.00</span>
+                    </div>
+                  }
+                  <div class="summary-total">
+                    <span class="total-label">Total Paid</span>
+                    <span class="total-value">{{ order()!.totalPrice | currency }}</span>
+                  </div>
+                </div>
+              </section>
+
+              <!-- Shipping Info -->
+              <section class="info-box">
+                <h3 class="sidebar-title">Delivery Address</h3>
+                <div class="address-details">
+                  <div class="detail-row">
+                    <i class="pi pi-map-marker"></i>
+                    <p>
+                      {{ order()!.shippingAddress.street }}<br />
+                      {{ order()!.shippingAddress.city }}, {{ order()!.shippingAddress.country
+                      }}<br />
+                      {{ order()!.shippingAddress.postalCode }}
+                    </p>
+                  </div>
+                  <div class="detail-row">
+                    <i class="pi pi-phone"></i>
+                    <p class="font-bold">{{ order()!.shippingAddress.phone }}</p>
+                  </div>
+                </div>
+              </section>
+
+              <!-- Payment Info -->
+              <section class="info-box">
+                <h3 class="sidebar-title">Method & Security</h3>
+                <div class="payment-row">
+                  <div class="method-info">
+                    <i [class]="getPaymentMethodIcon(order()!.paymentMethod)"></i>
+                    <span class="method-label">{{
+                      formatPaymentMethod(order()!.paymentMethod)
+                    }}</span>
+                  </div>
+                  <div
+                    class="status-pill"
+                    [ngClass]="getPaymentStatusClasses(order()!.paymentStatus)"
+                  >
+                    {{ order()!.paymentStatus }}
+                  </div>
+                </div>
+              </section>
+            </aside>
+          </div>
+        </div>
+
+        <!-- Decorative Receipt Edge (Bottom) -->
+        <div class="receipt-edge bottom"></div>
+      </div>
+    } @else {
+      <div class="order-not-found">
+        <i class="pi pi-exclamation-circle"></i>
+        <h2>Order not found</h2>
+        <p>The order you're looking for doesn't exist or you don't have access to it.</p>
+        <button routerLink="/orders" class="btn-return">Back to History</button>
+      </div>
+    }
+  </div>
+</main>
+<p-confirmDialog [style]="{ width: '450px' }"></p-confirmDialog>

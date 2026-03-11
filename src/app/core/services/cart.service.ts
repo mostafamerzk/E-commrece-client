@@ -28,13 +28,9 @@ export class CartService {
   private _cart = signal<Cart | null>(null);
   readonly cart = this._cart.asReadonly();
 
-  readonly items = computed(() => {
-    const cart = this._cart();
-    const products = cart?.products ?? [];
-    return products.filter((item) => !!item.product?._id);
-  });
+  readonly items = computed(() => (this._cart()?.products ?? []).filter((item) => !!item.product));
   readonly itemCount = computed(() =>
-    this.items().reduce((count, item) => count + (item.quantity || 0), 0)
+    this.items().reduce((count, item) => count + item.quantity, 0)
   );
   readonly totalPrice = computed(() => {
     const cart = this._cart();
@@ -46,29 +42,43 @@ export class CartService {
   });
 
   constructor() {
-    this.loadCart();
+    // Initial load from storage (guest) or fetch from API
+    this.initializeCart();
 
+    // Re-sync or re-load whenever logged-in status changes
     effect(() => {
-      if (this.authService.isLoggedIn()) {
-        this.syncCartWithBackend().subscribe();
-      } else {
-        this.loadCart();
-      }
+      const loggedIn = this.authService.isLoggedIn();
+      // We don't want to run this synchronously in the effect
+      // to avoid 'signal writes' warnings and recursive loops.
+      // setTimeout or a microtask ensures it runs after current detection cycle.
+      Promise.resolve().then(() => {
+        if (loggedIn) {
+          this.syncCartWithBackend().subscribe();
+        } else {
+          this.loadGuestCart();
+        }
+      });
     });
   }
 
-  private loadCart() {
+  private initializeCart() {
     if (this.authService.isLoggedIn()) {
       this.getCart().subscribe();
     } else {
-      const guestCart = this.storage.getItem<CartItem[]>(this.GUEST_CART_KEY);
-      if (guestCart) {
-        this._cart.set({
-          userId: 'guest',
-          products: guestCart,
-          totalPrice: guestCart.reduce((total, item) => total + item.price * item.quantity, 0),
-        });
-      }
+      this.loadGuestCart();
+    }
+  }
+
+  private loadGuestCart() {
+    const guestCart = this.storage.getItem<CartItem[]>(this.GUEST_CART_KEY);
+    if (guestCart) {
+      this._cart.set({
+        userId: 'guest',
+        products: guestCart,
+        totalPrice: guestCart.reduce((total, item) => total + item.price * item.quantity, 0),
+      });
+    } else {
+      this._cart.set(null);
     }
   }
 
@@ -98,19 +108,17 @@ export class CartService {
       tap((res) => {
         if (res?.cart) {
           this.mergeServerCart(res.cart);
-        } else {
-          console.warn('Backend returned no cart for user');
         }
       })
     );
   }
-
   addItem(payload: AddToCartPayload, product?: Product): Observable<CartResponse> {
     if (!this.authService.isLoggedIn()) {
       return this.addGuestItem(payload, product);
     }
     return this.api.post<CartResponse, AddToCartPayload>(this.endpoint, payload).pipe(
       tap((res) => {
+        console.log('ADD ITEM RESPONSE:', JSON.stringify(res, null, 2));
         if (res?.cart) {
           this.mergeServerCart(res.cart, product);
         }
@@ -137,7 +145,11 @@ export class CartService {
     return of(this.getGuestCartResponse(currentItems));
   }
 
-  updateQuantity(productId: string, payload: UpdateCartPayload): Observable<CartResponse> {
+  updateQuantity(
+    productId: string,
+    payload: UpdateCartPayload,
+    product?: Product
+  ): Observable<CartResponse> {
     if (!this.authService.isLoggedIn()) {
       const currentItems = this.items().map((i) => ({ ...i }));
       const itemIndex = currentItems.findIndex((i) => i.product._id === productId);
@@ -165,7 +177,7 @@ export class CartService {
       .pipe(
         tap((res) => {
           if (res?.cart) {
-            this.mergeServerCart(res.cart);
+            this.mergeServerCart(res.cart, product);
           } else {
             console.warn('Backend returned empty cart in PATCH response');
           }
@@ -198,47 +210,57 @@ export class CartService {
   /**
    * Merges a server cart response into _cart without losing populated Product objects.
    *
-   * @param serverCart The cart object returned from the server
-   * @param hintProduct An optional Product object to use if the server returns a bare ID
+   * The backend's PATCH /cart/:id can return products whose `product` field is
+   * either:
+   *   (a) a fully-populated Product object  → use it as-is
+   *   (b) a bare MongoDB ObjectId string    → re-attach the Product we already
+   *                                           have in local state
+   *   (c) null / undefined                  → keep the existing local item
+   *
+   * In all cases, the server's quantities, prices, and totalPrice are adopted so
+   * the local state stays in sync with the source of truth.
    */
-  private mergeServerCart(serverCart: Cart, hintProduct?: Product): void {
+  private mergeServerCart(serverCart: Cart, newProduct?: Product): void {
     const currentProducts = this._cart()?.products ?? [];
 
-    const mergedProducts = (serverCart.products as unknown as RawCartItem[]).map((serverItem) => {
-      // 1. Extract the ID. Backend might send it as 'productId' OR 'product' (string or object)
-      const productId =
-        serverItem.productId ||
-        (this.isProductObject(serverItem.product) ? serverItem.product._id : serverItem.product);
+    const mergedProducts = (serverCart.products as RawCartItem[]).map((serverItem) => {
+      let productId: string | undefined;
 
-      if (!productId) {
-        return serverItem;
+      const productField = serverItem.product;
+      const productIdField = serverItem.productId;
+
+      if (typeof productField === 'string') {
+        productId = productField;
+      } else if (this.isProductObject(productField)) {
+        productId = productField._id || productField.id;
+      } else if (typeof productIdField === 'string') {
+        productId = productIdField;
+      } else if (this.isProductObject(productIdField)) {
+        productId = productIdField._id || productIdField.id;
+      } else if (serverItem._id) {
+        productId = serverItem._id;
       }
 
-      // 2. Try to find populated product object from:
-      //    (a) The server item itself (if it's already an object)
-      //    (b) Our hintProduct (if we just added something)
-      //    (c) Our current local state
-      let populatedProduct: Product;
-
-      if (this.isProductObject(serverItem.product)) {
-        populatedProduct = serverItem.product;
-      } else if (hintProduct?._id === productId) {
-        populatedProduct = hintProduct;
-      } else {
-        const existing = currentProducts.find((p) => p.product?._id === productId);
-        populatedProduct = existing?.product ?? ({ _id: productId } as Product);
+      if (this.isProductObject(productField)) {
+        return { ...serverItem, product: productField };
       }
 
-      return {
-        product: populatedProduct,
-        quantity: serverItem.quantity || 1,
-        price: serverItem.price || populatedProduct.finalPrice || 0,
-      };
+      const existing = currentProducts.find((p) => p.product?._id === productId);
+      if (existing) return { ...serverItem, product: existing.product };
+
+      if (newProduct && newProduct._id === productId) {
+        return { ...serverItem, product: newProduct };
+      }
+
+      return { ...serverItem, product: { _id: productId } as Product };
     });
 
-    this._cart.set({ ...serverCart, products: mergedProducts as CartItem[] });
+    this._cart.set({ ...serverCart, products: [...mergedProducts] as CartItem[] });
   }
-
+  private isProductObject(p: (Product & { id?: string }) | string | undefined): p is Product {
+    if (!p || typeof p !== 'object') return false;
+    return '_id' in p || 'id' in p;
+  }
   removeItem(productId: string): Observable<CartResponse> {
     if (!this.authService.isLoggedIn()) {
       const currentItems = this.items().filter((i) => i.product._id !== productId);
@@ -248,7 +270,7 @@ export class CartService {
     return this.api.delete<CartResponse>(`${this.endpoint}/${productId}`).pipe(
       tap((res) => {
         if (res?.cart) {
-          this.mergeServerCart(res.cart);
+          this.mergeServerCart(res.cart); // ✅ بدل _cart.set
         }
       })
     );
@@ -301,7 +323,8 @@ export class CartService {
         this.storage.removeItem(this.GUEST_CART_KEY);
         return this.getCart();
       }),
-      catchError(() => {
+      catchError((err) => {
+        console.error('Error syncing cart:', err);
         return of(null);
       })
     );
@@ -312,11 +335,7 @@ export class CartService {
   }
 
   loadInitialCart() {
-    this.loadCart();
-  }
-
-  private isProductObject(p: Product | string | undefined): p is Product {
-    return !!p && typeof p === 'object' && '_id' in p;
+    this.initializeCart();
   }
 
   /** Immediately patches the quantity in the local signal without a network call. */
@@ -330,7 +349,7 @@ export class CartService {
 
       return {
         ...current,
-        products: updatedProducts,
+        products: [...updatedProducts],
         totalPrice: updatedProducts.reduce((sum, item) => {
           if (!item.product) return sum;
           const qty = item.product._id === productId ? newQty : item.quantity;

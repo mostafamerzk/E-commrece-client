@@ -1,4 +1,13 @@
-import { Component, signal, HostListener, inject, OnDestroy, input, output } from '@angular/core';
+import {
+  Component,
+  signal,
+  HostListener,
+  inject,
+  OnDestroy,
+  input,
+  output,
+  OnInit,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -16,14 +25,20 @@ import { Product } from '../../../core/models/product.model';
   templateUrl: './header.component.html',
   styleUrl: './header.component.scss',
 })
-export class HeaderComponent implements OnDestroy {
+export class HeaderComponent implements OnDestroy, OnInit {
   // ── Services ─────────────────────────────────────────────
+  newcurrent = JSON.parse(localStorage.getItem('user') || 'null');
+
+  ngOnInit(): void {
+    if (this.authService.isLoggedIn()) {
+      this.wishlistService.getWishlist().subscribe();
+    }
+  }
   private readonly authService = inject(AuthService);
   private readonly cartService = inject(CartService);
   private readonly wishlistService = inject(WishlistService);
   private readonly productService = inject(ProductService);
   private readonly router = inject(Router);
-
   // ── UI State ─────────────────────────────────────────────
   readonly mobileMenuOpen = signal(false);
   readonly isScrolled = signal(false);
@@ -37,12 +52,12 @@ export class HeaderComponent implements OnDestroy {
 
   private readonly searchSubject = new Subject<string>();
   private readonly destroy$ = new Subject<void>();
+  readonly wishlistCount = this.wishlistService.itemCount;
 
   // ── Derived State ─────────────────────────────────────────
   readonly isLoggedIn = this.authService.isLoggedIn;
   readonly currentUser = this.authService.currentUser;
   readonly itemCount = this.cartService.itemCount;
-  readonly wishlistCount = this.wishlistService.itemCount;
 
   // ── Sidebar State (Admin Layout) ─────────────────────────
   sidebarExpanded = input<boolean | undefined>(undefined);
@@ -140,7 +155,6 @@ export class HeaderComponent implements OnDestroy {
     this.isScrolled.set(window.scrollY > 10);
   }
 
-  // ── Click Outside — يقفل الـ dropdown ────────────────────
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event): void {
     const target = event.target as HTMLElement;

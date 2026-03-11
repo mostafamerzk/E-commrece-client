@@ -1,17 +1,16 @@
-<section class="featured-products">
+<section class="products-section">
   <div class="container">
     <!-- Section Header -->
-    <div class="section-header animate-in">
-      <div class="section-tag">Handpicked for you</div>
+    <div class="section-header">
       <h2 class="section-title">Featured <span class="accent">Products</span></h2>
       <p class="section-subtitle">Discover our most loved items, curated for quality and style.</p>
     </div>
 
-    <!-- Loading Skeleton (first load) -->
-    @if (loading) {
+    <!-- Loading Skeleton -->
+    @if (loading()) {
       <div class="products-grid">
         @for (item of [1, 2, 3, 4, 5, 6, 7, 8]; track item) {
-          <div class="product-card skeleton-card">
+          <div class="skeleton-card">
             <div class="skeleton skeleton-img"></div>
             <div class="skeleton-body">
               <div class="skeleton skeleton-text short"></div>
@@ -24,7 +23,7 @@
     }
 
     <!-- Error State -->
-    @if (error) {
+    @if (error()) {
       <div class="error-state">
         <i class="pi pi-exclamation-circle"></i>
         <p>Failed to load products. Please try again.</p>
@@ -33,105 +32,29 @@
     }
 
     <!-- Products Grid -->
-    @if (!loading && !error) {
+    @if (!loading() && !error()) {
       <div class="products-grid">
-        @for (product of products; track product._id) {
-          <a [routerLink]="['/products', product._id]" class="product-card animate-in">
-            <!-- Wishlist Button -->
-            <button
-              class="wishlist-btn"
-              [class.active]="isInWishlist(product._id)"
-              (click)="toggleWishlist($event, product)"
-              aria-label="Toggle wishlist"
-            >
-              <i [class]="isInWishlist(product._id) ? 'pi pi-heart-fill' : 'pi pi-heart'"></i>
-            </button>
-
-            <!-- Discount Badge -->
-            @if (product.discount) {
-              <div class="badge-discount">-{{ getDiscount(product) }}%</div>
-            }
-
-            <!-- Image -->
-            <div class="product-img-wrap">
-              <img
-                [src]="product.mainImage.secure_url"
-                [alt]="product.title"
-                class="product-img"
-                loading="lazy"
-              />
-            </div>
-
-            <!-- Info -->
-            <div class="product-info">
-              <h3 class="product-name">{{ product.title }}</h3>
-
-              <!-- Rating -->
-              <div class="product-rating">
-                <div class="stars">
-                  @for (filled of getStars(product.avgRating); track $index) {
-                    <i class="pi pi-star-fill" [class.filled]="filled"></i>
-                  }
-                </div>
-                <span class="rating-value">{{ product.avgRating | number: '1.1-1' }}</span>
-              </div>
-
-              <!-- Price + Cart -->
-              <div class="product-footer">
-                <div class="price-wrap">
-                  <span class="price-current">${{ product.finalPrice }}</span>
-                  @if (product.discount) {
-                    <span class="price-original">${{ product.price }}</span>
-                  }
-                </div>
-
-                <button
-                  class="add-to-cart-btn"
-                  [class.in-cart]="isInCart(product._id)"
-                  [class.loading]="isAddingToCart(product._id)"
-                  (click)="addToCart($event, product)"
-                  [disabled]="isAddingToCart(product._id)"
-                  aria-label="Add to cart"
-                >
-                  @if (isAddingToCart(product._id)) {
-                    <i class="pi pi-spin pi-spinner"></i>
-                  } @else if (isInCart(product._id)) {
-                    <i class="pi pi-check"></i>
-                  } @else {
-                    <i class="pi pi-shopping-cart"></i>
-                  }
-                </button>
-              </div>
-            </div>
-          </a>
+        @for (product of products(); track product._id) {
+          <app-product-card [product]="product" />
         }
       </div>
 
-      <!-- Pagination Info -->
-      @if (pagination) {
-        <div class="pagination-info">
-          Showing <strong>{{ products.length }}</strong> of
-          <strong>{{ pagination.totalItems }}</strong> products
-        </div>
-      }
-
-      <!-- Load More Button -->
+      <!-- Load More -->
       @if (hasMore) {
         <div class="section-cta">
-          <button class="btn-load-more" (click)="loadMore()" [disabled]="loadingMore">
-            @if (loadingMore) {
+          <button class="btn-load-more" (click)="loadMore()" [disabled]="loadingMore()">
+            @if (loadingMore()) {
               <i class="pi pi-spin pi-spinner"></i>
               Loading...
             } @else {
               Load More Products
-              <i class="pi pi-arrow-down ml-1"></i>
+              <i class="pi pi-arrow-down"></i>
             }
           </button>
         </div>
       }
 
-      <!-- View All (لما يخلص كل الـ products) -->
-      @if (!hasMore && products.length > 0) {
+      @if (!hasMore && products().length > 0) {
         <div class="section-cta">
           <a routerLink="/products" class="btn-view-all">
             View All Products <i class="pi pi-arrow-right"></i>

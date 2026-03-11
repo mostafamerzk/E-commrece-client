@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
-import { catchError, throwError } from 'rxjs';
+import { catchError, throwError, EMPTY } from 'rxjs';
 import { AUTH_FACADE, TOAST_FACADE } from '../tokens/app.tokens';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
@@ -9,6 +9,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
+      // ✅ 409 — بنتجاهله، الـ wishlist service بتتعامل معاه
+      if (error.status === 409) {
+        return EMPTY;
+      }
+
       let message = 'Something went wrong';
 
       if (error.error?.message) {
@@ -25,8 +30,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         message = 'Forbidden — you do not have permission for this action';
       } else if (error.status === 404) {
         message = 'Resource not found';
-      } else if (error.status === 409) {
-        message = 'Conflict — this resource already exists';
       } else if (error.status === 422) {
         message = 'Validation error — please check the input fields';
       } else if (error.status === 429) {
@@ -37,9 +40,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
       console.error('[API ERROR]:', message);
 
-      // Skip toast for expected scenarios like "Cart Not Found" for a new user
+      // Show error toast for all errors except specific cases
       if (message !== 'Cart Not Found') {
-        toastService?.show(message);
+        toastService?.error(message);
       }
 
       // Re-throw the original error instead of new Error(message)

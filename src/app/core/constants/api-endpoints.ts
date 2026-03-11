@@ -5,9 +5,10 @@ export const API_ENDPOINTS = {
   ADMIN: {
     BASE: '/admin',
     STATS: '/admin/stats',
-    ORDERS: '/admin/order',
+    ORDERS: '/admin/orders',
     USERS: '/admin/users',
     BANNERS: '/admin/banners',
+    PRODUCTS: '/admin/products',
   },
   ORDERS: '/order',
   CATEGORIES: '/category',

@@ -1,120 +1,62 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
-import { HomeService } from '../../../../../../core/services/home.service';
-import { CartService } from '../../../../../../core/services/cart.service';
+import { ProductService } from '../../../../../../core/services/product.service';
 import { WishlistService } from '../../../../../../core/services/wishlist.service';
 import { Product } from '../../../../../../core/models/product.model';
-import { Pagination } from '../../../../../../core/models/shared.model';
+import { ProductCardComponent } from '../../../../../../shared/components/product-card/product-card.component';
 
 @Component({
-  selector: 'app-featured-products',
+  selector: 'app-products-section',
   standalone: true,
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, ProductCardComponent],
   templateUrl: './featured-products.component.html',
   styleUrl: './featured-products.component.scss',
 })
-export class FeaturedProductsComponent implements OnInit {
-  private homeService = inject(HomeService);
-  private cartService = inject(CartService);
+export class ProductsSectionComponent implements OnInit {
+  private productService = inject(ProductService);
   private wishlistService = inject(WishlistService);
 
-  products: Product[] = [];
-  pagination: Pagination | null = null;
-
-  loading = true;
-  loadingMore = false;
-  error = false;
+  products = signal<Product[]>([]);
+  loading = signal(true);
+  loadingMore = signal(false);
+  error = signal(false);
 
   private currentPage = 1;
-  private readonly limit = 8;
-
-  addingToCart = new Set<string>();
-
-  // ── Lifecycle ─────────────────────────────────────────────
-  ngOnInit(): void {
-    this.loadProducts(1, true);
-  }
-
-  // ── Load Products ─────────────────────────────────────────
-  private loadProducts(page: number, initial = false): void {
-    if (initial) {
-      this.loading = true;
-    } else {
-      this.loadingMore = true;
-    }
-
-    this.homeService.getFeaturedProducts().subscribe({
-      next: (res) => {
-        // لو initial نبدل الـ array — لو load more نضيف عليه
-        this.products = initial ? res.products : [...this.products, ...res.products];
-
-        this.pagination = res.pagination;
-        this.currentPage = res.pagination.currentPage;
-        this.loading = false;
-        this.loadingMore = false;
-      },
-      error: () => {
-        this.error = true;
-        this.loading = false;
-        this.loadingMore = false;
-      },
-    });
-  }
-
-  // ── Load More ─────────────────────────────────────────────
-  loadMore(): void {
-    if (!this.hasMore || this.loadingMore) return;
-    this.loadProducts(this.currentPage + 1);
-  }
+  private totalPages = 1;
 
   get hasMore(): boolean {
-    if (!this.pagination) return false;
-    return this.currentPage < this.pagination.totalPages;
+    return this.currentPage < this.totalPages;
   }
 
-  // ── Cart ──────────────────────────────────────────────────
-  addToCart(event: Event, product: Product): void {
-    event.preventDefault();
-    event.stopPropagation();
-    if (this.cartService.isInCart(product._id)) return;
+  ngOnInit(): void {
+    this.wishlistService.getWishlist().subscribe({
+      next: () => this.loadProducts(1, true),
+      error: () => this.loadProducts(1, true),
+    });
+  }
 
-    this.addingToCart.add(product._id);
-    this.cartService.addItem({ productId: product._id }, product).subscribe({
-      next: () => {
-        this.addingToCart.delete(product._id);
+  private loadProducts(page: number, initial = false): void {
+    initial ? this.loading.set(true) : this.loadingMore.set(true);
+
+    this.productService.getFeatured(page).subscribe({
+      next: (res) => {
+        this.products.update((current) => (initial ? res.products : [...current, ...res.products]));
+        this.currentPage = res.pagination.currentPage;
+        this.totalPages = res.pagination.totalPages;
+        this.loading.set(false);
+        this.loadingMore.set(false);
       },
       error: () => {
-        this.addingToCart.delete(product._id);
+        this.error.set(true);
+        this.loading.set(false);
+        this.loadingMore.set(false);
       },
     });
   }
 
-  isInCart(productId: string): boolean {
-    return this.cartService.isInCart(productId);
-  }
-
-  isAddingToCart(productId: string): boolean {
-    return this.addingToCart.has(productId);
-  }
-
-  // ── Wishlist ──────────────────────────────────────────────
-  toggleWishlist(event: Event, product: Product): void {
-    event.preventDefault();
-    event.stopPropagation();
-    this.wishlistService.toggleWishlist(product._id).subscribe();
-  }
-
-  isInWishlist(productId: string): boolean {
-    return this.wishlistService.isInWishlist(productId);
-  }
-
-  // ── Helpers ───────────────────────────────────────────────
-  getDiscount(product: Product): number {
-    return Math.round(product.discount ?? 0);
-  }
-
-  getStars(rating: number): boolean[] {
-    return Array.from({ length: 5 }, (_, i) => i < Math.round(rating));
+  loadMore(): void {
+    if (!this.hasMore || this.loadingMore()) return;
+    this.loadProducts(this.currentPage + 1);
   }
 }

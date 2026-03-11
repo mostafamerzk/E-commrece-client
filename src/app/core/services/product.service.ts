@@ -60,8 +60,24 @@ export class ProductService {
   /**
    * Delete a product (Soft Delete).
    * @param id The product MongoDB ObjectId.
+   * @param isAdmin Whether the action is performed by an admin.
    */
-  delete(id: string): Observable<MessageResponse> {
-    return this.api.delete<MessageResponse>(`${API_ENDPOINTS.PRODUCTS}/${id}`);
+  delete(id: string, isAdmin: boolean = false): Observable<MessageResponse> {
+    console.log(id);
+    const endpoint = isAdmin
+      ? `${API_ENDPOINTS.ADMIN.PRODUCTS}/${id}`
+      : `${API_ENDPOINTS.PRODUCTS}/${id}`;
+    return this.api.delete<MessageResponse>(endpoint);
+  }
+  /**
+   * Restore a soft-deleted product.
+   * @param id The product MongoDB ObjectId.
+   * @param isAdmin Whether the action is performed by an admin (Required).
+   */
+  restore(id: string, isAdmin: boolean = true): Observable<MessageResponse> {
+    const endpoint = isAdmin
+      ? `${API_ENDPOINTS.ADMIN.PRODUCTS}/${id}/recover`
+      : `${API_ENDPOINTS.PRODUCTS}/${id}/recover`;
+    return this.api.patch<MessageResponse, object>(endpoint, {});
   }
 }

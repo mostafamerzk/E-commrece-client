@@ -35,9 +35,15 @@ export class ApiService {
     );
   }
   post<T, B extends object>(endpoint: string, body: B): Observable<T> {
-    return this.http
-      .post<T>(`${this.baseUrl}${endpoint}`, body)
-      .pipe(catchError((err) => throwError(() => err)));
+    const fullUrl = `${this.baseUrl}${endpoint}`;
+    console.log('[ApiService] 🌐 POST Full URL:', fullUrl);
+    console.log('[ApiService] 🌐 POST Body:', body);
+    return this.http.post<T>(fullUrl, body).pipe(
+      catchError((err) => {
+        console.error('[ApiService] 🌐 POST Error:', err);
+        return throwError(() => err);
+      })
+    );
   }
 
   patch<T, B extends object>(endpoint: string, body?: B): Observable<T> {
