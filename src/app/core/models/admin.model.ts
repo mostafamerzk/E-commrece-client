@@ -81,11 +81,22 @@ export interface AdminBannerQueryParams {
 
 /**
  * Response from GET /admin/users
+ * Backend returns paginated response with users in data.docs
  */
 export interface AdminUsersResponse {
   message: string;
-  users: User[];
-  pagination?: Pagination;
+  data: {
+    docs: User[];
+    totalDocs: number;
+    limit: number;
+    totalPages: number;
+    page: number;
+    pagingCounter: number;
+    hasPrevPage: boolean;
+    hasNextPage: boolean;
+    prevPage: number | null;
+    nextPage: number | null;
+  };
 }
 
 /**

@@ -158,6 +158,13 @@ export const routes: Routes = [
             (m) => m.CategoriesComponent
           ),
       },
+      {
+        path: 'users',
+        loadComponent: () =>
+          import('./features/admin/pages/users/admin-users.component').then(
+            (m) => m.AdminUsersComponent
+          ),
+      },
     ],
   },
   {

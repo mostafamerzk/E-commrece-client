@@ -53,7 +53,6 @@ export class HeaderComponent implements OnDestroy {
   }
 
   constructor() {
-    // Real-time search — ينتظر 400ms بعد آخر حرف
     this.searchSubject
       .pipe(
         debounceTime(400),

@@ -10,6 +10,16 @@
     </button>
   </div>
 
+  @if (isLoggedIn()) {
+    <div class="drawer-user">
+      <div class="drawer-avatar"><i class="pi pi-user"></i></div>
+      <div class="drawer-user-info">
+        <span class="drawer-user-name">{{ currentUser()?.userName }}</span>
+        <span class="drawer-user-role">{{ currentUser()?.role }}</span>
+      </div>
+    </div>
+  }
+
   <!-- Mobile Search -->
   <!-- <div class="drawer-search">
     <i class="pi pi-search search-icon"></i>
@@ -41,6 +51,16 @@
     >
       <i class="pi pi-box"></i> Products
     </a>
+    @if (currentUser()?.role === 'admin') {
+      <a
+        routerLink="/admin"
+        routerLinkActive="active"
+        class="drawer-link"
+        (click)="closeMobileMenu()"
+      >
+        <i class="pi pi-chart-bar"></i> Admin Dashboard
+      </a>
+    }
     <a
       routerLink="/wishlist"
       routerLinkActive="active"
@@ -60,16 +80,9 @@
     </a>
   </nav>
 
-  <div class="drawer-divider"></div>
-
   @if (isLoggedIn()) {
-    <div class="drawer-user">
-      <div class="drawer-avatar"><i class="pi pi-user"></i></div>
-      <div class="drawer-user-info">
-        <span class="drawer-user-name">{{ currentUser()?.userName }}</span>
-        <span class="drawer-user-role">{{ currentUser()?.role }}</span>
-      </div>
-    </div>
+    <div class="drawer-divider"></div>
+
     <nav class="drawer-nav">
       <a
         routerLink="/orders"
@@ -156,6 +169,11 @@
             >Home</a
           >
           <a routerLink="/products" routerLinkActive="nav-active" class="nav-link">Products</a>
+          @if (currentUser()?.role === 'admin') {
+            <a routerLink="/admin" routerLinkActive="nav-active" class="nav-link">
+              <i class="pi pi-chart-bar"></i> Admin Dashboard
+            </a>
+          }
           <!-- <a routerLink="/wishlist" routerLinkActive="nav-active" class="nav-link">Wishlist</a> -->
         </nav>
       }

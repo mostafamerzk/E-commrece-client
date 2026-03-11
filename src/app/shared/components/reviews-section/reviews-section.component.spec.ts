@@ -23,7 +23,7 @@ describe('ReviewsSectionComponent', () => {
     userName: 'John Doe',
     email: 'john@example.com',
     role: 'customer',
-    isBlocked: false,
+    isDeleted: false,
   };
   const mockReview: Review = {
     _id: 'r1',
@@ -42,7 +42,7 @@ describe('ReviewsSectionComponent', () => {
       'addReview',
       'deleteReview',
     ]);
-    authServiceSpy = jasmine.createSpyObj('AuthService', [], {
+    authServiceSpy = jasmine.createSpyObj('AuthService', ['isLoggedIn', 'currentUser', 'isAdmin'], {
       isLoggedIn: signal(false),
       currentUser: signal<User | null>(null),
       isAdmin: signal(false),

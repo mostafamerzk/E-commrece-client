@@ -40,7 +40,7 @@ export class ApiService {
       .pipe(catchError((err) => throwError(() => err)));
   }
 
-  patch<T, B extends object>(endpoint: string, body: B): Observable<T> {
+  patch<T, B extends object>(endpoint: string, body?: B): Observable<T> {
     return this.http
       .patch<T>(`${this.baseUrl}${endpoint}`, body)
       .pipe(catchError((err) => throwError(() => err)));

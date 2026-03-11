@@ -1,17 +1,17 @@
 <aside class="sidebar" [class.collapsed]="!expanded()">
   <div class="sidebar-header">
     @if (expanded()) {
-      <div class="logo-section">
+      <a routerLink="/" class="logo-section">
         <div class="logo-icon">
           <i class="pi pi-shopping-bag"></i>
         </div>
         <span class="logo-text">ITI<span class="logo-accent">Shop</span></span>
-      </div>
+      </a>
     }
     @if (!expanded()) {
-      <div class="logo-icon-small">
+      <a routerLink="/" class="logo-icon-small">
         <i class="pi pi-shopping-bag"></i>
-      </div>
+      </a>
     }
   </div>
 
