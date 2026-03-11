@@ -113,22 +113,22 @@
               </div>
               @if (f['userName'].touched && f['userName'].errors) {
                 <div class="field-errors">
-                  @if (f['userName'].errors?.['required']) {
+                  @if (f['userName'].errors['required']) {
                     <span class="field-error"
                       ><i class="pi pi-exclamation-circle"></i> Username is required.</span
                     >
                   }
-                  @if (f['userName'].errors?.['minlength']) {
+                  @if (f['userName'].errors['minlength']) {
                     <span class="field-error"
                       ><i class="pi pi-exclamation-circle"></i> Minimum 5 characters.</span
                     >
                   }
-                  @if (f['userName'].errors?.['maxlength']) {
+                  @if (f['userName'].errors['maxlength']) {
                     <span class="field-error"
                       ><i class="pi pi-exclamation-circle"></i> Maximum 15 characters.</span
                     >
                   }
-                  @if (f['userName'].errors?.['userName']) {
+                  @if (f['userName'].errors['userName']) {
                     <span class="field-error"
                       ><i class="pi pi-exclamation-circle"></i> Only letters, numbers, and
                       underscores allowed.</span
@@ -255,12 +255,12 @@
               </div>
               @if (p['newPassword'].touched && p['newPassword'].errors) {
                 <div class="field-errors">
-                  @if (p['newPassword'].errors?.['required']) {
+                  @if (p['newPassword'].errors['required']) {
                     <span class="field-error"
                       ><i class="pi pi-exclamation-circle"></i> New password is required.</span
                     >
                   }
-                  @if (p['newPassword'].errors?.['minlength']) {
+                  @if (p['newPassword'].errors['minlength']) {
                     <span class="field-error"
                       ><i class="pi pi-exclamation-circle"></i> Minimum 8 characters.</span
                     >
@@ -427,12 +427,12 @@
                 </div>
                 @if (a['postalCode'].touched && a['postalCode'].errors) {
                   <div class="field-errors">
-                    @if (a['postalCode'].errors?.['required']) {
+                    @if (a['postalCode'].errors['required']) {
                       <span class="field-error"
                         ><i class="pi pi-exclamation-circle"></i> Postal code is required.</span
                       >
                     }
-                    @if (a['postalCode'].errors?.['pattern']) {
+                    @if (a['postalCode'].errors['pattern']) {
                       <span class="field-error"
                         ><i class="pi pi-exclamation-circle"></i> Must be exactly 5 digits.</span
                       >

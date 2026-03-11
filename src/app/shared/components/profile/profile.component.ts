@@ -1,5 +1,5 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe, SlicePipe, TitleCasePipe } from '@angular/common';
+import { CommonModule, TitleCasePipe } from '@angular/common';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -46,16 +46,7 @@ interface Tab {
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    CurrencyPipe,
-    DatePipe,
-    SlicePipe,
-    TitleCasePipe,
-    OrderListComponent,
-  ],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, TitleCasePipe, OrderListComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })

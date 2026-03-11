@@ -121,7 +121,7 @@
                   <td class="text-muted">{{ getProductName(review.productId) }}</td>
                   <td>
                     <div class="stars-display">
-                      @for (star of getStarArray(review.rating); track star) {
+                      @for (star of getStarArray(); track star) {
                         <svg
                           width="14"
                           height="14"

@@ -22,7 +22,6 @@ import {
   AdminReviewQueryParams,
   AdminBannerQueryParams,
   AnalyticsResponse,
-  Coupon,
   SellerDetail,
   AdminSellerInfo,
   CreateCouponPayload,
