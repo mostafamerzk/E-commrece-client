@@ -17,7 +17,7 @@ import { CloudinaryImage } from './shared.model';
  * 'seller'   → can create and manage their own product listings
  * 'admin'    → full platform control: users, all products, orders, banners
  */
-export type UserRole = 'customer' | 'seller' | 'admin';
+export type UserRole = 'user' | 'seller' | 'admin';
 
 /**
  * The core User object.

@@ -1,44 +1,51 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// admin.model.ts
-//
-// Covers: Admin-specific query params and response shapes from /admin endpoints.
-// Used by: AdminService (all admin API calls), AdminUsersComponent,
-//          AdminOrdersComponent, AdminProductsComponent, AdminBannersComponent.
-//
-// NOTE: The core data shapes (User, Product, Order, Banner) are defined in their
-// own model files. This file only defines admin-specific query param interfaces
-// and the admin-flavored response wrappers (which sometimes differ slightly
-// from the public endpoint responses — e.g. admin gets isDeleted products).
+// admin.model.ts — All admin-specific models, query params, and responses.
 // ─────────────────────────────────────────────────────────────────────────────
 
 import { Pagination } from './shared.model';
-import { User } from './auth.model';
 import { Product } from './product.model';
-import { Order, OrderStatus } from './order.model';
+import type { Order, OrderStatus, ShippingAddress } from './order.model';
+export type { Order, OrderStatus, ShippingAddress };
+import { Banner } from './banner.model';
 
-// ─── Query Param Interfaces ────────────────────────────────────────────────────
-// These type the query params accepted by each admin list endpoint.
-// Using typed interfaces prevents accidentally passing unknown filter keys.
+// ─── Admin User Model ─────────────────────────────────────────────────────────
+// The admin /users endpoint returns extra fields not in the base User model.
 
-/**
- * Query params for GET /admin/users
- */
+export interface AdminUser {
+  _id: string;
+  userName: string;
+  email: string;
+  role: 'user' | 'seller' | 'admin';
+  isBlocked?: boolean;
+  isDeleted?: boolean;
+  profileImage?: { secure_url: string; public_id: string };
+  phone?: string;
+  addresses?: ShippingAddress[];
+  createdAt?: string;
+}
+
 export interface AdminUserQueryParams {
   [key: string]: string | undefined;
   search?: string;
   page?: string;
   limit?: string;
+  role?: string;
+  isBlocked?: string;
 }
 
-/**
- * Query params for GET /admin/products
- * More filter options than the public endpoint — admin can see by stock, rating, etc.
- */
+export interface AdminSellerQueryParams {
+  [key: string]: string | undefined;
+  search?: string;
+  page?: string;
+  limit?: string;
+  isBlocked?: string;
+}
+
 export interface AdminProductQueryParams {
   [key: string]: string | undefined;
   page?: string;
   limit?: string;
-  sort?: string;
+  sort?: 'newest' | 'oldest' | 'priceHigh' | 'priceLow' | 'rating';
   category?: string;
   minPrice?: string;
   maxPrice?: string;
@@ -47,99 +54,242 @@ export interface AdminProductQueryParams {
   search?: string;
 }
 
-/**
- * Query params for GET /admin/orders
- * Extensive filter set because admins need to find specific orders quickly.
- */
 export interface AdminOrderQueryParams {
   [key: string]: string | OrderStatus | undefined;
   page?: string;
   limit?: string;
-  sort?: string;
-  status?: OrderStatus;
-  paymentStatus?: string;
-  shippingStatus?: string;
+  sort?: 'newest' | 'oldest' | 'totalHigh' | 'totalLow' | 'status';
+  orderStatus?: string;
+  paymentStatus?: 'unpaid' | 'paid' | 'refunded';
+  paymentMethod?: 'card' | 'cash';
+  userId?: string;
   minTotal?: string;
   maxTotal?: string;
   startDate?: string;
   endDate?: string;
 }
 
-/**
- * Query params for GET /admin/banners
- */
+export interface AdminCouponQueryParams {
+  [key: string]: string | undefined;
+  page?: string;
+  limit?: string;
+}
+
+export interface AdminReviewQueryParams {
+  [key: string]: string | undefined;
+  productId?: string;
+  userId?: string;
+  rating?: string;
+  page?: string;
+  limit?: string;
+}
+
 export interface AdminBannerQueryParams {
   [key: string]: string | undefined;
   page?: string;
   limit?: string;
-  sort?: string;
+  sort?: 'newest' | 'oldest' | 'title';
   isActive?: string;
   search?: string;
 }
 
+// ─── Seller Model (admin view) ────────────────────────────────────────────────
+// SellerProfile for admin is a leaner shape returned by the /admin/sellers endpoint.
+
+export interface AdminSellerInfo {
+  _id: string;
+  userId: string;
+  storeName: string;
+  email: string;
+  phone?: string;
+  isBlocked: boolean;
+  productsCount?: number;
+  createdAt: string;
+}
+
+export interface SellerDetail extends AdminSellerInfo {
+  products: Product[];
+}
+
+// ─── Coupon Model ─────────────────────────────────────────────────────────────
+
+export interface Coupon {
+  _id: string;
+  code: string;
+  discountType: 'percentage' | 'fixed';
+  discountValue: number;
+  minOrderAmount?: number;
+  maxUses?: number;
+  usedCount: number;
+  expiresAt?: string;
+  isActive: boolean;
+  createdAt: string;
+}
+
+export interface CreateCouponPayload {
+  code: string;
+  discountType: 'percentage' | 'fixed';
+  discountValue: number;
+  minOrderAmount?: number;
+  maxUses?: number;
+  expiresAt?: string;
+}
+
+export interface UpdateCouponPayload extends Partial<CreateCouponPayload> {}
+
+// ─── Review Model ─────────────────────────────────────────────────────────────
+
+export interface AdminReview {
+  _id: string;
+  userId: { _id: string; userName: string; email: string } | string;
+  productId: { _id: string; name: string } | string;
+  rating: number;
+  comment?: string;
+  createdAt: string;
+}
+
+// ─── Banner Model ─────────────────────────────────────────────────────────────
+// Banner is defined in banner.model.ts — imported above, re-exported for admin use.
+// (No duplicate definition here to avoid TS2308 from the barrel index.ts)
+
+// ─── Analytics Models ─────────────────────────────────────────────────────────
+
+export interface DayRevenue {
+  date: string;
+  revenue: number;
+  orders: number;
+}
+
+export interface MonthRevenue {
+  month: string;
+  revenue: number;
+  orders: number;
+}
+
+export interface TopProduct {
+  productId: string;
+  name: string;
+  unitsSold: number;
+  revenue: number;
+}
+
+export interface LowStockProduct {
+  _id: string;
+  name: string;
+  stock: number;
+  category?: string;
+}
+
+export interface OrdersByStatus {
+  status: string;
+  count: number;
+}
+
+export interface AnalyticsResponse {
+  message: string;
+  data: {
+    counts: {
+      totalUsers: number;
+      totalSellers: number;
+      totalProducts: number;
+      totalOrders: number;
+    };
+    revenue: {
+      totalRevenue: { _id: null; total: number }[];
+      byDay: { _id: string; total: number }[];
+      byMonth: { _id: string; total: number }[];
+    };
+    ordersByStatus: { _id: string; count: number }[];
+    topProducts: { _id: string; title: string; soldQuantity: number }[];
+    lowStock: Product[];
+  };
+}
+
+// ─── Paginated Response Generic ───────────────────────────────────────────────
+
+export interface PaginatedResponse<T> {
+  message: string;
+  data: T[];
+  docs?: T[];
+  pagination?: Pagination;
+  // Some endpoints use specific keys
+  users?: T[];
+  sellers?: T[];
+  products?: T[];
+  orders?: T[];
+  coupons?: T[];
+  reviews?: T[];
+  banners?: T[];
+}
+
 // ─── Response Shapes ──────────────────────────────────────────────────────────
 
-/**
- * Response from GET /admin/users
- */
 export interface AdminUsersResponse {
   message: string;
-  users: User[];
+  users: AdminUser[];
+  docs?: AdminUser[];
   pagination?: Pagination;
 }
 
-/**
- * Response from GET /admin/users/:userId
- * Note: the API contract uses 'data' instead of 'user' as the key.
- * This is a backend inconsistency — match it exactly so the service
- * can correctly read response.data instead of response.user.
- */
-export interface AdminUserResponse {
+export interface AdminSellersResponse {
   message: string;
-  data: User;
+  sellers: AdminSellerInfo[];
+  docs?: AdminSellerInfo[];
+  pagination?: Pagination;
 }
 
-/**
- * Response from GET /admin/products
- * Admin version returns ALL products including soft-deleted ones
- * (isDeleted: true), unlike the public endpoint which filters them out.
- */
 export interface AdminProductsResponse {
   message: string;
   products: Product[];
+  docs?: Product[];
   pagination?: Pagination;
 }
 
-/**
- * Response from GET /admin/products/:productId
- * Note: uses 'data' key — same backend inconsistency as AdminUserResponse.
- */
-export interface AdminProductResponse {
-  message: string;
-  data: Product;
-}
-
-/**
- * Response from GET /admin/orders
- */
 export interface AdminOrdersResponse {
   message: string;
   orders: Order[];
+  docs?: Order[];
   pagination?: Pagination;
 }
 
-/**
- * Response from GET /admin/orders/:orderId
- * Note: uses 'data' key — same pattern as other admin single-item endpoints.
- */
-export interface AdminOrderResponse {
+export interface AdminCouponsResponse {
   message: string;
-  data: Order;
+  coupons: Coupon[];
+  docs?: Coupon[];
+  pagination?: Pagination;
 }
 
-/**
- * KPI shape for the Admin Dashboard
- */
+export interface AdminReviewsResponse {
+  message: string;
+  reviews: AdminReview[];
+  docs?: AdminReview[];
+  pagination?: Pagination;
+}
+
+export interface AdminBannersResponse {
+  message: string;
+  banners: Banner[];
+  docs?: Banner[];
+  pagination?: Pagination;
+}
+
+export interface AdminUserResponse {
+  message: string;
+  user: AdminUser;
+}
+
+export interface AdminSellerResponse {
+  message: string;
+  seller: AdminSellerInfo;
+}
+
+export interface AdminOrderResponse {
+  message: string;
+  order: Order;
+}
+
+// ─── KPI / Stats (legacy for existing dashboard) ─────────────────────────────
+
 export interface AdminStat {
   label: string;
   value: number;
@@ -147,12 +297,10 @@ export interface AdminStat {
   iconBg: string;
   iconColor: string;
   route: string;
-  change?: number; // percentage change this month
+  colorScheme?: string;
+  change?: number;
 }
 
-/**
- * Response from GET /admin/stats
- */
 export interface AdminStatsResponse {
   message: string;
   stats: AdminStat[];

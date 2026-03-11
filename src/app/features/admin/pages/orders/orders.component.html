@@ -1,0 +1,260 @@
+<section class="admin-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Orders</h1>
+      <p class="page-subtitle">Manage all customer orders</p>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar filter-bar--wrap">
+    <select class="filter-select" [(ngModel)]="orderStatusFilter" (change)="applyFilters()">
+      <option value="">All Order Status</option>
+      @for (s of orderStatuses; track s) {
+        <option [value]="s">{{ s | titlecase }}</option>
+      }
+    </select>
+    <select class="filter-select" [(ngModel)]="paymentStatusFilter" (change)="applyFilters()">
+      <option value="">All Payment Status</option>
+      @for (s of paymentStatuses; track s) {
+        <option [value]="s">{{ s | titlecase }}</option>
+      }
+    </select>
+    <div class="filter-group">
+      <span class="filter-label">From:</span>
+      <input
+        type="date"
+        class="filter-select"
+        [(ngModel)]="startDateFilter"
+        (change)="applyFilters()"
+      />
+    </div>
+    <div class="filter-group">
+      <span class="filter-label">To:</span>
+      <input
+        type="date"
+        class="filter-select"
+        [(ngModel)]="endDateFilter"
+        (change)="applyFilters()"
+      />
+    </div>
+    <input
+      type="number"
+      class="filter-select"
+      [(ngModel)]="minTotalFilter"
+      (change)="applyFilters()"
+      placeholder="Min $"
+    />
+    <input
+      type="number"
+      class="filter-select"
+      [(ngModel)]="maxTotalFilter"
+      (change)="applyFilters()"
+      placeholder="Max $"
+    />
+    <button class="btn btn-secondary btn-sm" (click)="clearFilters()">Clear</button>
+  </div>
+
+  @if (isLoading() && isInitialLoad()) {
+    <div class="table-card">
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Order #</th>
+              <th>Customer</th>
+              <th>Items</th>
+              <th>Total</th>
+              <th>Payment</th>
+              <th>Order Status</th>
+              <th>Date</th>
+              <th>Update</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (i of [1, 2, 3, 4, 5]; track i) {
+              <tr>
+                <td><div class="skeleton skeleton-text" style="width: 80px"></div></td>
+                <td><div class="skeleton skeleton-text" style="width: 120px"></div></td>
+                <td><div class="skeleton skeleton-text" style="width: 30px"></div></td>
+                <td><div class="skeleton skeleton-text" style="width: 70px"></div></td>
+                <td><div class="skeleton skeleton-badge"></div></td>
+                <td><div class="skeleton skeleton-badge"></div></td>
+                <td><div class="skeleton skeleton-text" style="width: 100px"></div></td>
+                <td><div class="skeleton skeleton-button"></div></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+  @if (error()) {
+    <div class="error-state">
+      <p>{{ error() }}</p>
+      <button class="btn btn-secondary" (click)="loadOrders()">Retry</button>
+    </div>
+  }
+
+  @if (!isLoading() && !error()) {
+    <div class="table-card">
+      @if (orders().length === 0) {
+        <div class="empty-state">
+          <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"
+            />
+          </svg>
+          <p>No orders found</p>
+        </div>
+      } @else {
+        <div class="table-wrapper" style="position: relative">
+          @if (isFiltering()) {
+            <div class="filtering-overlay" @fadeInOut>
+              <div class="spinner spinner-sm"></div>
+            </div>
+          }
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Order #</th>
+                <th>Customer</th>
+                <th>Items</th>
+                <th>Total</th>
+                <th>Payment</th>
+                <th>Order Status</th>
+                <th>Date</th>
+                <th>Update</th>
+              </tr>
+            </thead>
+            <tbody [@listAnimation]="orders().length">
+              @for (order of orders(); track order?._id ?? $index) {
+                <tr (click)="toggleExpand(order._id)" class="expandable-row">
+                  <td class="order-id">
+                    <svg
+                      width="14"
+                      height="14"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      class="expand-icon"
+                      [class.expanded]="expandedOrderId() === order._id"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M9 5l7 7-7 7"
+                      />
+                    </svg>
+                    #{{ order._id.slice(-6) | uppercase }}
+                  </td>
+                  <td class="text-muted">{{ order.userId }}</td>
+                  <td>{{ order.products.length }}</td>
+                  <td>{{ formatCurrency(order.totalPrice) }}</td>
+                  <td>
+                    <span class="status-badge" [class]="getStatusClass(order.paymentStatus)">
+                      {{ order.paymentStatus | titlecase }}
+                    </span>
+                  </td>
+                  <td>
+                    <span class="status-badge" [class]="getStatusClass(order.orderStatus)">
+                      {{ order.orderStatus | titlecase }}
+                    </span>
+                  </td>
+                  <td class="text-muted">{{ formatDate(order.createdAt) }}</td>
+                  <td (click)="$event.stopPropagation()">
+                    @if (actionLoading() === order._id) {
+                      <div class="action-spinner">
+                        <span class="btn-spinner"></span>
+                      </div>
+                    } @else if (getNextStatuses(order.orderStatus).length > 0) {
+                      <select
+                        class="status-select"
+                        (change)="updateStatus(order, $any($event.target).value)"
+                      >
+                        <option value="">Move to...</option>
+                        @for (s of getNextStatuses(order.orderStatus); track s) {
+                          <option [value]="s">{{ s | titlecase }}</option>
+                        }
+                      </select>
+                    } @else {
+                      <span class="text-muted">—</span>
+                    }
+                  </td>
+                </tr>
+                <!-- Expanded Row -->
+                @if (expandedOrderId() === order._id) {
+                  <tr class="expanded-detail-row">
+                    <td colspan="8">
+                      <div class="order-items-detail">
+                        <h4>Order Items</h4>
+                        @if (order.products && order.products.length) {
+                          <div class="order-items-list">
+                            @for (item of order.products; track item.productId) {
+                              <div class="order-item-row">
+                                <span>{{ item.title }}</span>
+                                <span class="text-muted">× {{ item.quantity }}</span>
+                                <span>{{ formatCurrency(item.price * item.quantity) }}</span>
+                              </div>
+                            }
+                          </div>
+                        } @else {
+                          <p class="text-muted">No items</p>
+                        }
+                      </div>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+        @if (totalPages > 1) {
+          <div class="pagination">
+            <button
+              class="page-btn"
+              [disabled]="currentPage() === 1"
+              (click)="goToPage(currentPage() - 1)"
+            >
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+            @for (page of pages; track page) {
+              <button
+                class="page-btn"
+                [class.active]="page === currentPage()"
+                (click)="goToPage(page)"
+              >
+                {{ page }}
+              </button>
+            }
+            <button
+              class="page-btn"
+              [disabled]="currentPage() === totalPages"
+              (click)="goToPage(currentPage() + 1)"
+            >
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </div>
+        }
+      }
+    </div>
+  }
+</section>

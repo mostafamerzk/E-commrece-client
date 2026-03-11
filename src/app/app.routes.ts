@@ -157,10 +157,69 @@ export const routes: Routes = [
           ),
       },
       {
+        path: 'users',
+        loadComponent: () =>
+          import('./features/admin/pages/users/users.component').then((m) => m.AdminUsersComponent),
+      },
+      {
+        path: 'sellers',
+        children: [
+          {
+            path: '',
+            loadComponent: () =>
+              import('./features/admin/pages/sellers/sellers.component').then(
+                (m) => m.AdminSellersComponent
+              ),
+          },
+          {
+            path: ':id',
+            loadComponent: () =>
+              import('./features/admin/pages/sellers/seller-detail/seller-detail.component').then(
+                (m) => m.SellerDetailComponent
+              ),
+          },
+        ],
+      },
+      {
+        path: 'products',
+        loadComponent: () =>
+          import('./features/admin/pages/products/products.component').then(
+            (m) => m.AdminProductsComponent
+          ),
+      },
+      {
         path: 'categories',
         loadComponent: () =>
           import('./features/admin/pages/categories/categories.component').then(
             (m) => m.CategoriesComponent
+          ),
+      },
+      {
+        path: 'orders',
+        loadComponent: () =>
+          import('./features/admin/pages/orders/orders.component').then(
+            (m) => m.AdminOrdersComponent
+          ),
+      },
+      {
+        path: 'coupons',
+        loadComponent: () =>
+          import('./features/admin/pages/coupons/coupons.component').then(
+            (m) => m.AdminCouponsComponent
+          ),
+      },
+      {
+        path: 'reviews',
+        loadComponent: () =>
+          import('./features/admin/pages/reviews/reviews.component').then(
+            (m) => m.AdminReviewsComponent
+          ),
+      },
+      {
+        path: 'banners',
+        loadComponent: () =>
+          import('./features/admin/pages/banners/banners.component').then(
+            (m) => m.AdminBannersComponent
           ),
       },
     ],

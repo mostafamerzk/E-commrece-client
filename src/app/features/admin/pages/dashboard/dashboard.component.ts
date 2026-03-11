@@ -1,10 +1,10 @@
-import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { Component, inject, signal, computed, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AdminService } from '../../../../core/services/admin.service';
 import { AuthService } from '../../../../core/services/auth.service';
-import { AdminStat } from '../../../../core/models/admin.model';
+import { AdminStat, AdminOrderQueryParams } from '../../../../core/models/admin.model';
 import { Order } from '../../../../core/models/order.model';
 import { finalize, forkJoin } from 'rxjs';
 
@@ -15,7 +15,7 @@ import { finalize, forkJoin } from 'rxjs';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent {
   private adminService = inject(AdminService);
   private authService = inject(AuthService);
   router = inject(Router);
@@ -34,17 +34,32 @@ export class DashboardComponent implements OnInit {
     { label: 'Last 90 Days', value: '90d' },
   ];
 
-  ngOnInit(): void {
-    this.loadDashboardData();
+  constructor() {
+    // Reload data when chart period changes
+    effect(() => {
+      this.chartPeriod();
+      this.loadDashboardData();
+    });
   }
 
   loadDashboardData(): void {
+    const period = this.chartPeriod();
+    const { startDate, endDate } = this.getPeriodDates(period);
+
     this.isLoading.set(true);
     this.error.set(null);
 
+    const statsParams = { startDate, endDate };
+    const orderParams: AdminOrderQueryParams = {
+      startDate,
+      endDate,
+      limit: '5',
+      sort: 'newest',
+    };
+
     forkJoin({
-      stats: this.adminService.getStats(),
-      orders: this.adminService.getRecentOrders(5),
+      stats: this.adminService.getStats(statsParams),
+      orders: this.adminService.getRecentOrders(orderParams),
     })
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
@@ -57,6 +72,25 @@ export class DashboardComponent implements OnInit {
           this.error.set('Failed to load dashboard data. Please try again.');
         },
       });
+  }
+
+  private getPeriodDates(period: '7d' | '30d' | '90d'): {
+    startDate: string;
+    endDate: string;
+  } {
+    const end = new Date();
+    const start = new Date();
+    let days = 30;
+
+    if (period === '7d') days = 7;
+    else if (period === '90d') days = 90;
+
+    start.setDate(end.getDate() - days);
+
+    return {
+      startDate: start.toISOString(),
+      endDate: end.toISOString(),
+    };
   }
 
   getStatusBadgeClass(status: string): string {
