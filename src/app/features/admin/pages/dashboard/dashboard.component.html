@@ -179,8 +179,8 @@
                     <span class="customer-name">User #{{ order.userId.slice(-6) }}</span>
                   </div>
                 </td>
-                <td>{{ order.items.length }} items</td>
-                <td class="font-semibold">{{ formatCurrency(order.totalAmount) }}</td>
+                <td>{{ order.products.length }} items</td>
+                <td class="font-semibold">{{ formatCurrency(order.totalPrice) }}</td>
                 <td>
                   <span class="status-badge" [ngClass]="getStatusBadgeClass(order.orderStatus)">
                     {{ order.orderStatus }}

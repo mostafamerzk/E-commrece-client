@@ -35,7 +35,6 @@ export class ApiService {
     );
   }
   post<T, B extends object>(endpoint: string, body: B): Observable<T> {
-    console.log(endpoint, body);
     return this.http
       .post<T>(`${this.baseUrl}${endpoint}`, body)
       .pipe(catchError((err) => throwError(() => err)));
