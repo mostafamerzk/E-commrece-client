@@ -11,7 +11,6 @@
     <!-- ── Sidebar ── -->
     <aside class="profile-sidebar">
       <div class="sidebar-avatar">
-        <!-- Avatar with upload overlay -->
         <div class="avatar-wrap">
           @if (avatarPreview()) {
             <img [src]="avatarPreview()" alt="preview" class="avatar-img" />
@@ -25,7 +24,6 @@
             <div class="avatar-placeholder"><i class="pi pi-user"></i></div>
           }
 
-          <!-- Upload overlay button -->
           <label
             class="avatar-upload-overlay"
             [class.uploading]="isUploadingAvatar()"
@@ -86,7 +84,6 @@
             <p class="section-subtitle">Update your display name</p>
           </div>
 
-          <!-- API feedback -->
           @if (infoSuccess()) {
             <div class="alert alert-success">
               <i class="pi pi-check-circle"></i> Profile updated successfully!
@@ -99,7 +96,6 @@
           }
 
           <form class="profile-form" [formGroup]="infoForm" (ngSubmit)="saveInfo()">
-            <!-- userName -->
             <div class="form-group">
               <label for="userName">Username</label>
               <div
@@ -185,7 +181,6 @@
           }
 
           <form class="profile-form" [formGroup]="passwordForm" (ngSubmit)="savePassword()">
-            <!-- Old Password -->
             <div class="form-group">
               <label for="oldPassword">Current Password</label>
               <div
@@ -231,7 +226,6 @@
               }
             </div>
 
-            <!-- New Password -->
             <div class="form-group">
               <label for="newPassword">New Password</label>
               <div
@@ -280,7 +274,6 @@
                 >
               }
 
-              <!-- Strength indicator -->
               @if (p['newPassword'].value) {
                 <div class="strength-bar">
                   <div
@@ -294,7 +287,6 @@
               }
             </div>
 
-            <!-- Confirm Password -->
             <div class="form-group">
               <label for="confirmPassword">Confirm New Password</label>
               <div
@@ -339,53 +331,7 @@
 
       <!-- ── My Orders ── -->
       @if (activeTab() === 'orders') {
-        <section class="content-section">
-          <div class="section-header">
-            <h2 class="section-title">My Orders</h2>
-            <p class="section-subtitle">Track and manage your purchases</p>
-          </div>
-
-          @if (isLoadingOrders()) {
-            <div class="orders-list">
-              @for (s of skeletons; track $index) {
-                <div class="order-skeleton">
-                  <div class="skeleton-line long"></div>
-                  <div class="skeleton-line medium"></div>
-                </div>
-              }
-            </div>
-          } @else if (orders().length === 0) {
-            <div class="empty-state">
-              <div class="empty-icon"><i class="pi pi-shopping-bag"></i></div>
-              <h3>No orders yet</h3>
-              <p>Once you place an order, it will appear here.</p>
-              <button class="save-btn" routerLink="/products">
-                <i class="pi pi-shopping-cart"></i> Shop Now
-              </button>
-            </div>
-          } @else {
-            <div class="orders-list">
-              @for (order of orders(); track order._id) {
-                <div class="order-card">
-                  <div class="order-header">
-                    <span class="order-id">#{{ order._id | slice: -8 | uppercase }}</span>
-                    <span class="order-status" [class]="'status-' + order.status">
-                      {{ order.status | titlecase }}
-                    </span>
-                  </div>
-                  <div class="order-meta">
-                    <span
-                      ><i class="pi pi-calendar"></i>
-                      {{ order.createdAt | date: 'mediumDate' }}</span
-                    >
-                    <span><i class="pi pi-box"></i> {{ order.items?.length }} item(s)</span>
-                    <span class="order-total">{{ order.totalPrice | currency: 'EGP ' }}</span>
-                  </div>
-                </div>
-              }
-            </div>
-          }
-        </section>
+        <app-order-list></app-order-list>
       }
 
       <!-- ── Addresses ── -->

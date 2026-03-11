@@ -11,17 +11,16 @@ import {
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
+import { OrderListComponent } from '../../../features/orders/pages/order-list/order-list.component';
 
 // ── Custom Validators ─────────────────────────────────────────────────────────
 
-/** userName: letters, numbers, underscores only (mirrors backend Joi schema) */
 const userNameValidator: ValidatorFn = (ctrl: AbstractControl): ValidationErrors | null => {
   const v: string = ctrl.value ?? '';
   if (!v) return null;
   return /^[a-zA-Z0-9_]{5,15}$/.test(v) ? null : { userName: true };
 };
 
-/** Cross-field: newPassword must differ from oldPassword */
 const newNotSameAsOldValidator: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
   const oldPass = group.get('oldPassword')?.value;
   const newPass = group.get('newPassword')?.value;
@@ -29,7 +28,6 @@ const newNotSameAsOldValidator: ValidatorFn = (group: AbstractControl): Validati
   return oldPass === newPass ? { sameAsOld: true } : null;
 };
 
-/** Cross-field: confirmPassword must equal newPassword */
 const confirmMatchValidator: ValidatorFn = (group: AbstractControl): ValidationErrors | null => {
   const newPass = group.get('newPassword')?.value;
   const confirmPass = group.get('confirmPassword')?.value;
@@ -38,14 +36,6 @@ const confirmMatchValidator: ValidatorFn = (group: AbstractControl): ValidationE
 };
 
 // ── Interfaces ────────────────────────────────────────────────────────────────
-interface Order {
-  _id: string;
-  status: string;
-  totalPrice: number;
-  createdAt: string;
-  items?: unknown[];
-}
-
 interface Tab {
   key: 'info' | 'password' | 'orders' | 'addresses';
   label: string;
@@ -64,6 +54,7 @@ interface Tab {
     DatePipe,
     SlicePipe,
     TitleCasePipe,
+    OrderListComponent,
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
@@ -76,7 +67,6 @@ export class ProfileComponent implements OnInit {
 
   readonly user = this.auth.currentUser;
 
-  // ── Tabs ─────────────────────────────────────────────────────────────────
   readonly tabs: Tab[] = [
     { key: 'info', label: 'Personal Info', icon: 'pi-user' },
     { key: 'password', label: 'Change Password', icon: 'pi-lock' },
@@ -88,7 +78,6 @@ export class ProfileComponent implements OnInit {
 
   setTab(key: Tab['key']): void {
     this.activeTab.set(key);
-    if (key === 'orders' && this.orders().length === 0) this.loadOrders();
   }
 
   // ── Personal Info Form ────────────────────────────────────────────────────
@@ -102,7 +91,6 @@ export class ProfileComponent implements OnInit {
   readonly isUploadingAvatar = signal(false);
   readonly avatarError = signal('');
   readonly avatarPreview = signal<string | null>(null);
-
   readonly isSavingInfo = signal(false);
   readonly infoSuccess = signal(false);
   readonly infoError = signal('');
@@ -193,17 +181,6 @@ export class ProfileComponent implements OnInit {
       });
   }
 
-  // ── Orders ────────────────────────────────────────────────────────────────
-  readonly orders = signal<Order[]>([]);
-  readonly isLoadingOrders = signal(false);
-  readonly skeletons = Array(3);
-
-  loadOrders(): void {
-    // TODO: inject OrderService and call getUserOrders() when ready
-    this.isLoadingOrders.set(true);
-    setTimeout(() => this.isLoadingOrders.set(false), 800);
-  }
-
   // ── Address Form ──────────────────────────────────────────────────────────
   addressForm = this.fb.group({
     street: ['', Validators.required],
@@ -223,7 +200,6 @@ export class ProfileComponent implements OnInit {
   saveAddress(): void {
     this.addressForm.markAllAsTouched();
     if (this.addressForm.invalid) return;
-    // TODO: wire to AddressService when endpoint is ready
     this.isSavingAddress.set(true);
     this.addressError.set('');
     setTimeout(() => {
@@ -260,7 +236,6 @@ export class ProfileComponent implements OnInit {
     const file = input.files?.[0];
     if (!file) return;
 
-    // Client-side validation: images only, max 5 MB
     if (!file.type.startsWith('image/')) {
       this.avatarError.set('Only image files are allowed.');
       return;
@@ -270,7 +245,6 @@ export class ProfileComponent implements OnInit {
       return;
     }
 
-    // Show local preview immediately
     const reader = new FileReader();
     reader.onload = () => this.avatarPreview.set(reader.result as string);
     reader.readAsDataURL(file);
@@ -281,7 +255,7 @@ export class ProfileComponent implements OnInit {
     this.userService.uploadProfileImage(file).subscribe({
       next: () => {
         this.isUploadingAvatar.set(false);
-        this.avatarPreview.set(null); // signal updates from auth.currentUser now
+        this.avatarPreview.set(null);
       },
       error: () => {
         this.isUploadingAvatar.set(false);
@@ -290,7 +264,6 @@ export class ProfileComponent implements OnInit {
       },
     });
 
-    // Reset input so same file can be re-selected
     input.value = '';
   }
 
