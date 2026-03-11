@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { ApiService } from './api.service';
 import { API_ENDPOINTS } from '../constants/api-endpoints';
 import {
@@ -34,7 +34,14 @@ export class ReviewService {
     productId: string,
     params?: Record<string, unknown>
   ): Observable<ReviewsResponse> {
-    return this.apiService.get<ReviewsResponse>(`${API_ENDPOINTS.REVIEWS}/${productId}`, params);
+    return this.apiService
+      .get<ReviewsResponse>(`${API_ENDPOINTS.REVIEWS}/${productId}`, params)
+      .pipe(
+        map((res) => ({
+          ...res,
+          reviews: res.docs || res.reviews || [],
+        }))
+      );
   }
 
   /**

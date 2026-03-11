@@ -1,7 +1,7 @@
 import { Injectable, inject, signal } from '@angular/core';
 import { ApiService } from './api.service';
 import { API_ENDPOINTS } from '../constants/api-endpoints';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import {
   CategoriesResponse,
   Category,
@@ -35,7 +35,12 @@ export class CategoryService {
   }
 
   getAll(): Observable<CategoriesResponse> {
-    return this.api.get<CategoriesResponse>(this.endpoint);
+    return this.api.get<CategoriesResponse>(this.endpoint).pipe(
+      map((res) => ({
+        ...res,
+        categories: res.docs || res.categories || [],
+      }))
+    );
   }
 
   getById(id: string): Observable<CategoryResponse> {

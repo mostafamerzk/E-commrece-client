@@ -1,0 +1,63 @@
+<div class="wishlist-page">
+  <!-- Header -->
+  <div class="wishlist-header">
+    <div class="header-content">
+      <h1 class="page-title">
+        <i class="pi pi-heart-fill"></i>
+        My Wishlist
+      </h1>
+      @if (wishlist.itemCount() > 0) {
+        <span class="item-count"
+          >{{ wishlist.itemCount() }} item{{ wishlist.itemCount() > 1 ? 's' : '' }}</span
+        >
+      }
+    </div>
+
+    @if (wishlist.itemCount() > 0) {
+      <button class="clear-btn" (click)="confirmClear()">
+        <i class="pi pi-trash"></i>
+        Clear All
+      </button>
+    }
+  </div>
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+    <div class="wishlist-grid">
+      @for (item of skeletons; track $index) {
+        <div class="skeleton-card">
+          <div class="skeleton-img"></div>
+          <div class="skeleton-body">
+            <div class="skeleton-line long"></div>
+            <div class="skeleton-line short"></div>
+            <div class="skeleton-line medium"></div>
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Empty State -->
+  @else if (wishlist.itemCount() === 0) {
+    <div class="empty-state">
+      <div class="empty-icon">
+        <i class="pi pi-heart"></i>
+      </div>
+      <h2>Your wishlist is empty</h2>
+      <p>Save items you love and come back to them anytime.</p>
+      <button class="shop-btn" routerLink="/products">
+        <i class="pi pi-shopping-bag"></i>
+        Start Shopping
+      </button>
+    </div>
+  }
+
+  <!-- Products Grid -->
+  @else {
+    <div class="wishlist-grid">
+      @for (product of wishlist.items(); track product._id) {
+        <app-product-card [product]="product" />
+      }
+    </div>
+  }
+</div>

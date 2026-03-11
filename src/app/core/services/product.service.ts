@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { ApiService } from './api.service';
 import { API_ENDPOINTS } from '../constants/api-endpoints';
 import { ProductQueryParams, ProductsResponse, ProductResponse } from '../models/product.model';
@@ -16,10 +16,14 @@ export class ProductService {
    * @param params Query parameters for search, filtering, and sorting.
    */
   getAll(params?: ProductQueryParams): Observable<ProductsResponse> {
-    return this.api.get<ProductsResponse>(
-      API_ENDPOINTS.PRODUCTS,
-      params as Record<string, unknown>
-    );
+    return this.api
+      .get<ProductsResponse>(API_ENDPOINTS.PRODUCTS, params as Record<string, unknown>)
+      .pipe(
+        map((res) => ({
+          ...res,
+          products: res.docs || res.products || [],
+        }))
+      );
   }
 
   /**

@@ -43,8 +43,15 @@ export class LoginComponent {
     try {
       await this.authService.login(this.email, this.password);
 
-      // Navigate to home after successful login
-      this.router.navigate(['/']);
+      // Navigate based on role
+      const user = this.authService.currentUser();
+      if (user?.role === 'admin') {
+        this.router.navigate(['/admin']);
+      } else if (user?.role === 'seller') {
+        this.router.navigate(['/seller']);
+      } else {
+        this.router.navigate(['/']);
+      }
     } catch (error: unknown) {
       const err = error as { error?: { message?: string } | string; message?: string };
       const message =
