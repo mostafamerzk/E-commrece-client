@@ -6,7 +6,7 @@
 //          and the error interceptor (which reads the user's role on 401).
 // ─────────────────────────────────────────────────────────────────────────────
 import { CloudinaryImage } from './shared.model';
-import { Address } from '../../shared/components/profile/address.interface';
+//import { Address } from '../../shared/components/profile/address.interface';
 
 /**
  * The three roles in this application.
@@ -18,7 +18,19 @@ import { Address } from '../../shared/components/profile/address.interface';
  * 'seller'   → can create and manage their own product listings
  * 'admin'    → full platform control: users, all products, orders, banners
  */
-export type UserRole = 'customer' | 'seller' | 'admin';
+export type UserRole = 'user' | 'seller' | 'admin';
+
+/**
+ * Address structure for user profile and orders.
+ */
+export interface Address {
+  _id?: string;
+  street: string;
+  city: string;
+  country: string;
+  postalCode: string;
+  phone: string;
+}
 
 /**
  * The core User object.
@@ -65,7 +77,8 @@ export interface User {
   storeDescription?: string;
   phone?: string;
 
-  // Array of shipping addresses saved by the user.
+  // Array of user addresses (plural 'addresses' for frontend consistency, singular 'address' for backend compatibility)
+
   address?: Address[];
 
   // Timestamps

@@ -10,8 +10,8 @@ import {
 } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
-import { UserService } from '../../../core/services/user.service';
-import { Address } from '../../components/profile/address.interface';
+import { UserService, UpdateProfilePayload } from '../../../core/services/user.service';
+import { Address } from '../../../core/models/auth.model';
 import { OrderListComponent } from '../../../features/orders/pages/order-list/order-list.component';
 
 // ── Custom Validators ─────────────────────────────────────────────────────────
@@ -77,7 +77,7 @@ export class ProfileComponent implements OnInit {
       '',
       [Validators.required, Validators.minLength(5), Validators.maxLength(15), userNameValidator],
     ],
-    phone: [''],
+    phone: ['', [Validators.pattern(/^01[0125]\d{8}$/)]],
   });
 
   readonly isUploadingAvatar = signal(false);
@@ -180,9 +180,10 @@ export class ProfileComponent implements OnInit {
   // ── Address ───────────────────────────────────────────────────────────────
   addresses = signal<Address[]>([]);
   showAddressForm = signal(false);
-  editingAddressId = signal<string | null>(null);
+  readonly editingAddressId = signal<string | null>(null);
 
   addressForm = this.fb.group({
+    phone: ['', [Validators.required, Validators.pattern(/^01[0125]\d{8}$/)]],
     street: ['', Validators.required],
     city: ['', Validators.required],
     country: ['Egypt', Validators.required],
@@ -204,19 +205,21 @@ export class ProfileComponent implements OnInit {
   }
 
   openEditAddress(addr: Address): void {
-    this.editingAddressId.set(addr._id!);
-    this.addressForm.setValue({
-      street: addr.street,
-      city: addr.city,
-      country: addr.country,
-      postalCode: addr.postalCode,
+    this.editingAddressId.set(addr._id ?? null);
+    this.addressForm.patchValue({
+      phone: addr.phone ?? '',
+      street: addr.street ?? '',
+      city: addr.city ?? '',
+      country: addr.country ?? 'Egypt',
+      postalCode: addr.postalCode ?? '',
     });
     this.showAddressForm.set(true);
   }
 
   cancelAddress(): void {
     this.showAddressForm.set(false);
-    this.addressForm.reset();
+    this.addressForm.reset({ country: 'Egypt' });
+    this.editingAddressId.set(null);
   }
 
   saveAddress(): void {
@@ -225,27 +228,29 @@ export class ProfileComponent implements OnInit {
 
     this.isSavingAddress.set(true);
     this.addressError.set('');
+    this.addressSuccess.set(false);
 
-    const { street, city, country, postalCode } = this.addressForm.value;
-    const addressPayload: Omit<Address, '_id'> = {
-      street: street!,
-      city: city!,
-      country: country!,
-      postalCode: postalCode!,
+    const payload: UpdateProfilePayload = {
+      address: {
+        phone: this.a['phone'].value!,
+        street: this.a['street'].value!,
+        city: this.a['city'].value!,
+        country: this.a['country'].value!,
+        postalCode: this.a['postalCode'].value!,
+      },
     };
 
     const id = this.editingAddressId();
-    const req$ = id
-      ? this.userService.updateAddress(id, addressPayload)
-      : this.userService.addAddress(addressPayload);
+    if (id) payload.addressId = id;
 
-    req$.subscribe({
+    this.userService.updateProfile(payload).subscribe({
       next: () => {
         this.refreshAddresses();
         this.isSavingAddress.set(false);
         this.addressSuccess.set(true);
         this.showAddressForm.set(false);
-        this.addressForm.reset();
+        this.addressForm.reset({ country: 'Egypt' });
+        this.editingAddressId.set(null);
         setTimeout(() => this.addressSuccess.set(false), 3000);
       },
       error: (err) => {
@@ -255,11 +260,14 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  deleteAddress(id: string): void {
-    if (!confirm('Delete this address?')) return;
-    this.userService.deleteAddress(id).subscribe({
+  deleteAddress(addressId: string): void {
+    if (!confirm('Are you sure you want to delete this address?')) return;
+    this.addressError.set('');
+    this.userService.updateProfile({ addressId }).subscribe({
       next: () => this.refreshAddresses(),
-      error: (err) => this.addressError.set(err?.error?.message ?? 'Failed to delete address.'),
+      error: (err) => {
+        this.addressError.set(err?.error?.message ?? 'Failed to delete address.');
+      },
     });
   }
 

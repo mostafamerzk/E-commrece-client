@@ -1,6 +1,5 @@
 <main class="checkout-page">
   <div class="checkout-container">
-    <!-- Header — mirrors .cart-header -->
     <header class="checkout-header">
       <div class="header-titles">
         <h1>Checkout</h1>
@@ -10,11 +9,8 @@
       </div>
     </header>
 
-    <!-- Two-column grid — mirrors .cart-grid -->
     <div class="checkout-grid">
-      <!-- ── Left: Main Content ──────────────────────────────────────── -->
       <div class="checkout-main">
-        <!-- 1. Shipping Details — mirrors .cart-item-card card style -->
         <section class="checkout-card">
           <div class="card-header">
             <span class="step-badge">1</span>
@@ -22,28 +18,39 @@
           </div>
 
           <div class="card-body">
-            <form [formGroup]="shippingForm" novalidate>
-              <div class="form-grid-2">
-                <!-- Full Name -->
-                <div class="form-group">
-                  <label for="recipientName">Full Name</label>
-                  <input
-                    type="text"
-                    id="recipientName"
-                    formControlName="recipientName"
-                    placeholder="e.g. John Doe"
-                    class="form-input"
-                    [class.error]="fieldInvalid('recipientName')"
-                  />
-                  @if (fieldInvalid('recipientName')) {
-                    <span class="field-error">
-                      <i class="pi pi-exclamation-circle"></i>
-                      Name is required
-                    </span>
-                  }
-                </div>
+            <div class="checkout-form-intro">
+              <p class="text-sm text-gray-600 mb-6">
+                Please provide your shipping information below. You can save this address to your
+                profile for faster checkout next time.
+              </p>
+            </div>
 
-                <!-- Phone -->
+            @if (user()?.address?.length) {
+              <div class="saved-addresses-select-wrapper">
+                <label
+                  for="saved-address-select"
+                  class="form-label text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2 block"
+                >
+                  Use a saved address
+                </label>
+                <div class="select-wrapper">
+                  <select
+                    id="saved-address-select"
+                    class="form-select mb-6"
+                    (change)="onSelectSavedAddressByIndex($any($event.target).value)"
+                  >
+                    <option value="" disabled selected>Select from your saved addresses</option>
+                    @for (addr of user()?.address; track addr._id; let i = $index) {
+                      <option [value]="i">{{ addr.street }}, {{ addr.city }}</option>
+                    }
+                  </select>
+                  <i class="pi pi-chevron-down select-icon"></i>
+                </div>
+              </div>
+            }
+
+            <form [formGroup]="shippingForm" novalidate>
+              <div class="form-grid-1">
                 <div class="form-group">
                   <label for="phone">Phone Number</label>
                   <input
@@ -67,7 +74,6 @@
                 </div>
               </div>
 
-              <!-- Address full-width -->
               <div class="form-group form-group--full">
                 <label for="street">Shipping Address</label>
                 <input
@@ -87,7 +93,6 @@
               </div>
 
               <div class="form-grid-2">
-                <!-- City -->
                 <div class="form-group">
                   <label for="city">City</label>
                   <select
@@ -109,7 +114,6 @@
                   }
                 </div>
 
-                <!-- Postal Code -->
                 <div class="form-group">
                   <label for="postalCode">
                     Postal Code
@@ -124,14 +128,22 @@
                   />
                 </div>
 
-                <!-- Hidden Country (Defaulted to Egypt in Component) -->
                 <input type="hidden" formControlName="country" />
               </div>
+
+              @if (authService.isLoggedIn()) {
+                <div class="save-address-check">
+                  <label for="saveAddress" class="checkbox-container">
+                    <input id="saveAddress" type="checkbox" formControlName="saveAddress" />
+                    <span class="checkmark-box"></span>
+                    <span class="checkbox-text">Save this address to my profile for later</span>
+                  </label>
+                </div>
+              }
             </form>
           </div>
         </section>
 
-        <!-- 2. Payment Method -->
         <section class="checkout-card">
           <div class="card-header">
             <span class="step-badge">2</span>
@@ -146,9 +158,7 @@
               (click)="paymentMethod.set('creditCard')"
             >
               <div class="checkmark"><i class="pi pi-check"></i></div>
-              <div class="payment-icon-box">
-                <i class="pi pi-credit-card"></i>
-              </div>
+              <div class="payment-icon-box"><i class="pi pi-credit-card"></i></div>
               <div>
                 <p class="payment-label">Credit / Debit Card</p>
                 <p class="payment-desc">Secure payment via Stripe.</p>
@@ -162,9 +172,7 @@
               (click)="paymentMethod.set('cod')"
             >
               <div class="checkmark"><i class="pi pi-check"></i></div>
-              <div class="payment-icon-box">
-                <i class="pi pi-wallet"></i>
-              </div>
+              <div class="payment-icon-box"><i class="pi pi-wallet"></i></div>
               <div>
                 <p class="payment-label">Cash on Delivery</p>
                 <p class="payment-desc">Pay when your order arrives.</p>
@@ -173,7 +181,6 @@
           </div>
         </section>
 
-        <!-- 3. Review Items — rows mirror .cart-item-card layout -->
         <section class="checkout-card">
           <div class="card-header">
             <span class="step-badge">3</span>
@@ -181,11 +188,6 @@
           </div>
 
           <div class="items-list">
-            <!--
-              FIX: track by product._id, not $index.
-              $index causes every DOM node to be destroyed and re-created on any
-              cart change, producing a visible list flash.
-            -->
             @for (item of cartItems(); track item.product._id) {
               <div class="checkout-item-row">
                 <div class="item-visual">
@@ -206,9 +208,9 @@
                   <div class="item-info-group">
                     <h4 class="item-title">{{ item.product.title }}</h4>
                     <div class="meta-row">
-                      <span class="item-category">
-                        {{ getCategoryName(item.product.categoryId) }}
-                      </span>
+                      <span class="item-category">{{
+                        getCategoryName(item.product.categoryId)
+                      }}</span>
                       @if (item.product.avgRating) {
                         <span class="item-rating">
                           <i class="pi pi-star-fill text-yellow-500"></i>
@@ -219,11 +221,6 @@
                   </div>
                   <div class="item-bottom-row">
                     <span class="item-qty-badge">Qty: {{ item.quantity }}</span>
-                    <!--
-                      FIX: use the same safe price expression as the cart —
-                      (item.price || item.product.finalPrice || 0) * (item.quantity || 1)
-                      instead of item.price * item.quantity which throws when price is 0
-                    -->
                     <p class="item-subtotal">
                       {{
                         (item.price || item.product.finalPrice || 0) * (item.quantity || 1)
@@ -237,9 +234,7 @@
 
             @if (cartItems().length === 0) {
               <div class="empty-items">
-                <div class="empty-icon-box">
-                  <i class="pi pi-shopping-cart"></i>
-                </div>
+                <div class="empty-icon-box"><i class="pi pi-shopping-cart"></i></div>
                 <p class="text-gray-900 font-semibold">Your cart is empty</p>
                 <p class="text-gray-500 text-sm">Add items before checking out.</p>
               </div>
@@ -248,9 +243,7 @@
         </section>
       </div>
 
-      <!-- ── Right: Summary Sidebar — mirrors .cart-sidebar > .summary-card ── -->
       <aside class="checkout-aside">
-        <!-- Summary card uses the exact same class names as the cart -->
         <div class="summary-card">
           <h2 class="summary-title">Order Summary</h2>
 
@@ -277,7 +270,6 @@
               <div class="summary-line discount-line">
                 <span class="label flex-center-gap">
                   <i class="pi pi-tag"></i>
-                  <!-- FIX: was "Discount aplicado" (Spanish) -->
                   Discount Applied
                 </span>
                 <span class="value">-{{ discount() | currency: 'EGP' }}</span>
@@ -291,7 +283,6 @@
             <p class="total-hint">Taxes &amp; delivery included</p>
           </div>
 
-          <!-- Coupon — sits between total and CTA, same as summary-footer -->
           <div class="coupon-section">
             <p class="coupon-label">Have a promo code?</p>
             <div class="coupon-row">
@@ -300,19 +291,30 @@
                 [(ngModel)]="couponCode"
                 placeholder="Enter code"
                 class="form-input coupon-input"
+                [disabled]="!!couponSuccess() || isApplyingCoupon()"
               />
-              <button
-                type="button"
-                class="btn-coupon"
-                (click)="applyCoupon()"
-                [disabled]="!couponCode || isApplyingCoupon()"
-              >
-                @if (isApplyingCoupon()) {
-                  <i class="pi pi-spin pi-spinner"></i>
-                } @else {
-                  Apply
-                }
-              </button>
+              @if (couponSuccess()) {
+                <button
+                  type="button"
+                  class="btn-coupon btn-coupon--remove"
+                  (click)="removeCoupon()"
+                >
+                  Remove
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  class="btn-coupon"
+                  (click)="applyCoupon()"
+                  [disabled]="!couponCode || isApplyingCoupon()"
+                >
+                  @if (isApplyingCoupon()) {
+                    <i class="pi pi-spin pi-spinner"></i>
+                  } @else {
+                    Apply
+                  }
+                </button>
+              }
             </div>
             @if (couponError()) {
               <div class="coupon-feedback coupon-feedback--error">
@@ -328,7 +330,6 @@
             }
           </div>
 
-          <!-- CTA — mirrors .btn-checkout -->
           <button
             type="button"
             class="btn-checkout"
@@ -344,18 +345,14 @@
             }
           </button>
 
-          <!-- Footer — mirrors .summary-footer -->
           <div class="summary-footer">
             <p>Taxes and shipping calculated at checkout.</p>
             <p>Secure checkout guaranteed.</p>
           </div>
         </div>
 
-        <!-- Trust strip — mirrors the cart page's trust feel -->
         <div class="trust-strip">
-          <div class="trust-icon-box">
-            <i class="pi pi-truck"></i>
-          </div>
+          <div class="trust-icon-box"><i class="pi pi-truck"></i></div>
           <div>
             <p class="trust-title">Free Shipping</p>
             <p class="trust-desc">On all orders over 1000 EGP</p>

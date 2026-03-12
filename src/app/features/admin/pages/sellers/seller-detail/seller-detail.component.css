@@ -1,0 +1,52 @@
+@import '../../../admin-shared.css';
+
+.details-layout-wrapper {
+  display: grid;
+  grid-template-columns: 350px 1fr;
+  backdrop-filter: blur(8px);
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-top: 1rem;
+}
+
+.profile-main-card {
+  position: sticky;
+  top: 1rem;
+}
+
+.products-section {
+  min-height: 400px;
+}
+
+.card-header-flex {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--color-slate-100);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.count-badge {
+  background: var(--color-primary-100);
+  color: var(--color-primary-700);
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.empty-state-small {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 4rem 2rem;
+  color: var(--color-slate-400);
+}
+
+@media (max-width: 1024px) {
+  .details-layout-wrapper {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,174 @@
+<section class="admin-page">
+  <div class="page-header">
+    <div class="header-content">
+      <div class="header-title-wrapper">
+        <button class="btn-back" routerLink="/admin/products">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M10 19l-7-7m0 0l7-7m-7 7h18"
+            />
+          </svg>
+          Back to Products
+        </button>
+        <div class="header-title-group">
+          <h1 class="page-title">Product Details</h1>
+          <span
+            class="status-badge"
+            [class]="product()?.isDeleted ? 'status-danger' : 'status-success'"
+          >
+            {{ product()?.isDeleted ? 'Deleted' : 'Active' }}
+          </span>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        class="btn btn-danger"
+        (click)="onDelete()"
+        [disabled]="isDeleting() || isSaving()"
+      >
+        @if (isDeleting()) {
+          <span class="btn-spinner"></span>
+        } @else {
+          Delete Product
+        }
+      </button>
+    </div>
+  </div>
+
+  @if (isLoading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading product details...</p>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="error-state">
+      <p>{{ error() }}</p>
+      <button class="btn btn-secondary" routerLink="/admin/products">Go Back</button>
+    </div>
+  }
+
+  @if (!isLoading() && product()) {
+    <div class="detail-card">
+      <div class="card-grid">
+        <!-- Image Section -->
+        <div class="image-section">
+          <div class="image-wrapper">
+            @if (product()?.mainImage?.secure_url) {
+              <img
+                [src]="product()?.mainImage?.secure_url"
+                [alt]="product()?.title"
+                class="product-image"
+              />
+            } @else {
+              <div class="no-image">No Image Available</div>
+            }
+          </div>
+          <div class="image-info">
+            <!-- Status moved to header -->
+          </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="form-section">
+          <form (ngSubmit)="onSave()" #productForm="ngForm">
+            <div class="form-group">
+              <label for="title">Product Title</label>
+              <input
+                type="text"
+                id="title"
+                name="title"
+                [(ngModel)]="product()!.title"
+                required
+                class="form-input"
+              />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="price">Price ($)</label>
+                <input
+                  type="number"
+                  id="price"
+                  name="price"
+                  [(ngModel)]="product()!.price"
+                  required
+                  class="form-input"
+                />
+              </div>
+              <div class="form-group">
+                <label for="discount">Discount (%)</label>
+                <input
+                  type="number"
+                  id="discount"
+                  name="discount"
+                  [(ngModel)]="product()!.discount"
+                  class="form-input"
+                />
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="stock">Stock Quantity</label>
+                <input
+                  type="number"
+                  id="stock"
+                  name="stock"
+                  [(ngModel)]="product()!.stock"
+                  required
+                  class="form-input"
+                />
+              </div>
+              <div class="form-group">
+                <label>Final Price</label>
+                <div class="readonly-value">{{ formatCurrency(product()!.finalPrice) }}</div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="description">Description</label>
+              <textarea
+                id="description"
+                name="description"
+                [(ngModel)]="product()!.description"
+                rows="5"
+                class="form-input"
+              ></textarea>
+            </div>
+
+            <div class="action-footer">
+              <div class="spacer"></div>
+              <div class="right-actions">
+                <button
+                  type="button"
+                  class="btn btn-secondary"
+                  routerLink="/admin/products"
+                  [disabled]="isSaving()"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  class="btn btn-primary"
+                  [disabled]="isSaving() || !productForm.valid"
+                >
+                  @if (isSaving()) {
+                    <span class="btn-spinner"></span>
+                  } @else {
+                    Save Changes
+                  }
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  }
+</section>

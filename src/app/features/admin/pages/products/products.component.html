@@ -1,0 +1,278 @@
+<section class="admin-page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Products</h1>
+      <p class="page-subtitle">Manage all products including soft-deleted</p>
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <div class="search-wrapper">
+      <svg
+        class="search-icon"
+        width="16"
+        height="16"
+        fill="none"
+        stroke="currentColor"
+        viewBox="0 0 24 24"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"
+        />
+      </svg>
+      <input
+        type="text"
+        class="search-input"
+        placeholder="Search products..."
+        (input)="onSearchInput($event)"
+      />
+    </div>
+    <select
+      class="filter-select"
+      [value]="categoryFilter()"
+      (change)="onCategoryChange($any($event.target).value)"
+    >
+      <option value="">All Categories</option>
+      @for (cat of categories(); track cat._id) {
+        <option [value]="cat._id">{{ cat.name }}</option>
+      }
+    </select>
+    <select
+      class="filter-select"
+      [value]="inStockFilter()"
+      (change)="onInStockChange($any($event.target).value)"
+    >
+      <option value="">All Stock</option>
+      <option value="true">In Stock</option>
+      <option value="false">Out of Stock</option>
+    </select>
+  </div>
+
+  @if (isLoading() && isInitialLoad()) {
+    <div class="table-card">
+      <div class="table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>Price</th>
+              <th>Stock</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+              <tr>
+                <td>
+                  <div class="product-cell">
+                    <div class="skeleton product-thumb"></div>
+                    <div class="skeleton skeleton-text" style="width: 150px"></div>
+                  </div>
+                </td>
+                <td><div class="skeleton skeleton-text" style="width: 60px"></div></td>
+                <td><div class="skeleton skeleton-text" style="width: 30px"></div></td>
+                <td><div class="skeleton skeleton-badge"></div></td>
+                <td><div class="skeleton skeleton-button"></div></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  }
+  @if (error()) {
+    <div class="error-state">
+      <p>{{ error() }}</p>
+      <button class="btn btn-secondary" (click)="loadProducts()">Retry</button>
+    </div>
+  }
+
+  @if (!isLoading() && !error()) {
+    <div class="table-card">
+      @if (products().length === 0) {
+        <div class="empty-state">
+          <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
+            />
+          </svg>
+          <p>No products found</p>
+        </div>
+      } @else {
+        <div class="table-wrapper" style="position: relative">
+          @if (isFiltering()) {
+            <div class="filtering-overlay" @fadeInOut>
+              <div class="spinner spinner-sm"></div>
+            </div>
+          }
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody [@listAnimation]="products().length">
+              @for (product of products(); track product?._id ?? $index) {
+                <tr [class.deleted-row]="product.isDeleted">
+                  <td>
+                    <div class="product-cell">
+                      @if (product.mainImage && product.mainImage.secure_url) {
+                        <img
+                          [src]="product.mainImage.secure_url"
+                          [alt]="product.title"
+                          class="product-thumb"
+                        />
+                      }
+                      <div>
+                        <div class="user-name">{{ product.title }}</div>
+                        @if (product.isDeleted) {
+                          <span class="deleted-label">Soft Deleted</span>
+                        }
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ formatCurrency(product.price) }}</td>
+                  <td>
+                    <span
+                      [class]="
+                        product.stock > 10
+                          ? ''
+                          : product.stock > 0
+                            ? 'low-stock-text'
+                            : 'no-stock-text'
+                      "
+                    >
+                      {{ product.stock }}
+                    </span>
+                  </td>
+                  <td>
+                    <span
+                      class="status-badge"
+                      [class]="
+                        product.isDeleted
+                          ? 'status-danger'
+                          : product.stock === 0
+                            ? 'status-warning'
+                            : 'status-success'
+                      "
+                    >
+                      {{
+                        product.isDeleted
+                          ? 'Deleted'
+                          : product.stock === 0
+                            ? 'Out of Stock'
+                            : 'Active'
+                      }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button
+                        class="btn btn-sm btn-secondary"
+                        [routerLink]="['/admin/products', product._id]"
+                      >
+                        View
+                      </button>
+                      @if (product.isDeleted) {
+                        <button
+                          class="btn btn-sm btn-success"
+                          (click)="recoverProduct(product)"
+                          [disabled]="isActionLoading(product._id, 'recover')"
+                        >
+                          @if (isActionLoading(product._id, 'recover')) {
+                            <span class="btn-spinner"></span>
+                          } @else {
+                            Recover
+                          }
+                        </button>
+                      } @else {
+                        <button
+                          class="btn btn-sm btn-danger"
+                          (click)="requestDelete(product)"
+                          [disabled]="isActionLoading(product._id, 'delete')"
+                        >
+                          @if (isActionLoading(product._id, 'delete')) {
+                            <span class="btn-spinner"></span>
+                          } @else {
+                            Delete
+                          }
+                        </button>
+                      }
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        @if (totalPages > 1) {
+          <div class="pagination">
+            <button
+              class="page-btn"
+              [disabled]="currentPage() === 1"
+              (click)="goToPage(currentPage() - 1)"
+            >
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M15 19l-7-7 7-7"
+                />
+              </svg>
+            </button>
+            @for (page of pages; track page) {
+              <button
+                class="page-btn"
+                [class.active]="page === currentPage()"
+                (click)="goToPage(page)"
+              >
+                {{ page }}
+              </button>
+            }
+            <button
+              class="page-btn"
+              [disabled]="currentPage() === totalPages"
+              (click)="goToPage(currentPage() + 1)"
+            >
+              <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9 5l7 7-7 7"
+                />
+              </svg>
+            </button>
+          </div>
+        }
+      }
+    </div>
+  }
+
+  <!-- Confirm Delete Dialog -->
+  @if (confirmDeleteId()) {
+    <div class="modal-overlay" (click)="cancelDelete()">
+      <div class="confirm-dialog" (click)="$event.stopPropagation()">
+        <h3>Delete Product?</h3>
+        <p>This will soft-delete the product. You can recover it later.</p>
+        <div class="dialog-actions">
+          <button class="btn btn-secondary" (click)="cancelDelete()">Cancel</button>
+          <button class="btn btn-danger" (click)="confirmDelete()">Delete</button>
+        </div>
+      </div>
+    </div>
+  }
+</section>

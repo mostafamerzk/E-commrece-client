@@ -45,9 +45,9 @@
           <span class="avatar-name">{{ user()?.userName }}</span>
           <span class="avatar-role">{{ user()?.role | titlecase }}</span>
           @if (avatarError()) {
-            <span class="avatar-error"
-              ><i class="pi pi-exclamation-circle"></i> {{ avatarError() }}</span
-            >
+            <span class="avatar-error">
+              <i class="pi pi-exclamation-circle"></i> {{ avatarError() }}
+            </span>
           }
         </div>
       </div>
@@ -113,25 +113,25 @@
                 @if (f['userName'].touched && f['userName'].errors) {
                   <div class="field-errors">
                     @if (f['userName'].errors?.['required']) {
-                      <span class="field-error"
-                        ><i class="pi pi-exclamation-circle"></i> Username is required.</span
-                      >
+                      <span class="field-error">
+                        <i class="pi pi-exclamation-circle"></i> Username is required.
+                      </span>
                     }
                     @if (f['userName'].errors?.['minlength']) {
-                      <span class="field-error"
-                        ><i class="pi pi-exclamation-circle"></i> Minimum 5 characters.</span
-                      >
+                      <span class="field-error">
+                        <i class="pi pi-exclamation-circle"></i> Minimum 5 characters.
+                      </span>
                     }
                     @if (f['userName'].errors?.['maxlength']) {
-                      <span class="field-error"
-                        ><i class="pi pi-exclamation-circle"></i> Maximum 15 characters.</span
-                      >
+                      <span class="field-error">
+                        <i class="pi pi-exclamation-circle"></i> Maximum 15 characters.
+                      </span>
                     }
                     @if (f['userName'].errors?.['userName']) {
-                      <span class="field-error"
-                        ><i class="pi pi-exclamation-circle"></i> Only letters, numbers, and
-                        underscores.</span
-                      >
+                      <span class="field-error">
+                        <i class="pi pi-exclamation-circle"></i> Only letters, numbers, and
+                        underscores.
+                      </span>
                     }
                   </div>
                 }
@@ -156,6 +156,11 @@
                     autocomplete="tel"
                   />
                 </div>
+                @if (f['phone'].touched && f['phone'].errors?.['pattern']) {
+                  <span class="field-error">
+                    <i class="pi pi-exclamation-circle"></i> Invalid Egyptian phone number.
+                  </span>
+                }
               </div>
             </div>
 
@@ -206,6 +211,37 @@
             <div class="address-form-card">
               <h4>{{ editingAddressId() ? 'Edit Address' : 'New Address' }}</h4>
               <form class="profile-form" [formGroup]="addressForm">
+                <!-- Phone -->
+                <div class="form-group">
+                  <label for="addressPhone">Phone Number</label>
+                  <div
+                    class="input-wrap"
+                    [class.input-error]="a['phone'].invalid && a['phone'].touched"
+                  >
+                    <i class="pi pi-phone"></i>
+                    <input
+                      id="addressPhone"
+                      type="tel"
+                      formControlName="phone"
+                      placeholder="e.g. 0123456789"
+                    />
+                  </div>
+                  @if (a['phone'].touched && a['phone'].errors) {
+                    <div class="field-errors">
+                      @if (a['phone'].errors?.['required']) {
+                        <span class="field-error">
+                          <i class="pi pi-exclamation-circle"></i> Phone is required.
+                        </span>
+                      }
+                      @if (a['phone'].errors?.['pattern']) {
+                        <span class="field-error">
+                          <i class="pi pi-exclamation-circle"></i> Invalid Egyptian phone number.
+                        </span>
+                      }
+                    </div>
+                  }
+                </div>
+
                 <div class="form-row">
                   <div class="form-group">
                     <label for="street">Street</label>
@@ -222,9 +258,9 @@
                       />
                     </div>
                     @if (a['street'].touched && a['street'].errors?.['required']) {
-                      <span class="field-error"
-                        ><i class="pi pi-exclamation-circle"></i> Street is required.</span
-                      >
+                      <span class="field-error">
+                        <i class="pi pi-exclamation-circle"></i> Street is required.
+                      </span>
                     }
                   </div>
                   <div class="form-group">
@@ -237,12 +273,13 @@
                       <input id="city" type="text" formControlName="city" placeholder="Cairo" />
                     </div>
                     @if (a['city'].touched && a['city'].errors?.['required']) {
-                      <span class="field-error"
-                        ><i class="pi pi-exclamation-circle"></i> City is required.</span
-                      >
+                      <span class="field-error">
+                        <i class="pi pi-exclamation-circle"></i> City is required.
+                      </span>
                     }
                   </div>
                 </div>
+
                 <div class="form-row">
                   <div class="form-group">
                     <label for="country">Country</label>
@@ -259,9 +296,9 @@
                       />
                     </div>
                     @if (a['country'].touched && a['country'].errors?.['required']) {
-                      <span class="field-error"
-                        ><i class="pi pi-exclamation-circle"></i> Country is required.</span
-                      >
+                      <span class="field-error">
+                        <i class="pi pi-exclamation-circle"></i> Country is required.
+                      </span>
                     }
                   </div>
                   <div class="form-group">
@@ -282,20 +319,20 @@
                     @if (a['postalCode'].touched && a['postalCode'].errors) {
                       <div class="field-errors">
                         @if (a['postalCode'].errors?.['required']) {
-                          <span class="field-error"
-                            ><i class="pi pi-exclamation-circle"></i> Postal code is required.</span
-                          >
+                          <span class="field-error">
+                            <i class="pi pi-exclamation-circle"></i> Postal code is required.
+                          </span>
                         }
                         @if (a['postalCode'].errors?.['pattern']) {
-                          <span class="field-error"
-                            ><i class="pi pi-exclamation-circle"></i> Must be exactly 5
-                            digits.</span
-                          >
+                          <span class="field-error">
+                            <i class="pi pi-exclamation-circle"></i> Must be exactly 5 digits.
+                          </span>
                         }
                       </div>
                     }
                   </div>
                 </div>
+
                 <div class="form-actions">
                   <button type="button" class="cancel-btn" (click)="cancelAddress()">Cancel</button>
                   <button
@@ -340,6 +377,9 @@
                         <span class="addr-zip">{{ addr.postalCode }}</span>
                       }
                     </p>
+                    @if (addr.phone) {
+                      <p class="addr-meta"><i class="pi pi-phone"></i> {{ addr.phone }}</p>
+                    }
                   </div>
                 </div>
                 <div class="address-actions">
@@ -422,14 +462,14 @@
                 </button>
               </div>
               @if (p['oldPassword'].touched && p['oldPassword'].errors?.['required']) {
-                <span class="field-error"
-                  ><i class="pi pi-exclamation-circle"></i> Current password is required.</span
-                >
+                <span class="field-error">
+                  <i class="pi pi-exclamation-circle"></i> Current password is required.
+                </span>
               }
               @if (p['oldPassword'].errors?.['serverError']) {
-                <span class="field-error"
-                  ><i class="pi pi-exclamation-circle"></i> Current password is incorrect.</span
-                >
+                <span class="field-error">
+                  <i class="pi pi-exclamation-circle"></i> Current password is incorrect.
+                </span>
               }
             </div>
 
@@ -463,22 +503,22 @@
               @if (p['newPassword'].touched && p['newPassword'].errors) {
                 <div class="field-errors">
                   @if (p['newPassword'].errors?.['required']) {
-                    <span class="field-error"
-                      ><i class="pi pi-exclamation-circle"></i> New password is required.</span
-                    >
+                    <span class="field-error">
+                      <i class="pi pi-exclamation-circle"></i> New password is required.
+                    </span>
                   }
                   @if (p['newPassword'].errors?.['minlength']) {
-                    <span class="field-error"
-                      ><i class="pi pi-exclamation-circle"></i> Minimum 8 characters.</span
-                    >
+                    <span class="field-error">
+                      <i class="pi pi-exclamation-circle"></i> Minimum 8 characters.
+                    </span>
                   }
                 </div>
               }
               @if (passwordForm.errors?.['sameAsOld'] && p['newPassword'].touched) {
-                <span class="field-error"
-                  ><i class="pi pi-exclamation-circle"></i> New password must differ from the
-                  current one.</span
-                >
+                <span class="field-error">
+                  <i class="pi pi-exclamation-circle"></i> New password must differ from the current
+                  one.
+                </span>
               }
               @if (p['newPassword'].value) {
                 <div class="strength-bar">
@@ -511,9 +551,9 @@
                 />
               </div>
               @if (passwordForm.errors?.['mismatch'] && p['confirmPassword'].touched) {
-                <span class="field-error"
-                  ><i class="pi pi-exclamation-circle"></i> Passwords do not match.</span
-                >
+                <span class="field-error">
+                  <i class="pi pi-exclamation-circle"></i> Passwords do not match.
+                </span>
               }
             </div>
 

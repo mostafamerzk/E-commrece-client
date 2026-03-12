@@ -77,6 +77,10 @@ export interface UpdateCategoryPayload {
 export interface CategoriesResponse {
   message: string;
   categories: Category[];
+  docs?: Category[];
+  totalPages?: number;
+  page?: number;
+  totalDocs?: number;
 }
 
 /**

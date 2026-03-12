@@ -1,4 +1,5 @@
 import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { toObservable } from '@angular/core/rxjs-interop';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import {
   FormControl,
@@ -10,6 +11,7 @@ import {
 import { OrderService } from '../../../../core/services/order.service';
 import { CartService } from '../../../../core/services/cart.service';
 import { ToastService } from '../../../../core/services/toast.service';
+import { AuthService } from '../../../../core/services/auth.service';
 import {
   CheckoutSummary,
   OrderResponse,
@@ -20,6 +22,7 @@ import { PaymentService } from '../../../../core/services/payment.service';
 import { Router } from '@angular/router';
 import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { CategoryService } from '../../../../core/services/category.service';
+import { Address } from '../../../../core/models/auth.model';
 
 @Component({
   selector: 'app-checkout',
@@ -34,6 +37,7 @@ export class CheckoutComponent implements OnInit {
   private toastService = inject(ToastService);
   private categoryService = inject(CategoryService);
   private paymentService = inject(PaymentService);
+  public authService = inject(AuthService);
   private router = inject(Router);
 
   readonly isPlacingOrder = signal(false);
@@ -44,10 +48,11 @@ export class CheckoutComponent implements OnInit {
   readonly checkoutSummary = signal<CheckoutSummary | null>(null);
   readonly apiError = signal<string | null>(null);
 
-  couponCode = '';
+  readonly user = this.authService.currentUser;
   readonly paymentMethod = signal<PaymentMethod>('creditCard');
-
   readonly cartItems = this.cartService.items;
+
+  couponCode = '';
 
   readonly subtotal = computed(
     () => this.checkoutSummary()?.subtotal ?? this.cartService.totalPrice()
@@ -59,12 +64,12 @@ export class CheckoutComponent implements OnInit {
   );
 
   shippingForm = new FormGroup({
-    recipientName: new FormControl('', Validators.required),
     phone: new FormControl('', [Validators.required, Validators.pattern(/^01[0125]\d{8}$/)]),
     street: new FormControl('', Validators.required),
     city: new FormControl('', Validators.required),
     country: new FormControl('Egypt', Validators.required),
     postalCode: new FormControl('', Validators.required),
+    saveAddress: new FormControl(false),
   });
 
   readonly egyptianCities = [
@@ -87,20 +92,43 @@ export class CheckoutComponent implements OnInit {
     }
     this.updateCheckoutSummary();
 
-    // Auto-update summary when form changes
     this.shippingForm.valueChanges
       .pipe(debounceTime(1000), distinctUntilChanged())
       .subscribe(() => {
-        if (this.shippingForm.valid) {
-          this.updateCheckoutSummary();
-        }
+        if (this.shippingForm.valid) this.updateCheckoutSummary();
       });
+
+    toObservable(this.user).subscribe((u) => {
+      if (u && Array.isArray(u.address) && u.address.length > 0) {
+        if (!this.shippingForm.get('street')?.value) {
+          this.onSelectSavedAddress(u.address[0]);
+        }
+      } else if (u) {
+        this.shippingForm.patchValue({ phone: u.phone ?? '' });
+      }
+    });
   }
 
-  updateCheckoutSummary() {
-    const val = this.shippingForm.value;
+  onSelectSavedAddress(address: Address): void {
+    this.shippingForm.patchValue({
+      street: address.street,
+      city: address.city,
+      country: address.country || 'Egypt',
+      postalCode: address.postalCode || '',
+      phone: address.phone || this.user()?.phone || '',
+    });
+    this.updateCheckoutSummary();
+  }
 
-    // Only send address if it's partially filled to avoid 400 errors on page load
+  onSelectSavedAddressByIndex(index: string): void {
+    const addresses = this.user()?.address;
+    if (addresses && addresses[+index]) {
+      this.onSelectSavedAddress(addresses[+index]);
+    }
+  }
+
+  updateCheckoutSummary(): void {
+    const val = this.shippingForm.value;
     const hasAddress = val.street || val.city || val.phone;
 
     const address = hasAddress
@@ -124,20 +152,24 @@ export class CheckoutComponent implements OnInit {
       });
   }
 
-  applyCoupon() {
+  applyCoupon(): void {
     if (!this.couponCode) return;
     this.isApplyingCoupon.set(true);
     this.couponError.set(null);
     this.couponSuccess.set(null);
 
     const val = this.shippingForm.value;
-    const address = {
-      street: val.street!,
-      city: val.city!,
-      country: val.country!,
-      phone: val.phone!,
-      postalCode: val.postalCode!,
-    };
+    const hasPartialAddress = val.street || val.city || val.phone;
+
+    const address = hasPartialAddress
+      ? {
+          street: val.street || '',
+          city: val.city || '',
+          country: val.country || 'Egypt',
+          phone: val.phone || '',
+          postalCode: val.postalCode || '',
+        }
+      : undefined;
 
     this.orderService
       .checkout({
@@ -153,16 +185,25 @@ export class CheckoutComponent implements OnInit {
         error: (err) => {
           this.couponError.set(err.error?.message || 'Invalid coupon code');
           this.isApplyingCoupon.set(false);
+          this.couponCode = '';
         },
       });
   }
 
-  placeOrder() {
+  removeCoupon(): void {
+    this.couponCode = '';
+    this.couponSuccess.set(null);
+    this.couponError.set(null);
+    this.updateCheckoutSummary();
+  }
+
+  placeOrder(): void {
     if (this.shippingForm.invalid) {
       this.shippingForm.markAllAsTouched();
       this.toastService.error('Please fix the errors in the form');
       return;
     }
+
     this.isPlacingOrder.set(true);
     this.apiError.set(null);
 
@@ -179,12 +220,29 @@ export class CheckoutComponent implements OnInit {
 
     this.orderService
       .placeOrder({
-        paymentMethod: paymentMethod,
+        paymentMethod,
         shippingAddress: address,
         couponCode: this.couponCode || undefined,
       })
       .subscribe({
-        next: (res: OrderResponse) => {
+        next: async (res: OrderResponse) => {
+          if (val.saveAddress && this.authService.isLoggedIn()) {
+            try {
+              await this.authService.updateProfile({
+                address: {
+                  street: address.street,
+                  city: address.city,
+                  country: address.country,
+                  postalCode: address.postalCode,
+                  phone: address.phone,
+                },
+              });
+              this.toastService.success('Address saved to profile');
+            } catch (error) {
+              console.error('Failed to save address:', error);
+            }
+          }
+
           if (paymentMethod === 'cod') {
             this.toastService.success('Order placed successfully!');
             this.cartService.clearCart().subscribe();

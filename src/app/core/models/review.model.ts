@@ -76,6 +76,7 @@ export interface UpdateReviewPayload {
 export interface ReviewsResponse {
   message: string;
   reviews: Review[];
+  docs?: Review[];
   pagination?: Pagination;
 }
 

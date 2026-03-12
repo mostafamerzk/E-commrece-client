@@ -3,8 +3,7 @@ import { Observable, tap, catchError, throwError, switchMap } from 'rxjs';
 import { ApiService } from './api.service';
 import { AuthService } from './auth.service';
 import { StorageService } from './storage.service';
-import { User } from '../models/auth.model';
-import { Address } from '../../../app/shared/components/profile/address.interface';
+import { User, Address } from '../models/auth.model';
 import { API_ENDPOINTS } from '../constants/api-endpoints';
 
 interface ProfileResponse {
@@ -56,17 +55,14 @@ export class UserService {
       );
   }
 
-  // Add address — send address without addressId
   addAddress(address: Omit<Address, '_id'>): Observable<UserApiResponse> {
     return this.updateProfile({ address });
   }
 
-  // Update address — send both address and addressId
   updateAddress(addressId: string, address: Omit<Address, '_id'>): Observable<UserApiResponse> {
     return this.updateProfile({ addressId, address });
   }
 
-  // Delete address — send addressId without address
   deleteAddress(addressId: string): Observable<UserApiResponse> {
     return this.updateProfile({ addressId });
   }
