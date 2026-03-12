@@ -261,12 +261,14 @@
             <div class="review-header">
               <div class="reviewer-info">
                 <div class="reviewer-avatar">
-                  <span>{{ review.user.userName | slice: 0 : 1 | uppercase }}</span>
+                  <!-- <span>{{ (review.user?.userName || 'U') | slice: 0 : 1 | uppercase }}</span> -->
+                  <span>U</span>
                 </div>
                 <div class="reviewer-details">
                   <div class="reviewer-name-row">
-                    <h4 class="reviewer-name">{{ review.user.userName }}</h4>
-                    @if (true) {
+                    <!-- <h4 class="reviewer-name">{{ review.user?.userName || 'Anonymous User' }}</h4> -->
+                    <h4 class="reviewer-name">Anonymous User</h4>
+                    <!-- @if (true) {
                       <span class="verified-badge">
                         <svg viewBox="0 0 24 24" fill="none">
                           <path
@@ -279,7 +281,7 @@
                         </svg>
                         Verified Purchase
                       </span>
-                    }
+                    } -->
                   </div>
                   <time class="review-date">{{ review.createdAt | date: 'mediumDate' }}</time>
                 </div>

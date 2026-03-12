@@ -142,8 +142,14 @@ export class ProductListComponent implements OnInit {
 
     this.productService.getAll(params).subscribe({
       next: (res) => {
-        this.products.set(res.products);
-        this.totalProducts.set(res.pagination.totalItems);
+        let filteredProducts = res.products;
+        if (this.inStockOnly()) {
+          filteredProducts = filteredProducts.filter((p) => p.stock > 0);
+        }
+        this.products.set(filteredProducts);
+        this.totalProducts.set(
+          this.inStockOnly() ? filteredProducts.length : res.pagination.totalItems
+        );
         this.isLoading.set(false);
       },
       error: (err) => {

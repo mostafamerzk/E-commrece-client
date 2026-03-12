@@ -1,4 +1,4 @@
-import { Component, input, signal, inject, computed, OnInit } from '@angular/core';
+import { Component, input, signal, inject, computed, effect } from '@angular/core';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import {
@@ -10,7 +10,7 @@ import {
 } from '@angular/forms';
 import { ReviewService } from '../../../core/services/review.service';
 import { AuthService } from '../../../core/services/auth.service';
-import { Review, AddReviewPayload } from '../../../core/models/review.model';
+import { Review, AddReviewPayload, ReviewsResponse } from '../../../core/models/review.model';
 import { EmptyStateComponent } from '../empty-state/empty-state.component';
 import { ToastService } from '../../../core/services/toast.service';
 import { finalize } from 'rxjs';
@@ -32,8 +32,9 @@ import { PrimaryButton } from '../primary-button/primary-button';
   templateUrl: './reviews-section.component.html',
   styleUrl: './reviews-section.component.css',
 })
-export class ReviewsSectionComponent implements OnInit {
+export class ReviewsSectionComponent {
   productId = input<string>('test-product-id');
+  initialReviews = input<Review[]>([]);
 
   public reviewService = inject(ReviewService);
   public authService = inject(AuthService);
@@ -80,6 +81,23 @@ export class ReviewsSectionComponent implements OnInit {
     comment: new FormControl('', [Validators.required, Validators.minLength(10)]),
   });
 
+  constructor() {
+    effect(() => {
+      const id = this.productId();
+      const initial = this.initialReviews();
+
+      // If we have initial reviews and the productId matches, use them immediately
+      if (initial.length > 0) {
+        this.reviews.set(initial);
+      }
+
+      // Always try to fetch fresh reviews if we have a valid ID
+      if (id && id !== 'test-product-id') {
+        this.loadReviews();
+      }
+    });
+  }
+
   // --- Validation Helpers ---
   get isRatingInvalid(): boolean {
     const ctrl = this.reviewForm.get('rating');
@@ -110,18 +128,36 @@ export class ReviewsSectionComponent implements OnInit {
     return currentRating >= star;
   }
 
-  ngOnInit(): void {
-    this.loadReviews();
-  }
-
   loadReviews(): void {
+    const id = this.productId();
+    if (!id || id === 'test-product-id') return;
+
     this.isLoading.set(true);
     this.reviewService
-      .getProductReviews(this.productId())
+      .getProductReviews(id)
       .pipe(finalize(() => this.isLoading.set(false)))
       .subscribe({
-        next: (res) => {
-          this.reviews.set(res.reviews);
+        next: (res: ReviewsResponse) => {
+          const extractArray = (data: unknown): Review[] => {
+            if (Array.isArray(data)) return data as Review[];
+            if (!data || typeof data !== 'object') return [];
+
+            const d = data as Record<string, unknown>;
+            if (Array.isArray(d['docs'])) return d['docs'] as Review[];
+            if (Array.isArray(d['reviews'])) return d['reviews'] as Review[];
+
+            // Recursively check reviews/docs properties if they are objects (handles weird nesting)
+            if (d['reviews'] && typeof d['reviews'] === 'object') {
+              return extractArray(d['reviews']);
+            }
+            if (d['docs'] && typeof d['docs'] === 'object') {
+              return extractArray(d['docs']);
+            }
+            return [];
+          };
+
+          const reviewArray = extractArray(res.reviews) || extractArray(res) || [];
+          this.reviews.set(reviewArray);
         },
         error: () => {
           this.toast.error('Failed to load reviews');
