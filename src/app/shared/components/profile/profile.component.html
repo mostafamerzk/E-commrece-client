@@ -1,9 +1,8 @@
 <div class="profile-page">
-  <!-- Page Title -->
   <div class="profile-page-header">
     <h1 class="page-title">
       <i class="pi pi-user"></i>
-      {{ user()?.userName }} Profile
+      {{ user()?.userName }} <span style="color: #2563eb">Profile</span>
     </h1>
   </div>
 
@@ -23,7 +22,6 @@
           } @else {
             <div class="avatar-placeholder"><i class="pi pi-user"></i></div>
           }
-
           <label
             class="avatar-upload-overlay"
             [class.uploading]="isUploadingAvatar()"
@@ -43,14 +41,13 @@
             />
           </label>
         </div>
-
         <div class="avatar-info">
           <span class="avatar-name">{{ user()?.userName }}</span>
           <span class="avatar-role">{{ user()?.role | titlecase }}</span>
           @if (avatarError()) {
-            <span class="avatar-error"
-              ><i class="pi pi-exclamation-circle"></i> {{ avatarError() }}</span
-            >
+            <span class="avatar-error">
+              <i class="pi pi-exclamation-circle"></i> {{ avatarError() }}
+            </span>
           }
         </div>
       </div>
@@ -68,20 +65,20 @@
         }
       </nav>
 
-      <button class="logout-btn" (click)="logout()">
-        <i class="pi pi-sign-out"></i>
-        Logout
-      </button>
+      <button class="logout-btn" (click)="logout()"><i class="pi pi-sign-out"></i> Logout</button>
     </aside>
 
     <!-- ── Content ── -->
     <main class="profile-content">
-      <!-- ── Personal Info ── -->
+      <!-- ══════════════════════════════════════════
+           TAB: Personal Info
+      ══════════════════════════════════════════ -->
       @if (activeTab() === 'info') {
         <section class="content-section">
+          <!-- ── User Info ── -->
           <div class="section-header">
             <h2 class="section-title">Personal Information</h2>
-            <p class="section-subtitle">Update your display name</p>
+            <p class="section-subtitle">Update your username and phone number</p>
           </div>
 
           @if (infoSuccess()) {
@@ -96,70 +93,75 @@
           }
 
           <form class="profile-form" [formGroup]="infoForm" (ngSubmit)="saveInfo()">
-            <div class="form-group">
-              <label for="userName">Username</label>
-              <div
-                class="input-wrap"
-                [class.input-error]="f['userName'].invalid && f['userName'].touched"
-              >
-                <i class="pi pi-user"></i>
-                <input
-                  id="userName"
-                  type="text"
-                  formControlName="userName"
-                  placeholder="e.g. john_doe"
-                  autocomplete="username"
-                />
-              </div>
-              @if (f['userName'].touched && f['userName'].errors) {
-                <div class="field-errors">
-                  @if (f['userName'].errors['required']) {
-                    <span class="field-error"
-                      ><i class="pi pi-exclamation-circle"></i> Username is required.</span
-                    >
-                  }
-                  @if (f['userName'].errors['minlength']) {
-                    <span class="field-error"
-                      ><i class="pi pi-exclamation-circle"></i> Minimum 5 characters.</span
-                    >
-                  }
-                  @if (f['userName'].errors['maxlength']) {
-                    <span class="field-error"
-                      ><i class="pi pi-exclamation-circle"></i> Maximum 15 characters.</span
-                    >
-                  }
-                  @if (f['userName'].errors['userName']) {
-                    <span class="field-error"
-                      ><i class="pi pi-exclamation-circle"></i> Only letters, numbers, and
-                      underscores allowed.</span
-                    >
-                  }
-                </div>
-              }
-              <span class="field-hint"
-                >5–15 characters. Letters, numbers, and underscores only.</span
-              >
-            </div>
-
-            <div class="form-group">
-              <label for="phone">Phone Number</label>
-              <div
-                class="input-wrap"
-                [class.input-error]="f['phone'].invalid && f['phone'].touched"
-              >
-                <i class="pi pi-phone"></i>
-                <input
-                  id="phone"
-                  type="text"
-                  formControlName="phone"
-                  placeholder="e.g. 0123456789"
-                />
-              </div>
-              @if (f['phone'].touched && f['phone'].errors?.['pattern']) {
-                <span class="field-error"
-                  ><i class="pi pi-exclamation-circle"></i> Invalid Egyptian phone number.</span
+            <div class="form-row">
+              <!-- Username -->
+              <div class="form-group">
+                <label for="userName">Username</label>
+                <div
+                  class="input-wrap"
+                  [class.input-error]="f['userName'].invalid && f['userName'].touched"
                 >
-              }
+                  <i class="pi pi-user"></i>
+                  <input
+                    id="userName"
+                    type="text"
+                    formControlName="userName"
+                    placeholder="e.g. john_doe"
+                    autocomplete="username"
+                  />
+                </div>
+                @if (f['userName'].touched && f['userName'].errors) {
+                  <div class="field-errors">
+                    @if (f['userName'].errors?.['required']) {
+                      <span class="field-error">
+                        <i class="pi pi-exclamation-circle"></i> Username is required.
+                      </span>
+                    }
+                    @if (f['userName'].errors?.['minlength']) {
+                      <span class="field-error">
+                        <i class="pi pi-exclamation-circle"></i> Minimum 5 characters.
+                      </span>
+                    }
+                    @if (f['userName'].errors?.['maxlength']) {
+                      <span class="field-error">
+                        <i class="pi pi-exclamation-circle"></i> Maximum 15 characters.
+                      </span>
+                    }
+                    @if (f['userName'].errors?.['userName']) {
+                      <span class="field-error">
+                        <i class="pi pi-exclamation-circle"></i> Only letters, numbers, and
+                        underscores.
+                      </span>
+                    }
+                  </div>
+                }
+                <span class="field-hint"
+                  >5–15 characters. Letters, numbers, and underscores only.</span
+                >
+              </div>
+
+              <!-- Phone -->
+              <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <div
+                  class="input-wrap"
+                  [class.input-error]="f['phone'].invalid && f['phone'].touched"
+                >
+                  <i class="pi pi-phone"></i>
+                  <input
+                    id="phone"
+                    type="tel"
+                    formControlName="phone"
+                    placeholder="e.g. 0123456789"
+                    autocomplete="tel"
+                  />
+                </div>
+                @if (f['phone'].touched && f['phone'].errors?.['pattern']) {
+                  <span class="field-error">
+                    <i class="pi pi-exclamation-circle"></i> Invalid Egyptian phone number.
+                  </span>
+                }
+              </div>
             </div>
 
             <div class="form-actions">
@@ -177,10 +179,234 @@
               </button>
             </div>
           </form>
+
+          <!-- ── Divider ── -->
+          <div class="section-divider"></div>
+
+          <!-- ── Addresses ── -->
+          <div class="section-header">
+            <h2 class="section-title">Saved Addresses</h2>
+            <p class="section-subtitle">Manage your shipping addresses</p>
+          </div>
+
+          @if (addressSuccess()) {
+            <div class="alert alert-success">
+              <i class="pi pi-check-circle"></i> Address saved successfully!
+            </div>
+          }
+          @if (addressError()) {
+            <div class="alert alert-error">
+              <i class="pi pi-times-circle"></i> {{ addressError() }}
+            </div>
+          }
+
+          @if (!showAddressForm()) {
+            <button class="add-address-btn" (click)="openAddAddress()">
+              <i class="pi pi-plus"></i> Add New Address
+            </button>
+          }
+
+          <!-- Address Form -->
+          @if (showAddressForm()) {
+            <div class="address-form-card">
+              <h4>{{ editingAddressId() ? 'Edit Address' : 'New Address' }}</h4>
+              <form class="profile-form" [formGroup]="addressForm">
+                <!-- Phone -->
+                <div class="form-group">
+                  <label for="addressPhone">Phone Number</label>
+                  <div
+                    class="input-wrap"
+                    [class.input-error]="a['phone'].invalid && a['phone'].touched"
+                  >
+                    <i class="pi pi-phone"></i>
+                    <input
+                      id="addressPhone"
+                      type="tel"
+                      formControlName="phone"
+                      placeholder="e.g. 0123456789"
+                    />
+                  </div>
+                  @if (a['phone'].touched && a['phone'].errors) {
+                    <div class="field-errors">
+                      @if (a['phone'].errors?.['required']) {
+                        <span class="field-error">
+                          <i class="pi pi-exclamation-circle"></i> Phone is required.
+                        </span>
+                      }
+                      @if (a['phone'].errors?.['pattern']) {
+                        <span class="field-error">
+                          <i class="pi pi-exclamation-circle"></i> Invalid Egyptian phone number.
+                        </span>
+                      }
+                    </div>
+                  }
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="street">Street</label>
+                    <div
+                      class="input-wrap"
+                      [class.input-error]="a['street'].invalid && a['street'].touched"
+                    >
+                      <i class="pi pi-map-marker"></i>
+                      <input
+                        id="street"
+                        type="text"
+                        formControlName="street"
+                        placeholder="123 Main St"
+                      />
+                    </div>
+                    @if (a['street'].touched && a['street'].errors?.['required']) {
+                      <span class="field-error">
+                        <i class="pi pi-exclamation-circle"></i> Street is required.
+                      </span>
+                    }
+                  </div>
+                  <div class="form-group">
+                    <label for="city">City</label>
+                    <div
+                      class="input-wrap"
+                      [class.input-error]="a['city'].invalid && a['city'].touched"
+                    >
+                      <i class="pi pi-building"></i>
+                      <input id="city" type="text" formControlName="city" placeholder="Cairo" />
+                    </div>
+                    @if (a['city'].touched && a['city'].errors?.['required']) {
+                      <span class="field-error">
+                        <i class="pi pi-exclamation-circle"></i> City is required.
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                <div class="form-row">
+                  <div class="form-group">
+                    <label for="country">Country</label>
+                    <div
+                      class="input-wrap"
+                      [class.input-error]="a['country'].invalid && a['country'].touched"
+                    >
+                      <i class="pi pi-globe"></i>
+                      <input
+                        id="country"
+                        type="text"
+                        formControlName="country"
+                        placeholder="Egypt"
+                      />
+                    </div>
+                    @if (a['country'].touched && a['country'].errors?.['required']) {
+                      <span class="field-error">
+                        <i class="pi pi-exclamation-circle"></i> Country is required.
+                      </span>
+                    }
+                  </div>
+                  <div class="form-group">
+                    <label for="postalCode">Postal Code</label>
+                    <div
+                      class="input-wrap"
+                      [class.input-error]="a['postalCode'].invalid && a['postalCode'].touched"
+                    >
+                      <i class="pi pi-hashtag"></i>
+                      <input
+                        id="postalCode"
+                        type="text"
+                        formControlName="postalCode"
+                        placeholder="12345"
+                        maxlength="5"
+                      />
+                    </div>
+                    @if (a['postalCode'].touched && a['postalCode'].errors) {
+                      <div class="field-errors">
+                        @if (a['postalCode'].errors?.['required']) {
+                          <span class="field-error">
+                            <i class="pi pi-exclamation-circle"></i> Postal code is required.
+                          </span>
+                        }
+                        @if (a['postalCode'].errors?.['pattern']) {
+                          <span class="field-error">
+                            <i class="pi pi-exclamation-circle"></i> Must be exactly 5 digits.
+                          </span>
+                        }
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" class="cancel-btn" (click)="cancelAddress()">Cancel</button>
+                  <button
+                    type="button"
+                    class="save-btn"
+                    [class.loading]="isSavingAddress()"
+                    [disabled]="isSavingAddress()"
+                    (click)="saveAddress()"
+                  >
+                    @if (isSavingAddress()) {
+                      <i class="pi pi-spin pi-spinner"></i> Saving...
+                    } @else {
+                      <i class="pi pi-check"></i>
+                      {{ editingAddressId() ? 'Update Address' : 'Save Address' }}
+                    }
+                  </button>
+                </div>
+              </form>
+            </div>
+          }
+
+          <!-- Empty State -->
+          @if (addresses().length === 0 && !showAddressForm()) {
+            <div class="empty-addresses">
+              <i class="pi pi-map-marker"></i>
+              <p>No addresses saved yet.</p>
+              <span>Add an address to speed up your checkout.</span>
+            </div>
+          }
+
+          <!-- Addresses List -->
+          <div class="addresses-list">
+            @for (addr of addresses(); track addr._id) {
+              <div class="address-card">
+                <div class="address-info">
+                  <div class="address-icon"><i class="pi pi-map-marker"></i></div>
+                  <div class="address-details">
+                    <p class="addr-line">{{ addr.street }}</p>
+                    <p class="addr-meta">
+                      {{ addr.city }}, {{ addr.country }}
+                      @if (addr.postalCode) {
+                        <span class="addr-zip">{{ addr.postalCode }}</span>
+                      }
+                    </p>
+                    @if (addr.phone) {
+                      <p class="addr-meta"><i class="pi pi-phone"></i> {{ addr.phone }}</p>
+                    }
+                  </div>
+                </div>
+                <div class="address-actions">
+                  <button
+                    class="addr-btn addr-btn-edit"
+                    (click)="openEditAddress(addr)"
+                    title="Edit"
+                  >
+                    <i class="pi pi-pencil"></i>
+                  </button>
+                  <button
+                    class="addr-btn addr-btn-delete"
+                    (click)="deleteAddress(addr._id!)"
+                    title="Delete"
+                  >
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
         </section>
       }
 
-      <!-- ── Change Password ── -->
+      <!-- ══════════════════════════════════════════
+           TAB: Change Password
+      ══════════════════════════════════════════ -->
       @if (activeTab() === 'password') {
         <section class="content-section">
           <div class="section-header">
@@ -236,14 +462,14 @@
                 </button>
               </div>
               @if (p['oldPassword'].touched && p['oldPassword'].errors?.['required']) {
-                <span class="field-error"
-                  ><i class="pi pi-exclamation-circle"></i> Current password is required.</span
-                >
+                <span class="field-error">
+                  <i class="pi pi-exclamation-circle"></i> Current password is required.
+                </span>
               }
               @if (p['oldPassword'].errors?.['serverError']) {
-                <span class="field-error"
-                  ><i class="pi pi-exclamation-circle"></i> Current password is incorrect.</span
-                >
+                <span class="field-error">
+                  <i class="pi pi-exclamation-circle"></i> Current password is incorrect.
+                </span>
               }
             </div>
 
@@ -276,25 +502,24 @@
               </div>
               @if (p['newPassword'].touched && p['newPassword'].errors) {
                 <div class="field-errors">
-                  @if (p['newPassword'].errors['required']) {
-                    <span class="field-error"
-                      ><i class="pi pi-exclamation-circle"></i> New password is required.</span
-                    >
+                  @if (p['newPassword'].errors?.['required']) {
+                    <span class="field-error">
+                      <i class="pi pi-exclamation-circle"></i> New password is required.
+                    </span>
                   }
-                  @if (p['newPassword'].errors['minlength']) {
-                    <span class="field-error"
-                      ><i class="pi pi-exclamation-circle"></i> Minimum 8 characters.</span
-                    >
+                  @if (p['newPassword'].errors?.['minlength']) {
+                    <span class="field-error">
+                      <i class="pi pi-exclamation-circle"></i> Minimum 8 characters.
+                    </span>
                   }
                 </div>
               }
               @if (passwordForm.errors?.['sameAsOld'] && p['newPassword'].touched) {
-                <span class="field-error"
-                  ><i class="pi pi-exclamation-circle"></i> New password must differ from the
-                  current one.</span
-                >
+                <span class="field-error">
+                  <i class="pi pi-exclamation-circle"></i> New password must differ from the current
+                  one.
+                </span>
               }
-
               @if (p['newPassword'].value) {
                 <div class="strength-bar">
                   <div
@@ -326,9 +551,9 @@
                 />
               </div>
               @if (passwordForm.errors?.['mismatch'] && p['confirmPassword'].touched) {
-                <span class="field-error"
-                  ><i class="pi pi-exclamation-circle"></i> Passwords do not match.</span
-                >
+                <span class="field-error">
+                  <i class="pi pi-exclamation-circle"></i> Passwords do not match.
+                </span>
               }
             </div>
 
@@ -350,215 +575,11 @@
         </section>
       }
 
-      <!-- ── My Orders ── -->
+      <!-- ══════════════════════════════════════════
+           TAB: My Orders
+      ══════════════════════════════════════════ -->
       @if (activeTab() === 'orders') {
-        <app-order-list></app-order-list>
-      }
-
-      <!-- ── Addresses ── -->
-      @if (activeTab() === 'addresses') {
-        <section class="content-section">
-          <div class="section-header">
-            <h2 class="section-title">Saved Addresses</h2>
-            <p class="section-subtitle">Manage your shipping addresses</p>
-          </div>
-
-          @if (addressSuccess()) {
-            <div class="alert alert-success">
-              <i class="pi pi-check-circle"></i> Address saved successfully!
-            </div>
-          }
-          @if (addressError()) {
-            <div class="alert alert-error">
-              <i class="pi pi-times-circle"></i> {{ addressError() }}
-            </div>
-          }
-
-          <!-- Address List -->
-          <div class="address-list">
-            @for (address of user()?.addresses; track address._id) {
-              <div class="address-card" [class.editing]="editingAddressId() === address._id">
-                <div class="address-details">
-                  <p class="address-street">{{ address.street }}</p>
-                  <p class="address-city">{{ address.city }}, {{ address.country }}</p>
-                  <p class="address-zip">
-                    Zip: {{ address.postalCode }} | <i class="pi pi-phone"></i> {{ address.phone }}
-                  </p>
-                </div>
-                <div class="address-actions">
-                  <button class="action-btn edit" (click)="editAddress(address)" title="Edit">
-                    <i class="pi pi-pencil"></i>
-                  </button>
-                  <button
-                    class="action-btn delete"
-                    (click)="deleteAddress(address._id!)"
-                    title="Delete"
-                  >
-                    <i class="pi pi-trash"></i>
-                  </button>
-                </div>
-              </div>
-            } @empty {
-              <div class="empty-state">
-                <i class="pi pi-map-marker"></i>
-                <p>No addresses saved yet.</p>
-              </div>
-            }
-          </div>
-
-          <form
-            class="profile-form address-form"
-            [formGroup]="addressForm"
-            (ngSubmit)="saveAddress()"
-          >
-            <div class="section-divider">
-              <span>{{ editingAddressId() ? 'Edit Address' : 'Add New Address' }}</span>
-            </div>
-
-            <div class="form-group mb-4">
-              <label for="addressPhone">Address Phone Number</label>
-              <div
-                class="input-wrap"
-                [class.input-error]="a['phone'].invalid && a['phone'].touched"
-              >
-                <i class="pi pi-phone"></i>
-                <input
-                  id="addressPhone"
-                  type="text"
-                  formControlName="phone"
-                  placeholder="e.g. 0123456789"
-                />
-              </div>
-              @if (a['phone'].touched && a['phone'].errors) {
-                <div class="field-errors">
-                  @if (a['phone'].errors['required']) {
-                    <span class="field-error"
-                      ><i class="pi pi-exclamation-circle"></i> Phone is required.</span
-                    >
-                  }
-                  @if (a['phone'].errors['pattern']) {
-                    <span class="field-error"
-                      ><i class="pi pi-exclamation-circle"></i> Invalid Egyptian phone.</span
-                    >
-                  }
-                </div>
-              }
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="street">Street</label>
-                <div
-                  class="input-wrap"
-                  [class.input-error]="a['street'].invalid && a['street'].touched"
-                >
-                  <i class="pi pi-map-marker"></i>
-                  <input
-                    id="street"
-                    type="text"
-                    formControlName="street"
-                    placeholder="123 Main St"
-                  />
-                </div>
-                @if (a['street'].touched && a['street'].errors?.['required']) {
-                  <span class="field-error"
-                    ><i class="pi pi-exclamation-circle"></i> Street is required.</span
-                  >
-                }
-              </div>
-
-              <div class="form-group">
-                <label for="city">City</label>
-                <div
-                  class="input-wrap"
-                  [class.input-error]="a['city'].invalid && a['city'].touched"
-                >
-                  <i class="pi pi-building"></i>
-                  <input id="city" type="text" formControlName="city" placeholder="Cairo" />
-                </div>
-                @if (a['city'].touched && a['city'].errors?.['required']) {
-                  <span class="field-error"
-                    ><i class="pi pi-exclamation-circle"></i> City is required.</span
-                  >
-                }
-              </div>
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="country">Country</label>
-                <div
-                  class="input-wrap"
-                  [class.input-error]="a['country'].invalid && a['country'].touched"
-                >
-                  <i class="pi pi-globe"></i>
-                  <input id="country" type="text" formControlName="country" placeholder="Egypt" />
-                </div>
-                @if (a['country'].touched && a['country'].errors?.['required']) {
-                  <span class="field-error"
-                    ><i class="pi pi-exclamation-circle"></i> Country is required.</span
-                  >
-                }
-              </div>
-
-              <div class="form-group">
-                <label for="postalCode">Postal Code</label>
-                <div
-                  class="input-wrap"
-                  [class.input-error]="a['postalCode'].invalid && a['postalCode'].touched"
-                >
-                  <i class="pi pi-hashtag"></i>
-                  <input
-                    id="postalCode"
-                    type="text"
-                    formControlName="postalCode"
-                    placeholder="12345"
-                    maxlength="5"
-                  />
-                </div>
-                @if (a['postalCode'].touched && a['postalCode'].errors) {
-                  <div class="field-errors">
-                    @if (a['postalCode'].errors['required']) {
-                      <span class="field-error"
-                        ><i class="pi pi-exclamation-circle"></i> Postal code is required.</span
-                      >
-                    }
-                    @if (a['postalCode'].errors['pattern']) {
-                      <span class="field-error"
-                        ><i class="pi pi-exclamation-circle"></i> Must be exactly 5 digits.</span
-                      >
-                    }
-                  </div>
-                }
-              </div>
-            </div>
-
-            <div class="form-actions">
-              @if (editingAddressId()) {
-                <button type="button" class="cancel-btn" (click)="cancelEditAddress()">
-                  Cancel
-                </button>
-              }
-              <button
-                type="submit"
-                class="save-btn"
-                [class.loading]="isSavingAddress()"
-                [disabled]="isSavingAddress()"
-              >
-                @if (isSavingAddress()) {
-                  <i class="pi pi-spin pi-spinner"></i> Saving...
-                } @else {
-                  <i
-                    class="pi"
-                    [class.pi-map-marker]="!editingAddressId()"
-                    [class.pi-check]="editingAddressId()"
-                  ></i>
-                  {{ editingAddressId() ? 'Update Address' : 'Save Address' }}
-                }
-              </button>
-            </div>
-          </form>
-        </section>
+        <app-order-list />
       }
     </main>
   </div>

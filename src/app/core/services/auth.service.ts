@@ -1,5 +1,4 @@
 import { Injectable, inject, signal, computed } from '@angular/core';
-
 import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -7,17 +6,11 @@ import {
   User,
   RegisterPayload,
   AuthResponse,
+  LoginPayload,
   ResetPasswordPayload,
   ProfileResponse,
 } from '../models/auth.model';
 import { StorageService } from './storage.service';
-
-// AuthFacade is defined in app.tokens.ts
-
-export interface LoginPayload {
-  email: string;
-  password: string;
-}
 
 export interface LoginResponse {
   success: string;
@@ -32,11 +25,9 @@ export class AuthService {
   private storage = inject(StorageService);
   private baseUrl = environment.apiUrl;
 
-  // Core signals for UI reactivity
   currentUser = signal<User | null>(this.getUserFromStorage());
   private _token = signal<string | null>(localStorage.getItem('access_token'));
 
-  // Computed signals
   isLoggedIn = computed(() => !!this._token());
   isAdmin = computed(() => this.currentUser()?.role === 'admin');
   isSeller = computed(() => this.currentUser()?.role === 'seller');
@@ -44,35 +35,26 @@ export class AuthService {
   private getUserFromStorage(): User | null {
     const stored = this.storage.getItem<User | ProfileResponse>('user');
     const user = stored && 'data' in stored ? stored.data : (stored as User);
-
-    // Normalize backend 'address' (singular) to frontend 'addresses' (plural)
-    if (user && user.address && !user.addresses) {
-      user.addresses = user.address;
-    }
-
-    return user;
+    return user ?? null;
   }
 
   async login(email: string, password: string): Promise<LoginResponse> {
-    const payload = { email, password };
+    const payload: LoginPayload = { email, password };
     const response = await firstValueFrom(
       this.http.post<LoginResponse>(`${this.baseUrl}/auth/login`, payload)
     );
+
     if (response?.access_token) {
       localStorage.setItem('access_token', response.access_token);
       this._token.set(response.access_token);
       try {
         const user = await this.getProfile();
-
         if (user) {
           this.storage.setItem('user', user);
           this.currentUser.set(user);
-          console.log('[AuthService] User logged in:', { user: user });
         }
       } catch (error) {
         console.error('[AuthService] Failed to fetch user profile after login', error);
-        // Profile fetch failed, but login token is valid
-        // The profile will be fetched again when needed
       }
     }
 
@@ -88,38 +70,26 @@ export class AuthService {
       this.http.get<ProfileResponse | User>(`${this.baseUrl}/user/profile`)
     );
     const user = 'data' in response ? response.data : response;
-
-    // Normalize backend 'address' (singular) to frontend 'addresses' (plural)
-    if (user && user.address && !user.addresses) {
-      user.addresses = user.address;
-    }
-
     return user;
   }
 
   async register(payload: RegisterPayload): Promise<AuthResponse> {
-    const response = await firstValueFrom(
-      this.http.post<AuthResponse>(`${this.baseUrl}/auth/register`, payload)
-    );
-    return response;
+    return firstValueFrom(this.http.post<AuthResponse>(`${this.baseUrl}/auth/register`, payload));
   }
 
   async forgotPassword(email: string): Promise<{ message: string }> {
-    const response = await firstValueFrom(
+    return firstValueFrom(
       this.http.post<{ message: string }>(`${this.baseUrl}/auth/forgetPass`, { email })
     );
-    console.log(response);
-    return response;
   }
 
   async resetPassword(
     email: string,
     payload: Omit<ResetPasswordPayload, 'email'>
   ): Promise<{ message: string }> {
-    const response = await firstValueFrom(
+    return firstValueFrom(
       this.http.post<{ message: string }>(`${this.baseUrl}/auth/resetPass?email=${email}`, payload)
     );
-    return response;
   }
 
   async updateProfile(payload: Record<string, unknown>): Promise<void> {
@@ -131,7 +101,6 @@ export class AuthService {
     );
 
     if (response?.success) {
-      // Refresh user profile after update to keep signals in sync
       const updatedUser = await this.getProfile();
       this.storage.setItem('user', updatedUser);
       this.currentUser.set(updatedUser);

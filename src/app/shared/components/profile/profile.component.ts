@@ -38,7 +38,7 @@ const confirmMatchValidator: ValidatorFn = (group: AbstractControl): ValidationE
 
 // ── Interfaces ────────────────────────────────────────────────────────────────
 interface Tab {
-  key: 'info' | 'password' | 'orders' | 'addresses';
+  key: 'info' | 'password' | 'orders';
   label: string;
   icon: string;
 }
@@ -63,7 +63,6 @@ export class ProfileComponent implements OnInit {
     { key: 'info', label: 'Personal Info', icon: 'pi-user' },
     { key: 'password', label: 'Change Password', icon: 'pi-lock' },
     { key: 'orders', label: 'My Orders', icon: 'pi-shopping-bag' },
-    { key: 'addresses', label: 'Addresses', icon: 'pi-map-marker' },
   ];
 
   readonly activeTab = signal<Tab['key']>('info');
@@ -100,12 +99,9 @@ export class ProfileComponent implements OnInit {
     this.infoError.set('');
     this.infoSuccess.set(false);
 
-    const payload: UpdateProfilePayload = {
-      userName: this.f['userName'].value!,
-    };
-    if (this.f['phone'].value) {
-      payload.phone = this.f['phone'].value;
-    }
+    const payload: { userName?: string; phone?: string } = {};
+    if (this.f['userName'].value) payload.userName = this.f['userName'].value;
+    if (this.f['phone'].value) payload.phone = this.f['phone'].value;
 
     this.userService.updateProfile(payload).subscribe({
       next: () => {
@@ -181,7 +177,11 @@ export class ProfileComponent implements OnInit {
       });
   }
 
-  // ── Address Form ──────────────────────────────────────────────────────────
+  // ── Address ───────────────────────────────────────────────────────────────
+  addresses = signal<Address[]>([]);
+  showAddressForm = signal(false);
+  readonly editingAddressId = signal<string | null>(null);
+
   addressForm = this.fb.group({
     phone: ['', [Validators.required, Validators.pattern(/^01[0125]\d{8}$/)]],
     street: ['', Validators.required],
@@ -198,35 +198,28 @@ export class ProfileComponent implements OnInit {
     return this.addressForm.controls;
   }
 
-  // ── Init ─────────────────────────────────────────────────────────────────
-  ngOnInit(): void {
-    const u = this.user();
-    if (u) {
-      this.infoForm.patchValue({
-        userName: u.userName ?? '',
-        phone: u.phone ?? '',
-      });
-    }
-  }
-
-  // ── Address Operations ──────────────────────────────────────────────────
-  readonly editingAddressId = signal<string | null>(null);
-
-  editAddress(address: Address): void {
-    this.editingAddressId.set(address._id ?? null);
-    this.addressForm.patchValue({
-      phone: address.phone,
-      street: address.street,
-      city: address.city,
-      country: address.country,
-      postalCode: address.postalCode,
-    });
-    // Scroll to form if needed
-  }
-
-  cancelEditAddress(): void {
+  openAddAddress(): void {
     this.editingAddressId.set(null);
     this.addressForm.reset({ country: 'Egypt' });
+    this.showAddressForm.set(true);
+  }
+
+  openEditAddress(addr: Address): void {
+    this.editingAddressId.set(addr._id ?? null);
+    this.addressForm.patchValue({
+      phone: addr.phone ?? '',
+      street: addr.street ?? '',
+      city: addr.city ?? '',
+      country: addr.country ?? 'Egypt',
+      postalCode: addr.postalCode ?? '',
+    });
+    this.showAddressForm.set(true);
+  }
+
+  cancelAddress(): void {
+    this.showAddressForm.set(false);
+    this.addressForm.reset({ country: 'Egypt' });
+    this.editingAddressId.set(null);
   }
 
   saveAddress(): void {
@@ -247,16 +240,17 @@ export class ProfileComponent implements OnInit {
       },
     };
 
-    if (this.editingAddressId()) {
-      payload.addressId = this.editingAddressId()!;
-    }
+    const id = this.editingAddressId();
+    if (id) payload.addressId = id;
 
     this.userService.updateProfile(payload).subscribe({
       next: () => {
+        this.refreshAddresses();
         this.isSavingAddress.set(false);
         this.addressSuccess.set(true);
-        this.editingAddressId.set(null);
+        this.showAddressForm.set(false);
         this.addressForm.reset({ country: 'Egypt' });
+        this.editingAddressId.set(null);
         setTimeout(() => this.addressSuccess.set(false), 3000);
       },
       error: (err) => {
@@ -268,16 +262,28 @@ export class ProfileComponent implements OnInit {
 
   deleteAddress(addressId: string): void {
     if (!confirm('Are you sure you want to delete this address?')) return;
-
     this.addressError.set('');
     this.userService.updateProfile({ addressId }).subscribe({
-      next: () => {
-        // Success
-      },
+      next: () => this.refreshAddresses(),
       error: (err) => {
         this.addressError.set(err?.error?.message ?? 'Failed to delete address.');
       },
     });
+  }
+
+  private refreshAddresses(): void {
+    this.userService.getProfile().subscribe((res) => {
+      this.addresses.set(Array.isArray(res.data.address) ? res.data.address : []);
+    });
+  }
+
+  // ── Init ─────────────────────────────────────────────────────────────────
+  ngOnInit(): void {
+    const u = this.user();
+    if (u) {
+      this.infoForm.patchValue({ userName: u.userName ?? '', phone: u.phone ?? '' });
+      this.addresses.set(Array.isArray(u.address) ? u.address : []);
+    }
   }
 
   // ── Password Strength ─────────────────────────────────────────────────────
