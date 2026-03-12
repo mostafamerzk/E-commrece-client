@@ -179,13 +179,21 @@ export class CheckoutComponent implements OnInit {
       .subscribe({
         next: (res) => {
           this.checkoutSummary.set(res);
-          this.couponSuccess.set('Coupon applied successfully!');
           this.isApplyingCoupon.set(false);
+
+          if (res.discount > 0) {
+            this.couponSuccess.set('Coupon applied successfully!');
+            this.couponError.set(null);
+          } else {
+            this.couponSuccess.set(null);
+            this.couponError.set('This code is not valid for the items in your cart');
+          }
         },
         error: (err) => {
-          this.couponError.set(err.error?.message || 'Invalid coupon code');
           this.isApplyingCoupon.set(false);
-          this.couponCode = '';
+          this.couponSuccess.set(null);
+          this.couponError.set(err.error?.message || 'Invalid coupon code');
+          this.couponCode = ''; // Reset code on error
         },
       });
   }

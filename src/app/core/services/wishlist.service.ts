@@ -5,12 +5,12 @@ import { ApiService } from './api.service';
 import { Product } from '../models/product.model';
 import { API_ENDPOINTS } from '../constants/api-endpoints';
 
-interface WishlistResponse {
+export interface WishlistResponse {
   message: string;
   wishlist: Product[] | string[];
 }
 
-interface GetWishlistResponse {
+export interface GetWishlistResponse {
   message: string;
   wishlist: Product[];
 }

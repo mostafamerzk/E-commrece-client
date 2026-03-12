@@ -1,6 +1,6 @@
 import { inject } from '@angular/core';
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
-import { catchError, throwError, EMPTY } from 'rxjs';
+import { catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { AUTH_FACADE, TOAST_FACADE } from '../tokens/app.tokens';
 
@@ -25,11 +25,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         error.status === 401 ||
         (error.status === 500 && /jwt (expired|invalid|malformed)/i.test(serverMessage));
 
-      if (isJwtError) {
+      if (isJwtError && !req.url.includes('/auth/login')) {
         authService?.logout();
         router.navigate(['/auth/login']);
         toastService?.show('Session expired — please login again');
-        return EMPTY; // stop propagation, no need to re-throw
+        return throwError(() => error);
       }
 
       // ── Build user-facing message ────────────────────────────────────────
@@ -53,9 +53,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
       console.error('[API ERROR]:', message);
 
-      // Skip toast for expected scenarios
+      // Skip toast for expected scenarios or login errors
       const silentMessages = ['Cart Not Found'];
-      if (!silentMessages.includes(serverMessage)) {
+      const isLogin401 = error.status === 401 && req.url.includes('/auth/login');
+
+      if (!silentMessages.includes(serverMessage) && !isLogin401) {
         toastService?.show(message);
       }
 

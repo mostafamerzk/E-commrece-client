@@ -58,13 +58,10 @@
           </div>
 
           <!-- Rating -->
-          <div class="rating-row">
-            <p-rating [ngModel]="product()?.avgRating" [readonly]="true" />
-            <span class="rating-text">
-              {{ product()?.avgRating | number: '1.1-1' }}
-              <span class="rating-count">(0 reviews)</span>
-            </span>
-          </div>
+          <span class="rating-text">
+            {{ product()?.avgRating | number: '1.1-1' }}
+            <span class="rating-count">({{ product()?.reviews?.length || 0 }} reviews)</span>
+          </span>
 
           <!-- Price -->
           <div class="price-row">
@@ -172,7 +169,10 @@
 
       <!-- Reviews Section -->
       <div class="reviews-wrapper">
-        <app-reviews-section [productId]="product()?._id || ''" />
+        <app-reviews-section
+          [productId]="product()?._id || ''"
+          [initialReviews]="product()?.reviews || []"
+        />
       </div>
     }
   </div>

@@ -19,6 +19,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { SliderModule } from 'primeng/slider';
 import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { SelectModule } from 'primeng/select';
+import { RadioButtonModule } from 'primeng/radiobutton';
 import { PaginatorModule, PaginatorState } from 'primeng/paginator';
 import { DrawerModule } from 'primeng/drawer';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -40,6 +41,7 @@ import { ButtonModule } from 'primeng/button';
     SliderModule,
     ToggleSwitchModule,
     SelectModule,
+    RadioButtonModule,
     PaginatorModule,
     DrawerModule,
     SkeletonModule,
@@ -53,19 +55,19 @@ import { ButtonModule } from 'primeng/button';
 })
 export class ProductListComponent implements OnInit {
   private productService = inject(ProductService);
-  private categoryService = inject(CategoryService); // Future implementation
+  private categoryService = inject(CategoryService);
   private router = inject(Router);
   private route = inject(ActivatedRoute);
 
   // Data Signals
   products = signal<Product[]>([]);
-  categories = signal<Category[]>([]); // Using any for now until Category model is fully ready
+  categories = signal<Category[]>([]);
   totalProducts = signal(0);
   isLoading = signal(false);
 
   // Filter State Signals
   searchQuery = signal('');
-  selectedCategories = signal<string[]>([]);
+  selectedCategory = signal<string | null>(null);
   priceRange = signal<[number, number]>([0, 10000]);
   inStockOnly = signal(false);
   selectedSort = signal('-createdAt');
@@ -88,7 +90,7 @@ export class ProductListComponent implements OnInit {
 
   activeFilterCount = computed(
     () =>
-      (this.selectedCategories().length > 0 ? 1 : 0) +
+      (this.selectedCategory() !== null ? 1 : 0) +
       (this.inStockOnly() ? 1 : 0) +
       (this.searchQuery() ? 1 : 0) +
       (this.priceRange()[0] > 0 || this.priceRange()[1] < 10000 ? 1 : 0)
@@ -99,8 +101,9 @@ export class ProductListComponent implements OnInit {
     this.route.queryParams.subscribe((params) => {
       if (params['search']) this.searchQuery.set(params['search']);
       if (params['category']) {
-        const cats = Array.isArray(params['category']) ? params['category'] : [params['category']];
-        this.selectedCategories.set(cats);
+        this.selectedCategory.set(params['category']);
+      } else {
+        this.selectedCategory.set(null);
       }
       if (params['minPrice'] || params['maxPrice']) {
         this.priceRange.set([Number(params['minPrice'] || 0), Number(params['maxPrice'] || 10000)]);
@@ -129,7 +132,7 @@ export class ProductListComponent implements OnInit {
 
     const params: ProductQueryParams = {
       search: this.searchQuery() || undefined,
-      categoryId: this.selectedCategories().join(',') || undefined,
+      categoryId: this.selectedCategory() || undefined,
       minPrice: this.priceRange()[0].toString(),
       maxPrice: this.priceRange()[1].toString(),
       sort: this.selectedSort(),
@@ -137,13 +140,16 @@ export class ProductListComponent implements OnInit {
       limit: this.pageSize.toString(),
     };
 
-    // Note: inStock filter might need addition to QueryParams model if backend supports it
-    // For now we follow the ProductQueryParams interface
-
     this.productService.getAll(params).subscribe({
       next: (res) => {
-        this.products.set(res.products);
-        this.totalProducts.set(res.pagination.totalItems);
+        let filteredProducts = res.products;
+        if (this.inStockOnly()) {
+          filteredProducts = filteredProducts.filter((p) => p.stock > 0);
+        }
+        this.products.set(filteredProducts);
+        this.totalProducts.set(
+          this.inStockOnly() ? filteredProducts.length : res.pagination.totalItems
+        );
         this.isLoading.set(false);
       },
       error: (err) => {
@@ -171,7 +177,7 @@ export class ProductListComponent implements OnInit {
   updateUrl(): void {
     const queryParams = {
       search: this.searchQuery() || null,
-      category: this.selectedCategories().length ? this.selectedCategories() : null,
+      category: this.selectedCategory() || null,
       minPrice: this.priceRange()[0] > 0 ? this.priceRange()[0] : null,
       maxPrice: this.priceRange()[1] < 10000 ? this.priceRange()[1] : null,
       inStock: this.inStockOnly() ? 'true' : null,
@@ -188,7 +194,7 @@ export class ProductListComponent implements OnInit {
 
   clearFilters(): void {
     this.searchQuery.set('');
-    this.selectedCategories.set([]);
+    this.selectedCategory.set(null);
     this.priceRange.set([0, 10000]);
     this.inStockOnly.set(false);
     this.selectedSort.set('-createdAt');

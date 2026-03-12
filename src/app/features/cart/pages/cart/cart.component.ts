@@ -33,7 +33,7 @@ export class CartComponent implements OnDestroy {
   readonly totalPrice = this.cartService.totalPrice;
   readonly itemCount = this.cartService.itemCount;
 
-  readonly shipping = computed(() => (this.totalPrice() > 500 || this.totalPrice() === 0 ? 0 : 50));
+  readonly shipping = computed(() => (this.totalPrice() > 0 || this.totalPrice() === 0 ? 50 : 50));
   readonly finalTotal = computed(() => this.totalPrice() + this.shipping());
 
   readonly updatingItems = signal<Set<string>>(new Set());

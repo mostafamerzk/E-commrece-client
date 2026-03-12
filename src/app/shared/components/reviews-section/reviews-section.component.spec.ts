@@ -22,8 +22,8 @@ describe('ReviewsSectionComponent', () => {
     _id: 'u1',
     userName: 'John Doe',
     email: 'john@example.com',
-    role: 'customer',
-    isBlocked: false,
+    role: 'user',
+    isDeleted: false,
   };
   const mockReview: Review = {
     _id: 'r1',

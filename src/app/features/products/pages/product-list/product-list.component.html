@@ -32,12 +32,21 @@
           <div class="filter-card">
             <h2 class="filter-heading">Categories</h2>
             <div class="filter-options">
+              <div class="filter-option">
+                <p-radioButton
+                  [(ngModel)]="selectedCategory"
+                  [value]="null"
+                  (onClick)="onFilterChange()"
+                  inputId="cat-all"
+                />
+                <label for="cat-all" class="filter-label">All Categories</label>
+              </div>
               @for (cat of categories(); track cat._id) {
                 <div class="filter-option">
-                  <p-checkbox
-                    [(ngModel)]="selectedCategories"
+                  <p-radioButton
+                    [(ngModel)]="selectedCategory"
                     [value]="cat._id"
-                    (onChange)="onFilterChange()"
+                    (onClick)="onFilterChange()"
                     [inputId]="'cat-' + cat._id"
                   />
                   <label [for]="'cat-' + cat._id" class="filter-label">
@@ -110,12 +119,21 @@
           <div class="filter-card">
             <h2 class="filter-heading">Categories</h2>
             <div class="filter-options">
+              <div class="filter-option">
+                <p-radioButton
+                  [(ngModel)]="selectedCategory"
+                  [value]="null"
+                  (onClick)="onFilterChange()"
+                  inputId="cat-mobile-all"
+                />
+                <label for="cat-mobile-all" class="filter-label">All Categories</label>
+              </div>
               @for (cat of categories(); track cat._id) {
                 <div class="filter-option">
-                  <p-checkbox
-                    [(ngModel)]="selectedCategories"
+                  <p-radioButton
+                    [(ngModel)]="selectedCategory"
                     [value]="cat._id"
-                    (onChange)="onFilterChange()"
+                    (onClick)="onFilterChange()"
                     [inputId]="'cat-mobile-' + cat._id"
                   />
                   <label [for]="'cat-mobile-' + cat._id" class="filter-label">
