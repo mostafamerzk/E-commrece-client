@@ -6,6 +6,7 @@
 //          and the error interceptor (which reads the user's role on 401).
 // ─────────────────────────────────────────────────────────────────────────────
 import { CloudinaryImage } from './shared.model';
+import { Address } from '../../shared/components/profile/address.interface';
 
 /**
  * The three roles in this application.
@@ -63,6 +64,9 @@ export interface User {
   storeName?: string;
   storeDescription?: string;
   phone?: string;
+
+  // Array of shipping addresses saved by the user.
+  address?: Address[];
 
   // Timestamps
   createdAt?: string;

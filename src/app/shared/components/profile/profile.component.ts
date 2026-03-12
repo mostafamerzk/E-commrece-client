@@ -1,5 +1,5 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
-import { CommonModule, CurrencyPipe, DatePipe, SlicePipe, TitleCasePipe } from '@angular/common';
+import { CommonModule, TitleCasePipe } from '@angular/common';
 import {
   ReactiveFormsModule,
   FormBuilder,
@@ -11,6 +11,7 @@ import {
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
+import { Address } from '../../components/profile/address.interface';
 import { OrderListComponent } from '../../../features/orders/pages/order-list/order-list.component';
 
 // ── Custom Validators ─────────────────────────────────────────────────────────
@@ -37,7 +38,7 @@ const confirmMatchValidator: ValidatorFn = (group: AbstractControl): ValidationE
 
 // ── Interfaces ────────────────────────────────────────────────────────────────
 interface Tab {
-  key: 'info' | 'password' | 'orders' | 'addresses';
+  key: 'info' | 'password' | 'orders';
   label: string;
   icon: string;
 }
@@ -46,16 +47,7 @@ interface Tab {
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    RouterModule,
-    CurrencyPipe,
-    DatePipe,
-    SlicePipe,
-    TitleCasePipe,
-    OrderListComponent,
-  ],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, TitleCasePipe, OrderListComponent],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.scss',
 })
@@ -71,7 +63,6 @@ export class ProfileComponent implements OnInit {
     { key: 'info', label: 'Personal Info', icon: 'pi-user' },
     { key: 'password', label: 'Change Password', icon: 'pi-lock' },
     { key: 'orders', label: 'My Orders', icon: 'pi-shopping-bag' },
-    { key: 'addresses', label: 'Addresses', icon: 'pi-map-marker' },
   ];
 
   readonly activeTab = signal<Tab['key']>('info');
@@ -86,6 +77,7 @@ export class ProfileComponent implements OnInit {
       '',
       [Validators.required, Validators.minLength(5), Validators.maxLength(15), userNameValidator],
     ],
+    phone: [''],
   });
 
   readonly isUploadingAvatar = signal(false);
@@ -107,7 +99,11 @@ export class ProfileComponent implements OnInit {
     this.infoError.set('');
     this.infoSuccess.set(false);
 
-    this.userService.updateProfile({ userName: this.f['userName'].value! }).subscribe({
+    const payload: { userName?: string; phone?: string } = {};
+    if (this.f['userName'].value) payload.userName = this.f['userName'].value;
+    if (this.f['phone'].value) payload.phone = this.f['phone'].value;
+
+    this.userService.updateProfile(payload).subscribe({
       next: () => {
         this.isSavingInfo.set(false);
         this.infoSuccess.set(true);
@@ -181,7 +177,11 @@ export class ProfileComponent implements OnInit {
       });
   }
 
-  // ── Address Form ──────────────────────────────────────────────────────────
+  // ── Address ───────────────────────────────────────────────────────────────
+  addresses = signal<Address[]>([]);
+  showAddressForm = signal(false);
+  editingAddressId = signal<string | null>(null);
+
   addressForm = this.fb.group({
     street: ['', Validators.required],
     city: ['', Validators.required],
@@ -197,6 +197,28 @@ export class ProfileComponent implements OnInit {
     return this.addressForm.controls;
   }
 
+  openAddAddress(): void {
+    this.editingAddressId.set(null);
+    this.addressForm.reset({ country: 'Egypt' });
+    this.showAddressForm.set(true);
+  }
+
+  openEditAddress(addr: Address): void {
+    this.editingAddressId.set(addr._id!);
+    this.addressForm.setValue({
+      street: addr.street,
+      city: addr.city,
+      country: addr.country,
+      postalCode: addr.postalCode,
+    });
+    this.showAddressForm.set(true);
+  }
+
+  cancelAddress(): void {
+    this.showAddressForm.set(false);
+    this.addressForm.reset();
+  }
+
   saveAddress(): void {
     this.addressForm.markAllAsTouched();
     if (this.addressForm.invalid) return;
@@ -205,32 +227,54 @@ export class ProfileComponent implements OnInit {
     this.addressError.set('');
 
     const { street, city, country, postalCode } = this.addressForm.value;
+    const addressPayload: Omit<Address, '_id'> = {
+      street: street!,
+      city: city!,
+      country: country!,
+      postalCode: postalCode!,
+    };
 
-    this.userService
-      .updateAddress({
-        street: street!,
-        city: city!,
-        country: country!,
-        zipCode: postalCode!,
-      })
-      .subscribe({
-        next: () => {
-          this.isSavingAddress.set(false);
-          this.addressSuccess.set(true);
-          setTimeout(() => this.addressSuccess.set(false), 3000);
-        },
-        error: (err) => {
-          this.isSavingAddress.set(false);
-          this.addressError.set(err?.error?.message ?? 'Failed to save address.');
-        },
-      });
+    const id = this.editingAddressId();
+    const req$ = id
+      ? this.userService.updateAddress(id, addressPayload)
+      : this.userService.addAddress(addressPayload);
+
+    req$.subscribe({
+      next: () => {
+        this.refreshAddresses();
+        this.isSavingAddress.set(false);
+        this.addressSuccess.set(true);
+        this.showAddressForm.set(false);
+        this.addressForm.reset();
+        setTimeout(() => this.addressSuccess.set(false), 3000);
+      },
+      error: (err) => {
+        this.isSavingAddress.set(false);
+        this.addressError.set(err?.error?.message ?? 'Failed to save address.');
+      },
+    });
+  }
+
+  deleteAddress(id: string): void {
+    if (!confirm('Delete this address?')) return;
+    this.userService.deleteAddress(id).subscribe({
+      next: () => this.refreshAddresses(),
+      error: (err) => this.addressError.set(err?.error?.message ?? 'Failed to delete address.'),
+    });
+  }
+
+  private refreshAddresses(): void {
+    this.userService.getProfile().subscribe((res) => {
+      this.addresses.set(Array.isArray(res.data.address) ? res.data.address : []);
+    });
   }
 
   // ── Init ─────────────────────────────────────────────────────────────────
   ngOnInit(): void {
     const u = this.user();
     if (u) {
-      this.infoForm.patchValue({ userName: u.userName ?? '' });
+      this.infoForm.patchValue({ userName: u.userName ?? '', phone: u.phone ?? '' });
+      this.addresses.set(Array.isArray(u.address) ? u.address : []);
     }
   }
 

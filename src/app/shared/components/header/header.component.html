@@ -50,7 +50,7 @@
   <div class="drawer-divider"></div>
 
   @if (isLoggedIn()) {
-    <div class="drawer-user">
+    <button class="drawer-user" (click)="goToProfile(); closeMobileMenu()" style="cursor: pointer">
       <div class="drawer-avatar">
         @if (currentUser()?.profilePicture?.secure_url) {
           <img [src]="currentUser()!.profilePicture!.secure_url" [alt]="currentUser()!.userName" />
@@ -62,7 +62,7 @@
         <span class="drawer-user-name">{{ currentUser()?.userName }}</span>
         <span class="drawer-user-role">{{ currentUser()?.role }}</span>
       </div>
-    </div>
+    </button>
     <nav class="drawer-nav">
       <a
         routerLink="/orders"

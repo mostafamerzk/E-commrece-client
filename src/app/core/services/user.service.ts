@@ -4,13 +4,19 @@ import { ApiService } from './api.service';
 import { AuthService } from './auth.service';
 import { StorageService } from './storage.service';
 import { User } from '../models/auth.model';
+import { Address } from '../../../app/shared/components/profile/address.interface';
 import { API_ENDPOINTS } from '../constants/api-endpoints';
+
 interface ProfileResponse {
   result: string;
   data: User;
 }
+
 export interface UpdateProfilePayload {
-  userName: string;
+  userName?: string;
+  phone?: string;
+  addressId?: string;
+  address?: Omit<Address, '_id'>;
 }
 
 export interface ChangePasswordPayload {
@@ -20,14 +26,9 @@ export interface ChangePasswordPayload {
 }
 
 export interface UserApiResponse {
+  success: boolean;
   message: string;
   user?: User;
-}
-export interface UpdateAddressPayload {
-  street: string;
-  city: string;
-  country: string;
-  zipCode: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -35,15 +36,9 @@ export class UserService {
   private api = inject(ApiService);
   private auth = inject(AuthService);
   private storage = inject(StorageService);
-  updateAddress(payload: UpdateAddressPayload): Observable<UserApiResponse> {
-    return this.api
-      .patch<
-        UserApiResponse,
-        UpdateAddressPayload
-      >(`${API_ENDPOINTS.USER}/profile/updateAddress`, payload)
-      .pipe(catchError((err) => throwError(() => err)));
-  }
-  // PATCH /user/profile/update
+
+  // ── Profile & Address (single endpoint) ──────────────────────────────────
+
   updateProfile(payload: UpdateProfilePayload): Observable<UserApiResponse> {
     return this.api
       .patch<UserApiResponse, UpdateProfilePayload>(`${API_ENDPOINTS.USER}/profile/update`, payload)
@@ -51,34 +46,44 @@ export class UserService {
         tap((res) => {
           const current = this.auth.currentUser();
           if (!current) return;
-
-          // Always spread current user first so no fields go missing (role, email, etc.)
-          // then override only with what the backend returned
           const updated: User = res?.user
             ? { ...current, ...res.user }
-            : { ...current, userName: payload.userName };
-
+            : { ...current, ...(payload.userName ? { userName: payload.userName } : {}) };
           this.auth.currentUser.set(updated);
           this.storage.setItem('user', updated);
-        })
+        }),
+        catchError((err) => throwError(() => err))
       );
   }
 
-  // PATCH /user/profile/changePassword
+  // Add address — send address without addressId
+  addAddress(address: Omit<Address, '_id'>): Observable<UserApiResponse> {
+    return this.updateProfile({ address });
+  }
+
+  // Update address — send both address and addressId
+  updateAddress(addressId: string, address: Omit<Address, '_id'>): Observable<UserApiResponse> {
+    return this.updateProfile({ addressId, address });
+  }
+
+  // Delete address — send addressId without address
+  deleteAddress(addressId: string): Observable<UserApiResponse> {
+    return this.updateProfile({ addressId });
+  }
+
+  // ── Password ──────────────────────────────────────────────────────────────
+
   changePassword(payload: ChangePasswordPayload): Observable<UserApiResponse> {
     return this.api
       .patch<
         UserApiResponse,
         ChangePasswordPayload
       >(`${API_ENDPOINTS.USER}/profile/changePassword`, payload)
-      .pipe(
-        catchError((err) => {
-          return throwError(() => err);
-        })
-      );
+      .pipe(catchError((err) => throwError(() => err)));
   }
 
-  // POST /user/profile/image  — multipart/form-data, field: "image"
+  // ── Avatar ────────────────────────────────────────────────────────────────
+
   uploadProfileImage(file: File): Observable<ProfileResponse> {
     const formData = new FormData();
     formData.append('image', file);
@@ -96,6 +101,8 @@ export class UserService {
         })
       );
   }
+
+  // ── Profile ───────────────────────────────────────────────────────────────
 
   getProfile(): Observable<ProfileResponse> {
     return this.api.get<ProfileResponse>(`${API_ENDPOINTS.USER}/profile`);
