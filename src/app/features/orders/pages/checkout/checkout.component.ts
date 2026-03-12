@@ -49,11 +49,10 @@ export class CheckoutComponent implements OnInit {
   readonly apiError = signal<string | null>(null);
 
   readonly user = this.authService.currentUser;
+  readonly paymentMethod = signal<PaymentMethod>('creditCard');
+  readonly cartItems = this.cartService.items;
 
   couponCode = '';
-  readonly paymentMethod = signal<PaymentMethod>('creditCard');
-
-  readonly cartItems = this.cartService.items;
 
   readonly subtotal = computed(
     () => this.checkoutSummary()?.subtotal ?? this.cartService.totalPrice()
@@ -93,31 +92,24 @@ export class CheckoutComponent implements OnInit {
     }
     this.updateCheckoutSummary();
 
-    // Auto-update summary when form changes
     this.shippingForm.valueChanges
       .pipe(debounceTime(1000), distinctUntilChanged())
       .subscribe(() => {
-        if (this.shippingForm.valid) {
-          this.updateCheckoutSummary();
-        }
+        if (this.shippingForm.valid) this.updateCheckoutSummary();
       });
 
-    // Listen for user profile updates and pre-fill if form is empty
     toObservable(this.user).subscribe((u) => {
-      if (u && u.addresses && u.addresses.length > 0) {
-        // Only auto-fill if the user hasn't started typing yet
+      if (u && Array.isArray(u.address) && u.address.length > 0) {
         if (!this.shippingForm.get('street')?.value) {
-          this.onSelectSavedAddress(u.addresses[0]);
+          this.onSelectSavedAddress(u.address[0]);
         }
       } else if (u) {
-        this.shippingForm.patchValue({
-          phone: u.phone || '',
-        });
+        this.shippingForm.patchValue({ phone: u.phone ?? '' });
       }
     });
   }
 
-  onSelectSavedAddress(address: Address) {
+  onSelectSavedAddress(address: Address): void {
     this.shippingForm.patchValue({
       street: address.street,
       city: address.city,
@@ -128,17 +120,15 @@ export class CheckoutComponent implements OnInit {
     this.updateCheckoutSummary();
   }
 
-  onSelectSavedAddressByIndex(index: string) {
-    const addresses = this.user()?.addresses;
+  onSelectSavedAddressByIndex(index: string): void {
+    const addresses = this.user()?.address;
     if (addresses && addresses[+index]) {
       this.onSelectSavedAddress(addresses[+index]);
     }
   }
 
-  updateCheckoutSummary() {
+  updateCheckoutSummary(): void {
     const val = this.shippingForm.value;
-
-    // Only send address if it's partially filled to avoid 400 errors on page load
     const hasAddress = val.street || val.city || val.phone;
 
     const address = hasAddress
@@ -162,7 +152,7 @@ export class CheckoutComponent implements OnInit {
       });
   }
 
-  applyCoupon() {
+  applyCoupon(): void {
     if (!this.couponCode) return;
     this.isApplyingCoupon.set(true);
     this.couponError.set(null);
@@ -208,19 +198,20 @@ export class CheckoutComponent implements OnInit {
       });
   }
 
-  removeCoupon() {
+  removeCoupon(): void {
     this.couponCode = '';
     this.couponSuccess.set(null);
     this.couponError.set(null);
     this.updateCheckoutSummary();
   }
 
-  placeOrder() {
+  placeOrder(): void {
     if (this.shippingForm.invalid) {
       this.shippingForm.markAllAsTouched();
       this.toastService.error('Please fix the errors in the form');
       return;
     }
+
     this.isPlacingOrder.set(true);
     this.apiError.set(null);
 
@@ -237,13 +228,12 @@ export class CheckoutComponent implements OnInit {
 
     this.orderService
       .placeOrder({
-        paymentMethod: paymentMethod,
+        paymentMethod,
         shippingAddress: address,
         couponCode: this.couponCode || undefined,
       })
       .subscribe({
         next: async (res: OrderResponse) => {
-          // If user checked "Save Address", update their profile
           if (val.saveAddress && this.authService.isLoggedIn()) {
             try {
               await this.authService.updateProfile({

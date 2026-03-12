@@ -6,6 +6,7 @@
 //          and the error interceptor (which reads the user's role on 401).
 // ─────────────────────────────────────────────────────────────────────────────
 import { CloudinaryImage } from './shared.model';
+//import { Address } from '../../shared/components/profile/address.interface';
 
 /**
  * The three roles in this application.
@@ -77,7 +78,7 @@ export interface User {
   phone?: string;
 
   // Array of user addresses (plural 'addresses' for frontend consistency, singular 'address' for backend compatibility)
-  addresses?: Address[];
+
   address?: Address[];
 
   // Timestamps
